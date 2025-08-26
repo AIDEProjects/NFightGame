@@ -1,3 +1,5 @@
 hero/hero.aseprite
 hero/hero_sheet.png
 libgdx.png
+monster1/monster1.aseprite
+monster1/monster1_sheet.png
