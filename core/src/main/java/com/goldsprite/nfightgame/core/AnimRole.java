@@ -18,7 +18,6 @@ public class AnimRole extends TexRole{
 	public void act(float delta)
 	{
 		super.act(delta);
-		step(delta);
 	}
 
 	public void step(float delta){
