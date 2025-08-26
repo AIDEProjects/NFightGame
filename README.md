@@ -46,3 +46,9 @@
 ### 0.2.0
 1. 对现有类进行再封装
 2. 封装了GObject作为组件集合体， TextureComponent为材质组件拥有相关属性方法，以及TextureRenderer独立处理图像渲染
+
+### 0.3.0
+1. 规范化代码结构：抽象出IComponent IRenderer接口与其实现类
+2. 将基本属性封装到TransformComponent并默认绑定GObject创建时生成
+3. 独立开transfrom，textureComp，animatorComp, circleColliderComp等组件属性方法结构
+4. 设置单独debugRenderer用于调试线渲染

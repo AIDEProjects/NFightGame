@@ -8,29 +8,14 @@ import com.goldsprite.utils.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextureRenderer {
-	private final List<GObject> gobjects = new ArrayList<GObject>();
+public class TextureRenderer extends Renderer {
 	private final SpriteBatch batch;
-	private Camera camera;
 
 	public TextureRenderer(){
 		batch = new SpriteBatch();
 	}
 
-	public void addGObject(GObject gobject) {
-		if(gobject.hasComponent(TextureComponent.class))
-			gobjects.add(gobject);
-	}
-
-	public void removeGObject(GObject gobject) {
-		gobjects.remove(gobject);
-	}
-
-	public void setCamera(Camera camera) {
-		this.camera = camera;
-	}
-
-	public void draw(float delta){
+	public void render(float delta){
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		for(GObject gobject : gobjects){

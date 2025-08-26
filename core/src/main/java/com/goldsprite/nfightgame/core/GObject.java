@@ -6,10 +6,18 @@ import java.util.List;
 
 public class GObject {
 	private final HashMap<Class<? extends IComponent>, IComponent> components = new HashMap<>();
-	public void addComponent(IComponent component){
+	public final TransformComponent transform;
+
+	public GObject(){
+		addComponent(transform = new TransformComponent());
+	}
+
+	public <T extends IComponent> T addComponent(T component){
 		if(!components.containsKey(component.getClass())){
 			components.put(component.getClass(), component);
+			component.setGObject(this);
 		}
+		return (T)component;
 	}
 
 	public void removeComponent(IComponent component){
@@ -22,5 +30,11 @@ public class GObject {
 
 	public <T extends IComponent> T getComponent(Class<T> type) {
 		return (T)(Object)components.get(type);
+	}
+
+	public void act(float delta){
+		for(IComponent component : components.values()){
+			component.act(delta);
+		}
 	}
 }
