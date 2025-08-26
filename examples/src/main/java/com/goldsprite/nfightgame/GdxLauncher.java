@@ -1,28 +1,29 @@
 package com.goldsprite.nfightgame;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.goldsprite.gdxcore.screens.ScreenManager;
+import com.goldsprite.nfightgame.examples.RoleRendererExamples;
 
 public class GdxLauncher extends ApplicationAdapter {
-	private SpriteBatch batch;
-	private Color backgroundColor = Color.valueOf("#000000FF"), clearColor = Color.valueOf("#333333FF");
-
+	private ScreenManager screenManager;
 
 	@Override
 	public void create() {
-		batch = new SpriteBatch();
+		screenManager = new ScreenManager();
+		screenManager.setViewport(new FitViewport(960, 540, new OrthographicCamera()));
+		screenManager.setCurScreen(RoleRendererExamples.class, true);
 	}
 
 	@Override
 	public void render() {
-		ScreenUtils.clear(clearColor);
+		screenManager.render();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		screenManager.resize(width, height);
 	}
 }
 
