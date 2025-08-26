@@ -1,0 +1,22 @@
+# 指定这是项目的根配置文件，子目录中的 .editorconfig 不会覆盖此文件的设置
+root = true
+
+# 通用配置，适用于所有文件
+[*]
+indent_style = tab               # 使用 Tab 缩进
+end_of_line = lf                 # 换行符为 LF（适用于 Linux/Unix）
+charset = utf-8                  # 文件编码为 UTF-8
+trim_trailing_whitespace = true  # 移除每行末尾多余的空格
+insert_final_newline = true      # 文件末尾添加一个空行
+
+# 针对特定文件类型（Java、Scala、Groovy、Kotlin 文件）的额外配置
+[*.{java,scala,groovy,kt,kts}]
+indent_size = 4                  # 缩进宽度为 4 个空格
+
+# 针对 Gradle 脚本文件（*.gradle）的额外配置
+[*.gradle]
+indent_size = 2                  # 缩进宽度为 2 个空格，符合 Gradle 文件常见风格
+
+# 针对 Markdown 文件（*.md）的额外配置
+[*.md]
+trim_trailing_whitespace = false # 不移除行尾多余的空格，保留 Markdown 中的换行标记

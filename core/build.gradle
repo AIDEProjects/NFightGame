@@ -1,0 +1,150 @@
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+}
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+group = 'com.goldsprite.nfightgame.core'
+version = '0.1.0'
+
+dependencies {
+	api "com.badlogicgames.gdx:gdx:$gdxVersion"
+	api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+
+	if (enableGraalNative == 'true') {
+		implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+	}
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	// 用于抑制java构建版本过时警告
+	options.compilerArgs << "-Xlint:-options"
+}
+
+tasks.register('updateCommitCounts') {
+	doLast {
+		def readmeFile = file('../README.md')  // 你的 README 文件路径
+		def tempFile = file('../README_temp.md')
+		def startMarker = '## 实际贡献者'  // 找到参与者部分的标记
+		def endMarker = '---'  // 找到参与者部分的结束标记
+		// 读取文件内容
+		def content = readmeFile.text
+		// 使用正则表达式删除从 "## 实际贡献者" 到 "---" 之间的所有内容
+		def modifiedContent = content.replaceAll("(?s)$startMarker.*?$endMarker", "$startMarker\n$endMarker")
+		// 将修改后的内容写回文件
+		readmeFile.text = modifiedContent
+
+		// 检查是否是 Git 仓库
+		def isGitRepo = 'git rev-parse --is-inside-work-tree'.execute().text.trim() == 'true'
+
+		if (!isGitRepo) {
+			println "当前目录不是一个 Git 仓库。"
+			return // 退出任务
+		}
+
+		// 检查是否有提交记录
+		def hasCommits = true
+		def checkCommitsProcess = 'git rev-parse HEAD'.execute()
+		checkCommitsProcess.waitFor() // 等待命令执行完成
+
+		if (checkCommitsProcess.exitValue() != 0) {
+			hasCommits = false
+		}
+
+		if (!hasCommits) {
+			println "当前仓库没有任何提交记录，任务取消。"
+			return // 退出任务
+		}
+
+		// 获取每个开发者的提交次数
+		def commits = 'git shortlog -s -n --all'.execute().text
+
+		def writer = tempFile.newWriter()
+
+		// 读取并处理原始 README 文件
+		readmeFile.eachLine { line ->
+			// 如果找到参与者部分，开始更新
+			if (line.startsWith(startMarker)) {
+				writer.writeLine(line)
+				writer.flush()
+
+				// 解析并写入提交次数信息
+				commits.split('\n').each { commitLine ->
+					def parts = commitLine.trim().split(/\t+/, 2)
+					if (parts.size() > 1) {
+						def commitsCount = parts[0]
+						def developerName = parts[1]
+						writer.writeLine("- $developerName (提交次数: $commitsCount)")
+						writer.flush()
+					}
+				}
+			} else {
+				// 如果不是参与者部分，直接写入原文件内容
+				writer.writeLine(line)
+				writer.flush()
+			}
+			return
+		}
+		writer.close()
+		// 用更新后的内容覆盖原始 README 文件
+		readmeFile.text = tempFile.text
+		// 删除临时文件
+		tempFile.delete()
+
+		println "参与者提交次数已更新！"
+	}
+}
+// 在构建过程中执行该任务
+// build.dependsOn updateCommitCounts
+
+tasks.javadoc {
+	// 设置生成的 Javadoc 的输出目录
+	destinationDir = file("$rootProject.projectDir/readme/docs/javadoc")
+
+	// 配置 Javadoc 的额外选项
+	options {
+		// 设置语言版本
+		source = '8'
+		// 配置字符编码
+		encoding = 'UTF-8'
+		// 取消严格注释
+		options.addStringOption('Xdoclint:none', '-quiet')
+		// 添加文档标题
+		docTitle = 'My Project API Documentation'
+		// 显示所有成员，包括私有
+		addBooleanOption('private', true)
+		// 包含作者和版本信息
+		addBooleanOption('author', true)
+		addBooleanOption('version', true)
+	}
+}
+// 在构建过程中执行该任务
+build.dependsOn javadoc
+
+testing {
+	suites {
+		// Configure the built-in test suite
+		test {
+			// Use JUnit4 test framework
+			useJUnit('4.13.2')
+		}
+	}
+}
+tasks.named('build') {
+	dependsOn testing.suites.test // 确保 testing 的测试任务在 build 时执行
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

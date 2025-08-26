@@ -1,0 +1,92 @@
+buildscript {
+	repositories {
+		google()
+		jcenter()
+		mavenLocal()
+		mavenCentral()
+		gradlePluginPortal()
+		maven { url 'https://maven.aliyun.com/repository/public/' }
+		maven { url 'https://maven.aliyun.com/repository/google' }
+		maven { url 'https://maven.aliyun.com/repository/jcenter' }
+		maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+		maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
+		maven { url 'https://s01.oss.sonatype.org' }
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+		maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+		maven { url "https://jitpack.io" }
+		maven { url 'https://repo1.maven.org/maven2/' }
+		maven { url 'https://dl.bintray.com/ppartisan/maven/' }
+		maven { url "https://clojars.org/repo/" }
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:7.4.1'
+	}
+}
+
+allprojects {
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+
+	// This allows you to "Build and run using IntelliJ IDEA", an option in IDEA's Settings.
+	idea {
+		module {
+			outputDir file('build/classes/java/main')
+			testOutputDir file('build/classes/java/test')
+		}
+	}
+}
+
+configure(subprojects - project(':android')) {
+	apply plugin: 'java-library'
+	sourceCompatibility = 8
+
+/*
+  生成资源文件清单（assets.txt）
+  - 扫描 assets 目录中的所有文件
+  - 按相对路径排序后写入 assets.txt
+  - 用于动态加载资源，避免硬编码路径
+*/
+	tasks.register('generateAssetList') {
+		inputs.dir("${project.rootDir}/assets/")
+		File assetsFolder = new File("${project.rootDir}/assets/")
+		File assetsFile = new File(assetsFolder, "assets.txt")
+
+		assetsFile.delete() // 删除旧的清单文件
+		fileTree(assetsFolder).collect { assetsFolder.relativePath(it) }.sort().each {
+			assetsFile.append(it + "\n") // 写入文件路径
+		}
+	}
+// 将生成任务绑定到资源处理任务
+	processResources.dependsOn 'generateAssetList'
+
+	compileJava {
+		options.incremental = true
+	}
+}
+
+subprojects {
+	version = '$projectVersion'
+	ext.appName = 'GSGDXFramework'
+	repositories {
+		google()
+		jcenter()
+		mavenLocal()
+		mavenCentral()
+		gradlePluginPortal()
+		maven { url 'https://maven.aliyun.com/repository/public/' }
+		maven { url 'https://maven.aliyun.com/repository/google' }
+		maven { url 'https://maven.aliyun.com/repository/jcenter' }
+		maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+		maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
+		maven { url 'https://s01.oss.sonatype.org' }
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+		maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+		maven { url "https://jitpack.io" }
+		maven { url 'https://repo1.maven.org/maven2/' }
+		maven { url 'https://dl.bintray.com/ppartisan/maven/' }
+		maven { url "https://clojars.org/repo/" }
+	}
+}
+
+eclipse.project.name = 'GSGDXFramework' + '-parent'
+

@@ -1,0 +1,10 @@
+plugins {
+	id 'java'
+}
+
+group = 'com.goldsprite.nfightgame'
+version = '0.1.0'
+
+dependencies {
+	api project(':core')
+}

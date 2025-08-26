@@ -1,0 +1,11 @@
+hero/Attack/Attack1.png
+hero/Attack/Attack2.png
+hero/Idle/Idle1.png
+hero/Idle/Idle2.png
+hero/Idle/Idle3.png
+hero/Run/Run1.png
+hero/Run/Run2.png
+hero/Run/Run3.png
+hero/Run/Run4.png
+hero/hero.aseprite
+libgdx.png
