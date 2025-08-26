@@ -11,6 +11,7 @@ import com.goldsprite.gdxcore.screens.GScreen;
 import com.goldsprite.nfightgame.core.TexRole;
 import com.goldsprite.utils.math.Vector2Int;
 import com.goldsprite.nfightgame.core.*;
+import com.badlogic.gdx.*;
 
 public class RoleRendererExamples extends GScreen {
 	private Color clearColor = Color.valueOf("#333333FF");
@@ -21,6 +22,14 @@ public class RoleRendererExamples extends GScreen {
 
 	@Override
 	public void create() {
+		
+		getImp().addProcessor(new InputAdapter(){
+			public boolean touchDown(int x, int y, int p, int b){
+				role2.face.x = role2.face.x>0?-1:1;
+				return false;
+			}
+		});
+		
 		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 
@@ -70,6 +79,12 @@ public class RoleRendererExamples extends GScreen {
 		shapeRenderer.setColor(Color.GREEN);
 		//绿色脚底标识
 		shapeRenderer.circle(role.pos.x, role.pos.y, 5 * role.roleScl);
+		shapeRenderer.end();
+
+		//绘制攻击区域
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+		shapeRenderer.setColor(Color.YELLOW);
+		shapeRenderer.circle(role2.getAtkPos().x, role2.getAtkPos().y, role2.atkRange*role2.roleScl);
 		shapeRenderer.end();
 	}
 
