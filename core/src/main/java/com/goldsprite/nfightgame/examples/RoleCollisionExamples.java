@@ -12,7 +12,7 @@ import com.goldsprite.nfightgame.core.ecs.renderer.*;
 import com.goldsprite.utils.math.*;
 
 public class RoleCollisionExamples extends GScreen {
-	private DebugRenderer debugRenderer;
+	private Gizmos debugRenderer;
 	private GObject role, obj;
 	private float speed = 800, r = 50;
 	private Vector2 vel = new Vector2(), recSize = new Vector2(200, 200);
@@ -32,7 +32,7 @@ public class RoleCollisionExamples extends GScreen {
 			}
 		});
 
-		debugRenderer = new DebugRenderer();
+		debugRenderer = Gizmos.getInstance();
 		debugRenderer.setCamera(getCamera());
 
 		
@@ -42,15 +42,11 @@ public class RoleCollisionExamples extends GScreen {
 		CircleColliderComponent collider = role.addComponent(new CircleColliderComponent());
 		collider.setRadius(r);
 		
-		debugRenderer.addGObject(role);
-		
 		
 		obj = new GObject();
 		obj.transform.setPosition(500, 300);
 		RectColliderComponent collider2 = obj.addComponent(new RectColliderComponent());
 		collider2.setSize(recSize.x, recSize.y);
-		
-		debugRenderer.addGObject(obj);
 	}
 
 	
@@ -59,6 +55,8 @@ public class RoleCollisionExamples extends GScreen {
 		ScreenUtils.clear(0.7f, 0.7f, 0.7f, 1f);
 		
 		role.transform.getPosition().add(vel.x*delta, vel.y*delta);
+		obj.act(delta);
+		role.act(delta);
 		//调试线绘制器
 		debugRenderer.render(delta);
 	}

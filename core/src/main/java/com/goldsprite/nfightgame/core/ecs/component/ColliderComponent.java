@@ -1,0 +1,32 @@
+/**
+ * @Author 
+ * @AIDE AIDE+
+*/
+package com.goldsprite.nfightgame.core.ecs.component;
+
+import com.goldsprite.utils.math.*;
+
+public class ColliderComponent extends Component {
+	protected boolean showGizmos = true;
+	protected Vector2 centerPosition = new Vector2();
+	protected Vector2 offsetPosition = new Vector2();
+
+	public Vector2 getCenter() {
+		return centerPosition.set(offsetPosition).scl(transform.getFace()).scl(transform.getScale()).add(transform.getPosition());
+	}
+
+	public void setOffsetPosition(float offsetX, float offsetY) {
+		offsetPosition.set(offsetX, offsetY);
+	}
+
+	@Override
+	public void act(float delta) {
+		if (showGizmos)
+			drawGizmos();
+	}
+
+	protected void drawGizmos() {
+	}
+
+}
+

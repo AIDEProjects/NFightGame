@@ -1,19 +1,15 @@
 package com.goldsprite.nfightgame.core.ecs.component;
 
-import com.goldsprite.utils.math.Vector2;
+import com.goldsprite.nfightgame.core.ecs.renderer.*;
+import com.badlogic.gdx.graphics.*;
 
-public class CircleColliderComponent extends Component{
-	private Vector2 centerPosition = new Vector2();
-	private Vector2 offsetPosition = new Vector2();
+public class CircleColliderComponent extends ColliderComponent{
 	private float radius;
-
 	@Override
-	public void act(float delta) {
-
-	}
-
-	public Vector2 getCenter() {
-		return centerPosition.set(offsetPosition).scl(transform.getFace()).scl(transform.getScale()).add(transform.getPosition());
+	public void drawGizmos() {
+		Gizmos.setColor(Color.YELLOW);
+		Gizmos.setHollow(false);
+		Gizmos.circle(getCenter().x, getCenter().y, getRadius());
 	}
 
 	public float getRadius() {
@@ -22,9 +18,5 @@ public class CircleColliderComponent extends Component{
 
 	public void setRadius(float r) {
 		radius = r;
-	}
-
-	public void setOffsetPosition(float offsetX, float offsetY) {
-		offsetPosition.set(offsetX, offsetY);
 	}
 }

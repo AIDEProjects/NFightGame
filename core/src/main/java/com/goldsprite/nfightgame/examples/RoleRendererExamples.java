@@ -12,14 +12,14 @@ import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
 import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
-import com.goldsprite.nfightgame.core.ecs.renderer.DebugRenderer;
+import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
 import com.goldsprite.nfightgame.core.ecs.renderer.TextureRenderer;
 import com.goldsprite.utils.math.Vector2Int;
 
 public class RoleRendererExamples extends GScreen {
 	private ShapeRenderer shapeRenderer;
 	private TextureRenderer textureRenderer;
-	private DebugRenderer debugRenderer;
+	private Gizmos debugRenderer;
 	private Texture roleTex;
 	private GObject role;
 	private GObject role2;
@@ -42,7 +42,7 @@ public class RoleRendererExamples extends GScreen {
 		textureRenderer = new TextureRenderer();
 		textureRenderer.setCamera(getCamera());
 
-		debugRenderer = new DebugRenderer();
+		debugRenderer = Gizmos.getInstance();
 		debugRenderer.setCamera(getCamera());
 
 		roleTex = new Texture(Gdx.files.internal("hero/hero_sheet.png"));
@@ -84,7 +84,6 @@ public class RoleRendererExamples extends GScreen {
 		CircleColliderComponent collComp = role2.addComponent(new CircleColliderComponent());
 		collComp.setOffsetPosition(53, 60);
 		collComp.setRadius(24);
-		debugRenderer.addGObject(role2);
 
 		textureRenderer.addGObject(role2);
 	}
