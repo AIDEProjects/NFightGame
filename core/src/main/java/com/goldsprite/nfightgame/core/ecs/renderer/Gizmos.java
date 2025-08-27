@@ -138,6 +138,7 @@ public class Gizmos {
 		// 按形状类型分组绘制以减少状态切换
 		renderByShapeType(ShapeRenderer.ShapeType.Filled);
 		renderByShapeType(ShapeRenderer.ShapeType.Line);
+		clear();
 	}
 
 	// 按形状类型分组绘制
@@ -154,13 +155,6 @@ public class Gizmos {
 			}
 
 			shape.render(shapeRenderer);
-
-			// 释放对象回池
-			if (shape instanceof CircleData) {
-				circlePool.free((CircleData) shape);
-			} else if (shape instanceof RectData) {
-				rectPool.free((RectData) shape);
-			}
 		}
 
 		if (began) {
