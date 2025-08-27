@@ -22,19 +22,21 @@ public class RoleCollisionExamples extends GScreen {
 	@Override
 	public void create() {
 		createInputEvent();
-		
+
 		physics = new PhysicsSystem();
-		
+
 		gizmos = Gizmos.getInstance();
 		gizmos.setCamera(getCamera());
 
-		
+
 		role = new GObject();
 		role.transform.setPosition(200, 300);
-		
+
+		RigidbodyComponent rigi = role.addComponent(new RigidbodyComponent());
+
 		CircleColliderComponent collider = role.addComponent(new CircleColliderComponent());
 		collider.setRadius(r);
-		
+
 		physics.addGObject(collider);
 
 
@@ -44,46 +46,47 @@ public class RoleCollisionExamples extends GScreen {
 		collider2.setSize(recSize.x, recSize.y);
 
 		physics.addGObject(collider2);
-		
-		
+
+
 		obj2 = new GObject();
 		obj2.transform.setPosition(700, 300);
 		CircleColliderComponent collider3 = obj2.addComponent(new CircleColliderComponent());
 		collider3.setRadius(r2);
-		
+
 		physics.addGObject(collider3);
 	}
-	
+
 	public void createInputEvent(){
 		getImp().addProcessor(new InputAdapter(){
 				public boolean touchDragged(int x, int y, int p){
 					float vx = 1f*x/Gdx.graphics.getWidth()-0.5f;
 					float vy = (1-1f*y/Gdx.graphics.getHeight())-0.5f;
-					vel.set(vx, vy).scl(speed);
+					role.getComponent(RigidbodyComponent.class).getVelocity().set(vx, vy).scl(speed);
 					return false;
 				}
 				public boolean touchUp(int x, int y, int p, int b){
-					vel.scl(0);
+					role.getComponent(RigidbodyComponent.class).getVelocity().scl(0);
 					return false;
 				}
 			});
 	}
-	
+
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(0.7f, 0.7f, 0.7f, 1f);
-		
+
 		//应用速度
-		role.transform.getPosition().add(vel.x*delta, vel.y*delta);
+		Vector2 velocity = role.getComponent(RigidbodyComponent.class).getVelocity();
+		role.transform.getPosition().add(velocity.x*delta, velocity.y*delta);
 
 		//计算物理
 		physics.update(delta);
-		
+
 		//应用组件更新
 		obj.act(delta);
 		obj2.act(delta);
 		role.act(delta);
-		
+
 		//调试线绘制器
 		gizmos.render(delta);
 	}
