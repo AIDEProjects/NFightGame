@@ -1,8 +1,9 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs;
 
-import java.util.ArrayList;
+import com.goldsprite.nfightgame.core.ecs.component.IComponent;
+import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
+
 import java.util.HashMap;
-import java.util.List;
 
 public class GObject {
 	private final HashMap<Class<? extends IComponent>, IComponent> components = new HashMap<>();

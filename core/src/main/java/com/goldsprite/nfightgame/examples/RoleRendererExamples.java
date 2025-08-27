@@ -7,8 +7,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.goldsprite.gdxcore.screens.GScreen;
-import com.goldsprite.nfightgame.core.*;
 import com.badlogic.gdx.*;
+import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
+import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
+import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
+import com.goldsprite.nfightgame.core.ecs.renderer.DebugRenderer;
+import com.goldsprite.nfightgame.core.ecs.renderer.TextureRenderer;
 import com.goldsprite.utils.math.Vector2Int;
 
 public class RoleRendererExamples extends GScreen {

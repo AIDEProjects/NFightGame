@@ -1,4 +1,4 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.component;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

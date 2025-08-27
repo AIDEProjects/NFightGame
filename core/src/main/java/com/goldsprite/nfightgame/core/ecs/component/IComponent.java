@@ -1,4 +1,6 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.component;
+
+import com.goldsprite.nfightgame.core.ecs.GObject;
 
 public interface IComponent {
 	void act(float delta);

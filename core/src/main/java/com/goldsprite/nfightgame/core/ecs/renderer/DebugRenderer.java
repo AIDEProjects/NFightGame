@@ -1,9 +1,9 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.renderer;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.goldsprite.utils.math.Vector2;
+import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
 
 public class DebugRenderer extends Renderer{
 	private ShapeRenderer shapeRenderer;

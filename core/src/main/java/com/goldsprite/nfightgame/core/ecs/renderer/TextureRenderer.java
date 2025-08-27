@@ -1,12 +1,10 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.renderer;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
 import com.goldsprite.utils.math.Vector2;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TextureRenderer extends Renderer {
 	private final SpriteBatch batch;

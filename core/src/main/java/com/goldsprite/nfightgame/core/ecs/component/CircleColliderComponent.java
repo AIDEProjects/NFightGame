@@ -1,4 +1,4 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.component;
 
 import com.goldsprite.utils.math.Vector2;
 

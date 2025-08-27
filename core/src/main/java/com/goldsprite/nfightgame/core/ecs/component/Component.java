@@ -1,4 +1,6 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.component;
+
+import com.goldsprite.nfightgame.core.ecs.GObject;
 
 public class Component implements IComponent{
 	protected GObject gObject;

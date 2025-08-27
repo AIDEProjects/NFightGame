@@ -1,7 +1,6 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.component;
 
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.utils.math.Vector2Int;

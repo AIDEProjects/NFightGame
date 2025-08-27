@@ -1,6 +1,8 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ecs.renderer;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
 
 import java.util.ArrayList;
 import java.util.List;
