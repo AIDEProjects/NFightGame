@@ -1,6 +1,5 @@
 package com.goldsprite.nfightgame.core.ecs.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.ColliderComponent;
@@ -31,32 +30,35 @@ public class PhysicsSystem {
 			RigidbodyComponent rigi1 = c1.getComponent(RigidbodyComponent.class);
 			if (rigi1 == null) continue;
 
-			Vector2 pos1 = c1.getTransform().getPosition();
-			Vector2 velocity = rigi1.getVelocity();
-
 			boolean isColl = false;
 
-			// 计算重力
-			velocity.y -= GRAVITY * 0.2f;
+			if(c1.isTrigger()){
+				isColl = checkCollision(c1);
+			}else{
+				Vector2 pos1 = c1.getTransform().getPosition();
+				Vector2 velocity = rigi1.getVelocity();
 
-			// ---------- 先移动X ----------
-			float oldX = pos1.x;
-			pos1.x += velocity.x * delta;
+				// 计算重力
+				velocity.y -= GRAVITY * 0.2f;
 
-			if (checkCollision(c1)) { // 如果X方向有碰撞
-				isColl = true;
-				pos1.x = oldX;        // 回退X
-				velocity.x = 0;       // 停止X方向速度
+				// ---------- 先移动X ----------
+				float oldX = pos1.x;
+				pos1.x += velocity.x * delta;
+
+				if (checkCollision(c1)) { // 如果X方向有碰撞
+					isColl = true;
+					pos1.x = oldX;        // 回退X
+					velocity.x = 0;       // 停止X方向速度
+				}
+				float oldY = pos1.y;
+				pos1.y += velocity.y * delta;
+
+				if (checkCollision(c1)) { // 如果Y方向有碰撞
+					isColl = true;
+					pos1.y = oldY;        // 回退Y
+					velocity.y = 0;       // 停止Y方向速度
+				}
 			}
-			float oldY = pos1.y;
-			pos1.y += velocity.y * delta;
-
-			if (checkCollision(c1)) { // 如果Y方向有碰撞
-				isColl = true;
-				pos1.y = oldY;        // 回退Y
-				velocity.y = 0;       // 停止Y方向速度
-			}
-
 			c1.setIsCollision(isColl);
 		}
 	}
@@ -64,6 +66,8 @@ public class PhysicsSystem {
 	private boolean checkCollision(ColliderComponent c1) {
 		for (ColliderComponent c2 : colliders) {
 			if (c2 == c1) continue;
+			if (c2.getGObject() == c1.getGObject()) continue;
+
 			if (circleToCircleCollision(c1, c2)) return true;
 			if (circleToRectCollision(c1, c2)) return true;
 			if (rectToCircleCollision(c1, c2)) return true;

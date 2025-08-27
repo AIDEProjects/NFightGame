@@ -1,4 +1,4 @@
-# NFightGame 0.5.10
+# NFightGame 0.7.0
 
 ## [Java Doc](readme/docs/javadoc/index.html) 仅本地
 
@@ -80,3 +80,8 @@
 
 #### 0.6.1
 - [x] 解决人物粘在物体上的问题: 使用分轴检测解决
+
+#### 0.7.0 人物现在有碰撞体以及攻击区域检测器
+- [x] GObject组件表改良为<type, List<Comp>>形式, 可添加多个同类组件, 并增加getComponent(type, index)索引获取
+- [x] collider组件设置isTrigger标记是否触发器, 触发器不参与物理碰撞
+- [x] 给hero添加第二个circle碰撞器设置为trigger触发器

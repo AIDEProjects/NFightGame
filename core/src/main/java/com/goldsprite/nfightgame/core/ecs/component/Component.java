@@ -19,7 +19,8 @@ public class Component implements IComponent{
 	}
 
 	@Override
-	public void getGObject() {
+	public GObject getGObject() {
+		return gObject;
 	}
 
 	@Override

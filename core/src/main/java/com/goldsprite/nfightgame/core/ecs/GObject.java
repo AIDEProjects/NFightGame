@@ -3,10 +3,12 @@ package com.goldsprite.nfightgame.core.ecs;
 import com.goldsprite.nfightgame.core.ecs.component.IComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class GObject {
-	private final HashMap<Class<? extends IComponent>, IComponent> components = new HashMap<>();
+	private final HashMap<Class<? extends IComponent>, List<IComponent>> components = new HashMap<>();
 	public final TransformComponent transform;
 
 	public GObject(){
@@ -14,10 +16,12 @@ public class GObject {
 	}
 
 	public <T extends IComponent> T addComponent(T component){
-		if(!components.containsKey(component.getClass())){
-			components.put(component.getClass(), component);
-			component.setGObject(this);
-		}
+		List<IComponent> list = components.get(component.getClass());
+		if(list == null) list = new ArrayList<>();
+
+		list.add(component);
+		components.put(component.getClass(), list);
+		component.setGObject(this);
 		return (T)component;
 	}
 
@@ -30,12 +34,19 @@ public class GObject {
 	}
 
 	public <T extends IComponent> T getComponent(Class<T> type) {
-		return (T)(Object)components.get(type);
+		return getComponent(type, 0);
+	}
+	public <T extends IComponent> T getComponent(Class<T> type, int index) {
+		List<IComponent> list = components.get(type);
+		if(list == null) return null;
+		return (T)(Object)list.get(index);
 	}
 
 	public void update(float delta){
-		for(IComponent component : components.values()){
-			component.update(delta);
+		for(List<IComponent> list : components.values()){
+			for(IComponent component : list){
+				component.update(delta);
+			}
 		}
 	}
 }

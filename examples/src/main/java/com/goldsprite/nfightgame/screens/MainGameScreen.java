@@ -78,8 +78,13 @@ public class MainGameScreen extends GScreen {
 		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
 		heroFootCollider.setOffsetPosition(0, 15);
 		heroFootCollider.setRadius(15);
-
 		physicsSystem.addGObject(heroFootCollider);
+
+		CircleColliderComponent heroAtkCollider = hero.addComponent(new CircleColliderComponent());
+		heroAtkCollider.setTrigger(true);
+		heroAtkCollider.setOffsetPosition(53, 60);
+		heroAtkCollider.setRadius(24);
+		physicsSystem.addGObject(heroAtkCollider);
 
 		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
 		roleController.setRocker(rocker);
@@ -91,17 +96,17 @@ public class MainGameScreen extends GScreen {
 
 		wall = new GObject();
 		wall.transform.setPosition(500, 300);
+
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
 		wallCollider.setSize(100, 200);
-
 		physicsSystem.addGObject(wallCollider);
 
 
 		ground = new GObject();
 		ground.transform.setPosition(400, 150);
+
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
 		groundCollider.setSize(600, 40);
-
 		physicsSystem.addGObject(groundCollider);
 	}
 
