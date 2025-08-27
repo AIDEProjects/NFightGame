@@ -47,6 +47,10 @@
 3. 独立开transfrom，textureComp，animatorComp, circleColliderComp等组件属性方法结构
 4. 设置单独debugRenderer用于调试线渲染
 
-#### 0.3.1
-1. 增加ui_skin等资源以及配套工具类
-2. 纠正size属性: 从trans转到tex组件, 应该属于图片的专有属性
+#### 0.3.1 增加ui_skin等资源以及配套工具类
+
+#### 0.3.2 纠正size属性: 从trans转到tex组件, 应该属于图片的专有属性
+
+### 0.4.0
+1. 增加新的演示RoleCollision演示用于展示几何碰撞
+2. 实现圆与圆,圆与矩形, 矩形与矩形碰撞逻辑, 以及阻挡
