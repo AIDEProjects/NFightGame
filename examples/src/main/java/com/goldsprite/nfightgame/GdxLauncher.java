@@ -14,21 +14,22 @@ public class GdxLauncher extends ApplicationAdapter {
 	private Stage uiStage;
 	private InputMultiplexer imp;
 	private Skin uiSkin;
-	
+
 	@Override
 	public void create() {
 		new GlobalAssets();
 		screenManager = new ScreenManager();
 		screenManager.setViewport(new FitViewport(960, 540, new OrthographicCamera()));
-//		screenManager.setCurScreen(RoleRendererExamples.class, true);
-		screenManager.setCurScreen(RoleCollisionExamples.class, true);
-		
+		screenManager.setCurScreen(RoleRendererExamples.class, true);
+//		screenManager.setCurScreen(RoleCollisionExamples.class, true);
+//		screenManager.setCurScreen(LifeCycleExamples.class, true);
+
 		/*imp = new InputMultiplexer();
 		uiSkin = GlobalAssets.getInstance().editorSkin;
 		uiStage = new Stage();
 		imp.addProcessor(uiStage);
 		screenManager.enableInput(imp);
-		
+
 		TextButton textBtn = new TextButton("kk", uiSkin);
 		uiStage.addActor(textBtn);*/
 	}
@@ -36,7 +37,7 @@ public class GdxLauncher extends ApplicationAdapter {
 	@Override
 	public void render() {
 		screenManager.render();
-		
+
 		/*uiStage.act();
 		uiStage.draw();*/
 	}
