@@ -13,9 +13,9 @@ import com.goldsprite.utils.math.*;
 
 public class RoleCollisionExamples extends GScreen {
 	private DebugRenderer debugRenderer;
-	private GObject role;
+	private GObject role, obj;
 	private float speed = 800, r = 50;
-	private Vector2 vel = new Vector2();
+	private Vector2 vel = new Vector2(), recSize = new Vector2(200, 200);
 
 	@Override
 	public void create() {
@@ -35,12 +35,22 @@ public class RoleCollisionExamples extends GScreen {
 		debugRenderer = new DebugRenderer();
 		debugRenderer.setCamera(getCamera());
 
-		role = new GObject();
-		role.transform.setPosition(200, 200);
 		
-		CircleColliderComponent collComp = role.addComponent(new CircleColliderComponent());
-		collComp.setRadius(r);
+		role = new GObject();
+		role.transform.setPosition(200, 300);
+		
+		CircleColliderComponent collider = role.addComponent(new CircleColliderComponent());
+		collider.setRadius(r);
+		
 		debugRenderer.addGObject(role);
+		
+		
+		obj = new GObject();
+		obj.transform.setPosition(500, 300);
+		RectColliderComponent collider2 = obj.addComponent(new RectColliderComponent());
+		collider2.setSize(recSize.x, recSize.y);
+		
+		debugRenderer.addGObject(obj);
 	}
 
 	
