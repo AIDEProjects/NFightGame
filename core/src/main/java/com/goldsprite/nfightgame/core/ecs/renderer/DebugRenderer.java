@@ -15,6 +15,7 @@ public class DebugRenderer extends Renderer{
 	@Override
 	public void render(float delta) {
 		shapeRenderer.setProjectionMatrix(camera.combined);
+		
 		for(GObject gobject : gobjects){
 			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 			shapeRenderer.setColor(Color.YELLOW);

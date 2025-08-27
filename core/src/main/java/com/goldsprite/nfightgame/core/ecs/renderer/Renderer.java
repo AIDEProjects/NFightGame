@@ -19,8 +19,7 @@ public class Renderer implements IRenderer{
 
 	@Override
 	public void addGObject(GObject gobject) {
-		if(gobject.hasComponent(TextureComponent.class))
-			gobjects.add(gobject);
+		gobjects.add(gobject);
 	}
 
 	@Override
