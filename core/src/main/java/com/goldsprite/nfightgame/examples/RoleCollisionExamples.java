@@ -9,16 +9,25 @@ import com.goldsprite.gdxcore.screens.*;
 import com.goldsprite.nfightgame.core.ecs.*;
 import com.goldsprite.nfightgame.core.ecs.component.*;
 import com.goldsprite.nfightgame.core.ecs.renderer.*;
+import com.goldsprite.utils.math.*;
 
 public class RoleCollisionExamples extends GScreen {
 	private DebugRenderer debugRenderer;
 	private GObject role;
+	private float speed = 800, r = 50;
+	private Vector2 vel = new Vector2();
 
 	@Override
 	public void create() {
 		getImp().addProcessor(new InputAdapter(){
-			public boolean touchDown(int x, int y, int p, int b){
-				float viewWidth = Gdx.graphics.getWidth();
+			public boolean touchDragged(int x, int y, int p){
+				float vx = 1f*x/Gdx.graphics.getWidth()-0.5f;
+				float vy = (1-1f*y/Gdx.graphics.getHeight())-0.5f;
+				vel.set(vx, vy).scl(speed);
+				return false;
+			}
+			public boolean touchUp(int x, int y, int p, int b){
+				vel.scl(0);
 				return false;
 			}
 		});
@@ -30,7 +39,7 @@ public class RoleCollisionExamples extends GScreen {
 		role.transform.setPosition(200, 200);
 		
 		CircleColliderComponent collComp = role.addComponent(new CircleColliderComponent());
-		collComp.setRadius(20);
+		collComp.setRadius(r);
 		debugRenderer.addGObject(role);
 	}
 
@@ -38,7 +47,8 @@ public class RoleCollisionExamples extends GScreen {
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(0.7f, 0.7f, 0.7f, 1f);
-
+		
+		role.transform.getPosition().add(vel.x*delta, vel.y*delta);
 		//调试线绘制器
 		debugRenderer.render(delta);
 	}
