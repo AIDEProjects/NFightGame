@@ -5,7 +5,6 @@ import com.goldsprite.utils.math.Vector2Int;
 
 public class TransformComponent extends Component {
 	private Vector2 position = new Vector2();//原点位置
-	private Vector2 size = new Vector2(1, 1);//大小
 	private Vector2 scale = new Vector2(1, 1);//缩放
 	private Vector2Int face = new Vector2Int(1, 1);//朝向
 	public Vector2 getScale() {
@@ -30,13 +29,5 @@ public class TransformComponent extends Component {
 
 	public void setFace(int faceX, int faceY) {
 		face.set(faceX, faceY);
-	}
-
-	public Vector2 getSize() {
-		return size;
-	}
-
-	public void setSize(float sizeX, float sizeY) {
-		this.size.set(sizeX, sizeY);
 	}
 }

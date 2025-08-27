@@ -9,6 +9,7 @@ import com.goldsprite.utils.math.Vector2Int;
 public class TextureComponent extends Component {
 	private static final TextureRegion emptyRegion = new TextureRegion();
 	private TextureRegion region = emptyRegion;//材质
+	private Vector2 size = new Vector2(1, 1);//大小
 	private Vector2Int originOffset = new Vector2Int();//原点距左下偏移
 
 	public TextureRegion getRegion() {
@@ -17,7 +18,7 @@ public class TextureComponent extends Component {
 
 	public void setRegion(TextureRegion region) {
 		this.region = region;
-		transform.getSize().set(region.getRegionWidth(), region.getRegionHeight());
+		getTextureSize().set(region.getRegionWidth(), region.getRegionHeight());
 	}
 
 
@@ -56,8 +57,8 @@ public class TextureComponent extends Component {
 	public Vector2 getLeftDownPos() {
 		//计算翻转实际偏移
 		flipOriginOffset.set(originOffset.x, originOffset.y);
-		if(region.isFlipX()) flipOriginOffset.x = transform.getSize().x-originOffset.x;
-		if(region.isFlipY()) flipOriginOffset.y = transform.getSize().y-originOffset.y;
+		if(region.isFlipX()) flipOriginOffset.x = getTextureSize().x-originOffset.x;
+		if(region.isFlipY()) flipOriginOffset.y = getTextureSize().y-originOffset.y;
 		flipOriginOffset.scl(transform.getScale());
 		//返回左下位置
 		return leftDownPos.set(transform.getPosition().x - getFlipOriginOffset().x, transform.getPosition().y - getFlipOriginOffset().y);
@@ -65,7 +66,15 @@ public class TextureComponent extends Component {
 
 	private Vector2 renderSize = new Vector2();
 	public Vector2 getRenderSize() {
-		return renderSize.set(transform.getSize()).scl(transform.getScale());
+		return renderSize.set(getTextureSize()).scl(transform.getScale());
+	}
+
+	public Vector2 getTextureSize() {
+		return size;
+	}
+
+	public void setSize(float sizeX, float sizeY) {
+		this.size.set(sizeX, sizeY);
 	}
 
 	@Override
