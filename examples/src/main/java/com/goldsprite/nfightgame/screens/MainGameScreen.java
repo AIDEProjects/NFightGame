@@ -12,9 +12,7 @@ import com.goldsprite.infinityworld.assets.GlobalAssets;
 import com.goldsprite.nfightgame.core.Rocker;
 import com.goldsprite.nfightgame.core.RoleControllerComponent;
 import com.goldsprite.nfightgame.core.ecs.GObject;
-import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
-import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
-import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
+import com.goldsprite.nfightgame.core.ecs.component.*;
 import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
 import com.goldsprite.nfightgame.core.ecs.renderer.TextureRenderer;
 import com.goldsprite.nfightgame.core.ecs.system.PhysicsSystem;
@@ -25,7 +23,7 @@ public class MainGameScreen extends GScreen {
 	private Gizmos gizmosRenderer;
 	private PhysicsSystem physicsSystem;
 
-	private GObject hero;
+	private GObject hero, wall, ground;
 
 	private Skin uiSkin;
 	private Stage uiStage;
@@ -37,7 +35,7 @@ public class MainGameScreen extends GScreen {
 
 		createSystem();
 
-		createRole();
+		createGObjects();
 	}
 
 	private void createSystem() {
@@ -50,17 +48,20 @@ public class MainGameScreen extends GScreen {
 		physicsSystem = new PhysicsSystem();
 	}
 
-	private void createRole() {
+	private void createGObjects() {
 		hero = new GObject();
 
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
 		hero.transform.setScale(1.5f);
 
-		TextureComponent texComp = hero.addComponent(new TextureComponent());
-		texComp.setOriginOffset(119, 36);
+		RigidbodyComponent rigi = hero.addComponent(new RigidbodyComponent());
+		rigi.setGravity(true);
 
-		AnimatorComponent animComp = hero.addComponent(new AnimatorComponent(texComp));
+		TextureComponent texture = hero.addComponent(new TextureComponent());
+		texture.setOriginOffset(119, 36);
+
+		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));
 		TextureRegion[] frames1 = splitFrames("hero/hero_sheet.png", 0, 3);
 		TextureRegion[] frames2 = splitFrames("hero/hero_sheet.png", 1, 4);
 		TextureRegion[] frames3 = splitFrames("hero/hero_sheet.png", 2, 2);
@@ -70,13 +71,15 @@ public class MainGameScreen extends GScreen {
 		anim2.setPlayMode(Animation.PlayMode.LOOP);
 		Animation<TextureRegion> anim3 = new Animation<>(.2f, frames3);
 		anim3.setPlayMode(Animation.PlayMode.NORMAL);
-		animComp.addAnim("idle", anim1);
-		animComp.addAnim("run", anim2);
-		animComp.addAnim("attack", anim3);
+		animator.addAnim("idle", anim1);
+		animator.addAnim("run", anim2);
+		animator.addAnim("attack", anim3);
 
-		CircleColliderComponent collComp = hero.addComponent(new CircleColliderComponent());
-		collComp.setOffsetPosition(53, 60);
-		collComp.setRadius(24);
+		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
+		heroFootCollider.setOffsetPosition(0, 15);
+		heroFootCollider.setRadius(15);
+
+		physicsSystem.addGObject(heroFootCollider);
 
 		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
 		roleController.setRocker(rocker);
@@ -84,6 +87,22 @@ public class MainGameScreen extends GScreen {
 		roleController.setSpeed(500);
 
 		textureRenderer.addGObject(hero);
+
+
+		wall = new GObject();
+		wall.transform.setPosition(500, 300);
+		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
+		wallCollider.setSize(100, 200);
+
+		physicsSystem.addGObject(wallCollider);
+
+
+		ground = new GObject();
+		ground.transform.setPosition(400, 150);
+		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
+		groundCollider.setSize(600, 40);
+
+		physicsSystem.addGObject(groundCollider);
 	}
 
 	private void createUI() {
@@ -110,7 +129,11 @@ public class MainGameScreen extends GScreen {
 
 	private void gameLogic(float delta) {
 
+		physicsSystem.update(delta);
+
 		hero.update(delta);
+		wall.update(delta);
+		ground.update(delta);
 
 		textureRenderer.render(delta);
 
