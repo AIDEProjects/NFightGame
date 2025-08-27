@@ -21,4 +21,8 @@ public class Component implements IComponent{
 	@Override
 	public void getGObject() {
 	}
+	
+	public TransformComponent getTransform(){
+		return transform;
+	}
 }

@@ -60,7 +60,7 @@ public class Gizmos {
 		@Override
 		void render(ShapeRenderer renderer) {
 			renderer.setColor(color);
-			renderer.rect(x, y, width, height);
+			renderer.rect(x-width/2, y-height/2, width, height);
 		}
 	}
 

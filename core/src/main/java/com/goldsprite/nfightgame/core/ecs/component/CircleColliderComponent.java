@@ -7,8 +7,8 @@ public class CircleColliderComponent extends ColliderComponent{
 	private float radius;
 	@Override
 	public void drawGizmos() {
-		Gizmos.setColor(Color.YELLOW);
-		Gizmos.setHollow(false);
+		Gizmos.setColor(!isCollision? Color.GREEN: Color.RED);
+		Gizmos.setHollow(true);
 		Gizmos.circle(getCenter().x, getCenter().y, getRadius());
 	}
 
