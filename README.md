@@ -1,4 +1,4 @@
-# NFightGame
+# NFightGame 0.5.10
 
 ## [Java Doc](readme/docs/javadoc/index.html) 仅本地
 
@@ -70,5 +70,3 @@
 #### 0.5.8 封装RigidbodyComponent
 
 #### 0.5.9 修复严重性能问题: gizmos的shape大量占用内存, 使用clear清理后解决
-
-#### 0.5.10 
