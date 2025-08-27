@@ -33,9 +33,9 @@ public class GObject {
 		return (T)(Object)components.get(type);
 	}
 
-	public void act(float delta){
+	public void update(float delta){
 		for(IComponent component : components.values()){
-			component.act(delta);
+			component.update(delta);
 		}
 	}
 }

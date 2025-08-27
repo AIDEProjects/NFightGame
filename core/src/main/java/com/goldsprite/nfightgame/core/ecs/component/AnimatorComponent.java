@@ -9,28 +9,33 @@ public class AnimatorComponent extends Component {
 	private final TextureComponent texComp;
 	public HashMap<String, Animation<TextureRegion>> anims = new HashMap<>();
 	public float stateTime;
-	public Animation<TextureRegion> current;
+	public String current;
 
 	public AnimatorComponent(TextureComponent texComp){
 		this.texComp = texComp;
 	}
 
 	public void setCurAnim(String animName){
-		stateTime = 0;
-		current = anims.get(animName);
+		if(!current.equals(animName)) stateTime = 0;
+		current = animName;
 	}
+
 	public void addAnim(String animName, Animation<TextureRegion> anim){
-		if(current == null) current = anim;
+		if(current == null) current = animName;
 		anims.put(animName, anim);
 	}
 
 	@Override
-	public void act(float delta) {
+	public void update(float delta) {
 		step(delta);
 	}
 
 	public void step(float delta){
-		texComp.setRegion((TextureRegion) current.getKeyFrame(stateTime));
+		texComp.setRegion(getAnim(current).getKeyFrame(stateTime));
 		stateTime += delta;
+	}
+
+	private Animation<TextureRegion> getAnim(String animName) {
+		return anims.get(animName);
 	}
 }

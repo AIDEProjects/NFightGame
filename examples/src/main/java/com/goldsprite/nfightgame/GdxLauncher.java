@@ -6,8 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.viewport.*;
 import com.goldsprite.gdxcore.screens.*;
 import com.goldsprite.infinityworld.assets.*;
-import com.goldsprite.nfightgame.examples.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.goldsprite.nfightgame.screens.MainGameScreen;
 
 public class GdxLauncher extends ApplicationAdapter {
 	private ScreenManager screenManager;
@@ -20,9 +20,9 @@ public class GdxLauncher extends ApplicationAdapter {
 		new GlobalAssets();
 		screenManager = new ScreenManager();
 		screenManager.setViewport(new FitViewport(960, 540, new OrthographicCamera()));
-		screenManager.setCurScreen(RoleRendererExamples.class, true);
+//		screenManager.setCurScreen(RoleRendererExamples.class, true);
 //		screenManager.setCurScreen(RoleCollisionExamples.class, true);
-//		screenManager.setCurScreen(LifeCycleExamples.class, true);
+		screenManager.setCurScreen(MainGameScreen.class, true);
 
 		/*imp = new InputMultiplexer();
 		uiSkin = GlobalAssets.getInstance().editorSkin;

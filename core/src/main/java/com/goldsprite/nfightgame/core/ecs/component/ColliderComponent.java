@@ -1,5 +1,5 @@
 /**
- * @Author 
+ * @Author
  * @AIDE AIDE+
 */
 package com.goldsprite.nfightgame.core.ecs.component;
@@ -12,7 +12,7 @@ public class ColliderComponent extends Component {
 	protected Vector2 centerPosition = new Vector2();
 	protected Vector2 offsetPosition = new Vector2();
 	public Vector2 lastPos = new Vector2();
-	
+
 	public void setToLastPos(){
 		transform.getPosition().set(lastPos);
 	}
@@ -25,7 +25,7 @@ public class ColliderComponent extends Component {
 	public void setOffsetPosition(float offsetX, float offsetY) {
 		offsetPosition.set(offsetX, offsetY);
 	}
-	
+
 	public void setIsCollision(boolean isCollision) {
 		this.isCollision = isCollision;
 	}
@@ -35,7 +35,7 @@ public class ColliderComponent extends Component {
 	}
 
 	@Override
-	public void act(float delta) {
+	public void update(float delta) {
 		if (showGizmos)
 			drawGizmos();
 	}

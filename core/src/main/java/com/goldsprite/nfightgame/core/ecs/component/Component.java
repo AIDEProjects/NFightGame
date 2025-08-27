@@ -15,13 +15,18 @@ public class Component implements IComponent{
 	}
 
 	@Override
-	public void act(float delta) {
+	public void update(float delta) {
 	}
 
 	@Override
 	public void getGObject() {
 	}
-	
+
+	@Override
+	public <T extends IComponent> T getComponent(Class<T> type) {
+		return gObject.getComponent(type);
+	}
+
 	public TransformComponent getTransform(){
 		return transform;
 	}

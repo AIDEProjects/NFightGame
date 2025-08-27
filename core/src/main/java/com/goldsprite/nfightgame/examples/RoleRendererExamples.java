@@ -102,8 +102,8 @@ public class RoleRendererExamples extends GScreen {
 	public void render(float delta) {
 		ScreenUtils.clear(0.7f, 0.7f, 0.7f, 1f);
 
-		role.act(delta);
-		role2.act(delta);
+		role.update(delta);
+		role2.update(delta);
 		textureRenderer.render(delta);
 
 		shapeRenderer.setProjectionMatrix(getCamera().combined);

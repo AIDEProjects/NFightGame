@@ -77,6 +77,6 @@ public class TextureComponent extends Component {
 	}
 
 	@Override
-	public void act(float delta) {
+	public void update(float delta) {
 	}
 }
