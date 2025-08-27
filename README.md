@@ -3,12 +3,6 @@
 ## [Java Doc](readme/docs/javadoc/index.html) 仅本地
 
 ## 待办
-- [ ] 创建拥有基本属性的物体GObject 
-- [ ] 创建基于GObject实现锚点的角色渲染器 
-- [ ] 创建可以拥有组合功能的组合物体CompoundObject 
-- [ ] 图片角色渲染: 提供位移, 翻转, 缩放操作 
-- [ ] 动画角色渲染: 提供是否循环参数, 播放速率 
-- [ ] 动画组角色渲染: 设置初始动画, 主动切换动画, 获取当前动画, 获取某动画 
 - [ ] 当角色添加或移除某个组件时， 自动调用相关静态系统的代码，将角色加入某类型系统管理列表中或从中移除，来达到自动识别并运行系统的目的
 
 ## 项目配置
@@ -52,3 +46,6 @@
 2. 将基本属性封装到TransformComponent并默认绑定GObject创建时生成
 3. 独立开transfrom，textureComp，animatorComp, circleColliderComp等组件属性方法结构
 4. 设置单独debugRenderer用于调试线渲染
+
+#### 0.3.1
+1. 增加ui_skin等资源以及配套工具类
