@@ -32,38 +32,43 @@ public class PhysicsSystem {
 			if (rigi1 == null) continue;
 
 			Vector2 pos1 = c1.getTransform().getPosition();
-			//记录之前位置
-			lastPosition.set(pos1);
-			//计算重力
-			rigi1.getVelocity().setY(rigi1.getVelocity().getY() - GRAVITY * 0.2f);
-			//应用速度
-			Vector2 stepVel = tempVec.set(rigi1.getVelocity()).scl(delta);
-			pos1.add(stepVel);
-			//重置碰撞状态
-			c1.setIsCollision(false);
-			//检测碰撞
-			for (ColliderComponent c2 : colliders) {
-				if (c2 == c1)
-					continue;
-				if (circleToCircleCollision(c1, c2)) {
-					c1.setIsCollision(true);
-					break;
-				}
-				if (circleToRectCollision(c1, c2)) {
-					c1.setIsCollision(true);
-					break;
-				}
-				if (rectToCircleCollision(c1, c2)) {
-					c1.setIsCollision(true);
-					break;
-				}
+			Vector2 velocity = rigi1.getVelocity();
+
+			boolean isColl = false;
+
+			// 计算重力
+			velocity.y -= GRAVITY * 0.2f;
+
+			// ---------- 先移动X ----------
+			float oldX = pos1.x;
+			pos1.x += velocity.x * delta;
+
+			if (checkCollision(c1)) { // 如果X方向有碰撞
+				isColl = true;
+				pos1.x = oldX;        // 回退X
+				velocity.x = 0;       // 停止X方向速度
 			}
-			//取消应用速度
-			if (c1.isCollision()) {
-				pos1.set(lastPosition);
-				rigi1.getVelocity().scl(0);
+			float oldY = pos1.y;
+			pos1.y += velocity.y * delta;
+
+			if (checkCollision(c1)) { // 如果Y方向有碰撞
+				isColl = true;
+				pos1.y = oldY;        // 回退Y
+				velocity.y = 0;       // 停止Y方向速度
 			}
+
+			c1.setIsCollision(isColl);
 		}
+	}
+
+	private boolean checkCollision(ColliderComponent c1) {
+		for (ColliderComponent c2 : colliders) {
+			if (c2 == c1) continue;
+			if (circleToCircleCollision(c1, c2)) return true;
+			if (circleToRectCollision(c1, c2)) return true;
+			if (rectToCircleCollision(c1, c2)) return true;
+		}
+		return false;
 	}
 
 	private boolean circleToCircleCollision(ColliderComponent c1, ColliderComponent c2) {
