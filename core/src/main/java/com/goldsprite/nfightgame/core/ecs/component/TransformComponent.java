@@ -30,4 +30,5 @@ public class TransformComponent extends Component {
 	public void setFace(int faceX, int faceY) {
 		face.set(faceX, faceY);
 	}
+
 }

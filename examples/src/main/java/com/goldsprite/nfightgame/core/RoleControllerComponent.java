@@ -24,8 +24,10 @@ public class RoleControllerComponent extends Component {
 		Consumer<ColliderComponent> onTargetBeHurtListener = (collider) -> {
 			AnimatorComponent animator = collider.getComponent(AnimatorComponent.class);
 			animator.setCurAnim("hurt");
+			int facingPlayer = (int)Math.signum(transform.getPosition().x - collider.getTransform().getPosition().x);
+			collider.getTransform().getFace().setX(facingPlayer);
 		};
-		trigger.addOnTriggerEnterListener(onTargetBeHurtListener);
+		trigger.onTriggerEnterListeners.add(onTargetBeHurtListener);
 	}
 
 	public void setRocker(Rocker rocker) {
@@ -36,14 +38,14 @@ public class RoleControllerComponent extends Component {
 	public void update(float delta) {
 		//移动角色
 		moveRole(delta);
-		
+
 		//攻击播放完自动关闭
 		boolean isAtk = getAnimator().current.equals("attack");
 		boolean playFinish = getAnimator().anims.get(getAnimator().current).isAnimationFinished(getAnimator().stateTime);
 		if(isAtk && playFinish){
 			getAnimator().setCurAnim("idle");
 		}
-		
+
 		//攻击帧时才启用攻击碰撞器
 		int frameIndex = getAnimator().anims.get(getAnimator().current).getKeyFrameIndex(getAnimator().stateTime);
 		boolean enable = isAtk && frameIndex == 1;
@@ -69,7 +71,7 @@ public class RoleControllerComponent extends Component {
 	public void setTarget(TransformComponent target) {
 		this.target = target;
 	}
-	
+
 	public AnimatorComponent getAnimator(){
 		return target.getComponent(AnimatorComponent.class);
 	}

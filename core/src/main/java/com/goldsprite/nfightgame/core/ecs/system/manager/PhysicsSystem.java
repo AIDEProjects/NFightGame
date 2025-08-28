@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
-	private static float gravity_scale = 0.2f;//2
+	private static final float gravity_scale = 0.2f;//2
 
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();
@@ -65,38 +65,41 @@ public class PhysicsSystem extends System {
 
 	private boolean checkOtherCollision(ColliderComponent c1) {
 		for (ColliderComponent c2 : colliders) {
-			if (c2 == c1)
+			if (c2 == c1) continue;
+			if (c2.getGObject() == c1.getGObject()) continue;
+			if (!c2.isEnable()){
+				if(c1.isCollisingTarget(c2)){
+					if (c2.isTrigger()) c2.onTriggerExit(c1);
+					c1.removeCollisingTarget(c2);
+				}
 				continue;
-			if (c2.getGObject() == c1.getGObject())
-				continue;
-			
-			boolean collied = checkCollision(c1, c2);
-			if(collied && !c1.isCollisingTarget(c2)){
-				c1.addCollisingTarget(c2);
-				if(c2.isTrigger()) c2.onTriggerEnter(c1);
 			}
-			if(!collied && c1.isCollisingTarget(c2)){
+
+			boolean collied = checkCollision(c1, c2);
+			if (collied && !c1.isCollisingTarget(c2)) {
+				c1.addCollisingTarget(c2);
+				if (c2.isTrigger()) c2.onTriggerEnter(c1);
+			}
+			if (!collied && c1.isCollisingTarget(c2)) {
+				if (c2.isTrigger()) c2.onTriggerExit(c1);
 				c1.removeCollisingTarget(c2);
 			}
-			
-			if(c2.isTrigger()) continue;
-			if(collied) return true;
+
+			if (c2.isTrigger()) continue;
+			if (collied) return true;
 		}
 		return false;
 	}
 
-private boolean checkCollision(ColliderComponent c1, ColliderComponent c2) {
-	if (circleToCircleCollision(c1, c2))
-		return true;
-	if (circleToRectCollision(c1, c2))
-		return true;
-	if (rectToCircleCollision(c1, c2))
-		return true;
-	if (rectToRectCollision(c1, c2))
-		return true;
-	
-	return false;
-}
+	private boolean checkCollision(ColliderComponent c1, ColliderComponent c2) {
+		if (circleToCircleCollision(c1, c2))
+			return true;
+		if (circleToRectCollision(c1, c2))
+			return true;
+		if (rectToCircleCollision(c1, c2))
+			return true;
+		return rectToRectCollision(c1, c2);
+	}
 
 	private boolean circleToCircleCollision(ColliderComponent c1, ColliderComponent c2) {
 		if (!(c1 instanceof CircleColliderComponent && c2 instanceof CircleColliderComponent))
@@ -149,7 +152,7 @@ private boolean checkCollision(ColliderComponent c1, ColliderComponent c2) {
 		float r2y = c2.getCenter().y;
 		float r2w = ((RectColliderComponent) c2).getSize().x;
 		float r2h = ((RectColliderComponent) c2).getSize().y;
-		
+
 		//AABB
 		float minX = rx - rw / 2, maxX = rx + rw / 2, minY = ry - rh / 2, maxY = ry + rh / 2;
 		float min2X = r2x - r2w / 2, max2X = r2x + r2w / 2, min2Y = r2y - r2h / 2, max2Y = r2y + r2h / 2;

@@ -16,19 +16,17 @@ public class ColliderComponent extends Component {
 	protected Vector2 centerPosition = new Vector2();
 	protected Vector2 offsetPosition = new Vector2();
 	protected List<ColliderComponent> collisingTargets = new ArrayList<>();
-	protected List<Consumer<ColliderComponent>> onTriggerEnterListeners = new ArrayList<>();
+	public final List<Consumer<ColliderComponent>> onTriggerEnterListeners = new ArrayList<>();
+	public final List<Consumer<ColliderComponent>> onTriggerExitListeners = new ArrayList<>();
 
-	public void addOnTriggerEnterListener(Consumer<ColliderComponent> listener){
-		onTriggerEnterListeners.add(listener);
-	}
-	public void removeOnTriggerEnterListener(Consumer<ColliderComponent> listener){
-		onTriggerEnterListeners.remove(listener);
-	}
-	
 	public void onTriggerEnter(ColliderComponent c2) {
-		//onTriggerEnterListeners.forEach(c -> c.accept(c2));
+		onTriggerEnterListeners.forEach(c -> c.accept(c2));
 	}
-	
+
+	public void onTriggerExit(ColliderComponent c2) {
+		onTriggerExitListeners.forEach(c -> c.accept(c2));
+	}
+
 	public Vector2 getCenter() {
 		return centerPosition.set(offsetPosition).scl(transform.getFace()).scl(transform.getScale())
 				.add(transform.getPosition());
@@ -54,15 +52,15 @@ public class ColliderComponent extends Component {
 	public void setIsCollision(boolean isCollision) {
 		this.isCollision = isCollision;
 	}
-	
+
 	public boolean isCollisingTarget(ColliderComponent c2){
 		return collisingTargets.contains(c2);
 	}
-	
+
 	public void addCollisingTarget(ColliderComponent c){
 		collisingTargets.add(c);
 	}
-	
+
 	public void removeCollisingTarget(ColliderComponent c){
 		collisingTargets.remove(c);
 	}
@@ -74,7 +72,7 @@ public class ColliderComponent extends Component {
 	public void setTrigger(boolean trigger) {
 		isTrigger = trigger;
 	}
-	
+
 	public void setEnable(boolean isEnable) {
 		this.isEnabled = isEnable;
 	}

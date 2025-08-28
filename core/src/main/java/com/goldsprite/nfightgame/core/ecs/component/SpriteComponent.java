@@ -5,12 +5,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.utils.math.Vector2Int;
 
-public class TextureComponent extends Component {
+public class SpriteComponent extends Component {
 	public static final TextureRegion emptyRegion = new TextureRegion();
 	private TextureRegion region = emptyRegion;//材质
 	private Vector2 size = new Vector2(1, 1);//大小
 	private Vector2 scale = new Vector2(1, 1);
 	private Vector2Int originOffset = new Vector2Int();//原点距左下偏移
+	private Vector2Int spriteFace = new Vector2Int(1, 1);
+	private Vector2Int realFace = new Vector2Int(1, 1);
 
 	public TextureRegion getRegion() {
 		return region;
@@ -21,8 +23,16 @@ public class TextureComponent extends Component {
 		getTextureSize().set(region.getRegionWidth(), region.getRegionHeight());
 	}
 
+	public Vector2Int getSpriteFace() {
+		return spriteFace;
+	}
+	public void setSpriteFace(int spriteFaceX, int spriteFaceY) {
+		spriteFace.set(spriteFaceX, spriteFaceY);
+	}
 
-
+	public Vector2Int getRealFace() {
+		return (Vector2Int) realFace.set(transform.getFace()).scl(spriteFace);
+	}
 	public Vector2Int getOriginOffset() {
 		return originOffset;
 	}
@@ -41,11 +51,11 @@ public class TextureComponent extends Component {
 	public void updateRegionFlip(TextureRegion region) {
 		//翻转人物
 		boolean flipX, flipY;
-		if(transform.getFace().x >= 0){
+		if(getRealFace().x >= 0){
 			flipX = region.isFlipX();
 		}else
 			flipX = !region.isFlipX();
-		if(transform.getFace().y >= 0){
+		if(getRealFace().y >= 0){
 			flipY = region.isFlipY();
 		}else
 			flipY = !region.isFlipY();
@@ -72,7 +82,7 @@ public class TextureComponent extends Component {
 	public Vector2 getTextureSize() {
 		return size;
 	}
-	
+
 	public Vector2 getScale(){
 		return scale;
 	}
@@ -83,9 +93,5 @@ public class TextureComponent extends Component {
 
 	public void setSize(float sizeX, float sizeY) {
 		this.size.set(sizeX, sizeY);
-	}
-
-	@Override
-	public void update(float delta) {
 	}
 }

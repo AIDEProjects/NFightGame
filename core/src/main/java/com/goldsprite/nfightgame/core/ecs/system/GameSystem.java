@@ -1,14 +1,13 @@
 package com.goldsprite.nfightgame.core.ecs.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.ColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.IComponent;
-import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
+import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
 import com.goldsprite.nfightgame.core.ecs.system.manager.PhysicsSystem;
 import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
-import com.goldsprite.nfightgame.core.ecs.system.renderer.TextureRenderer;
+import com.goldsprite.nfightgame.core.ecs.system.renderer.SpriteRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ public class GameSystem {
 	private static GameSystem instance;
 
 	private Camera camera;
-	private TextureRenderer textureRenderer;
+	private SpriteRenderer spriteRenderer;
 	private Gizmos gizmosRenderer;
 	private PhysicsSystem physicsSystem;
 	private List<GObject> gobjects = new ArrayList<GObject>();
@@ -34,7 +33,7 @@ public class GameSystem {
 	}
 
 	private void createSystem() {
-		textureRenderer = new TextureRenderer();
+		spriteRenderer = new SpriteRenderer();
 		gizmosRenderer = new Gizmos();
 		physicsSystem = new PhysicsSystem();
 	}
@@ -44,13 +43,13 @@ public class GameSystem {
 	}
 
 	public static void manageGameComponent(IComponent component, ManageMode mode) {
-		if (component instanceof TextureComponent) {
+		if (component instanceof SpriteComponent) {
 			switch (mode) {
 				case ADD:
-					getInstance().textureRenderer.addGObject(component.getGObject());
+					getInstance().spriteRenderer.addGObject(component.getGObject());
 					break;
 				case REMOVE:
-					getInstance().textureRenderer.removeGObject(component.getGObject());
+					getInstance().spriteRenderer.removeGObject(component.getGObject());
 					break;
 			}
 		}
@@ -109,7 +108,7 @@ public class GameSystem {
 			obj.update(delta);
 		}
 
-		textureRenderer.update(delta);
+		spriteRenderer.update(delta);
 		gizmosRenderer.update(delta);
 	}
 
@@ -122,8 +121,8 @@ public class GameSystem {
 		this.camera = camera;
 	}
 
-	public TextureRenderer getTextureRenderer() {
-		return textureRenderer;
+	public SpriteRenderer getTextureRenderer() {
+		return spriteRenderer;
 	}
 
 	public Gizmos getGizmosRenderer() {

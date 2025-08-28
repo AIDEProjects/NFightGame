@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.HashMap;
 
 public class AnimatorComponent extends Component {
-	private final TextureComponent texComp;
+	private final SpriteComponent texComp;
 	public HashMap<String, Animation<TextureRegion>> anims = new HashMap<>();
 	public float stateTime;
 	public String current;
 
-	public AnimatorComponent(TextureComponent texComp){
+	public AnimatorComponent(SpriteComponent texComp){
 		this.texComp = texComp;
 	}
 

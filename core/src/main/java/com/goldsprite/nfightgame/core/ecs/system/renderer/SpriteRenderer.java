@@ -3,13 +3,13 @@ package com.goldsprite.nfightgame.core.ecs.system.renderer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.goldsprite.nfightgame.core.ecs.GObject;
-import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
+import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
 import com.goldsprite.utils.math.Vector2;
 
-public class TextureRenderer extends Renderer {
+public class SpriteRenderer extends Renderer {
 	private final SpriteBatch batch;
 
-	public TextureRenderer(){
+	public SpriteRenderer(){
 		batch = new SpriteBatch();
 	}
 
@@ -18,9 +18,9 @@ public class TextureRenderer extends Renderer {
 		batch.setProjectionMatrix(gm.getCamera().combined);
 		batch.begin();
 		for(GObject gobject : gobjects){
-			TextureComponent texComp = gobject.getComponent(TextureComponent.class);
+			SpriteComponent texComp = gobject.getComponent(SpriteComponent.class);
 			TextureRegion region = texComp.getRegion();
-			if(TextureComponent.emptyRegion.equals(region)) continue;
+			if(SpriteComponent.emptyRegion.equals(region)) continue;
 			texComp.updateRegionFlip();
 			Vector2 leftDownPos = texComp.getLeftDownPos();
 			Vector2 renderSize = texComp.getRenderSize();

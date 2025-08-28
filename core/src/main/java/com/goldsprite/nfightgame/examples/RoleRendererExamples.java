@@ -11,14 +11,14 @@ import com.badlogic.gdx.*;
 import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
 import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
-import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
+import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
 import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
-import com.goldsprite.nfightgame.core.ecs.system.renderer.TextureRenderer;
+import com.goldsprite.nfightgame.core.ecs.system.renderer.SpriteRenderer;
 import com.goldsprite.utils.math.Vector2Int;
 
 public class RoleRendererExamples extends GScreen {
 	private ShapeRenderer shapeRenderer;
-	private TextureRenderer textureRenderer;
+	private SpriteRenderer spriteRenderer;
 	private Gizmos debugRenderer;
 	private Texture roleTex;
 	private GObject role;
@@ -39,7 +39,7 @@ public class RoleRendererExamples extends GScreen {
 
 		shapeRenderer = new ShapeRenderer();
 
-		textureRenderer = new TextureRenderer();
+		spriteRenderer = new SpriteRenderer();
 
 		debugRenderer = Gizmos.getInstance();
 
@@ -51,10 +51,10 @@ public class RoleRendererExamples extends GScreen {
 		role.transform.setFace(-1, 1);
 		role.transform.setPosition(100, 250);
 		role.transform.setScale(1.5f);
-		TextureComponent texComp = role.addComponent(new TextureComponent());
+		SpriteComponent texComp = role.addComponent(new SpriteComponent());
 		texComp.setRegion(idleRegion);
 		texComp.setOriginOffset(119, 36);
-		textureRenderer.addGObject(role);
+		spriteRenderer.addGObject(role);
 
 
 		role2 = new GObject();
@@ -62,7 +62,7 @@ public class RoleRendererExamples extends GScreen {
 		role2.transform.setPosition(300, 250);
 		role2.transform.setScale(1.6f);
 
-		TextureComponent texComp2 = role2.addComponent(new TextureComponent());
+		SpriteComponent texComp2 = role2.addComponent(new SpriteComponent());
 		texComp2.setOriginOffset(119, 36);
 
 		AnimatorComponent animComp = role2.addComponent(new AnimatorComponent(texComp2));
@@ -83,7 +83,7 @@ public class RoleRendererExamples extends GScreen {
 		collComp.setOffsetPosition(53, 60);
 		collComp.setRadius(24);
 
-		textureRenderer.addGObject(role2);
+		spriteRenderer.addGObject(role2);
 	}
 
 	public TextureRegion[] splitFrames(String path, int col, int count){

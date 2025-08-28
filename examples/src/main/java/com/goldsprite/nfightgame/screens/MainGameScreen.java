@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.goldsprite.gdxcore.screens.GScreen;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.core.DummyControllerComponent;
 import com.goldsprite.nfightgame.core.Rocker;
 import com.goldsprite.nfightgame.core.RoleControllerComponent;
 import com.goldsprite.nfightgame.core.ecs.GObject;
@@ -40,7 +41,7 @@ public class MainGameScreen extends GScreen {
 		gm.setCamera(getCamera());
 
 		createBackImage();
-		
+
 		createUI();
 
 		createGObjects();
@@ -48,9 +49,9 @@ public class MainGameScreen extends GScreen {
 
 	private void createGObjects() {
 		createDummy();
-		
+
 		createHero();
-		
+
 
 		wall = new GObject();
 		wall.transform.setPosition(500, 300);
@@ -90,7 +91,7 @@ public class MainGameScreen extends GScreen {
 		RigidbodyComponent rigi = hero.addComponent(new RigidbodyComponent());
 		rigi.setGravity(true);
 
-		TextureComponent texture = hero.addComponent(new TextureComponent());
+		SpriteComponent texture = hero.addComponent(new SpriteComponent());
 		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 36);
 
@@ -111,27 +112,31 @@ public class MainGameScreen extends GScreen {
 
 	private void createDummy() {
 		dummy = new GObject();
+		dummy.transform.setFace(-1, 1);
 		dummy.transform.setPosition(220, 300);
 		dummy.transform.setScale(1.2f);
 
+		DummyControllerComponent dummyController = dummy.addComponent(new DummyControllerComponent());
+
 		RigidbodyComponent drigi = dummy.addComponent(new RigidbodyComponent());
 
-		TextureComponent dummyTexture = dummy.addComponent(new TextureComponent());
+		SpriteComponent dummyTexture = dummy.addComponent(new SpriteComponent());
+		dummyTexture.setSpriteFace(-1, 1);
 		dummyTexture.getScale().set(0.6f);
-		dummyTexture.setOriginOffset(130, 120);
+		dummyTexture.setOriginOffset(140, 120);
 
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
 		TextureRegion[] dframes1 = splitFrames("monster1/monster1_sheet.png", 0, 3);
 		TextureRegion[] dframes2 = splitFrames("monster1/monster1_sheet.png", 1, 2);
 		Animation<TextureRegion> danim1 = new Animation<>(.25f, dframes1);
-		danim1.setPlayMode(Animation.PlayMode.LOOP);
+		danim1.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
 		Animation<TextureRegion> danim2 = new Animation<>(.2f, dframes2);
 		danim2.setPlayMode(Animation.PlayMode.NORMAL);
 		dummyAnimator.addAnim("idle", danim1);
 		dummyAnimator.addAnim("hurt", danim2);
 
 		RectColliderComponent dummyCollider = dummy.addComponent(new RectColliderComponent());
-		dummyCollider.setSize(40, 100);
+		dummyCollider.setSize(45, 100);
 	}
 
 	private void createUI() {
@@ -139,12 +144,12 @@ public class MainGameScreen extends GScreen {
 		uiStage = new Stage();
 		uiStage.setViewport(getViewport());
 		getImp().addProcessor(uiStage);
-		
+
 		rocker = new Rocker(0, uiSkin);
 		rocker.setPosition(20, 20);
 		rocker.setSize(150, 150);
 		uiStage.addActor(rocker);
-		
+
 		TextButton atkBtn = new TextButton("平A", uiSkin);
 		atkBtn.addListener(new ClickListener(){
 			public void clicked(InputEvent e, float x, float y){
@@ -167,12 +172,12 @@ public class MainGameScreen extends GScreen {
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(.7f, .7f, .7f, 1);
-		
+
 		batch.begin();
 		batch.setProjectionMatrix(getCamera().combined);
 		batch.draw(backTex, 0, 0, getViewSize().x, getViewSize().y);
 		batch.end();
-		
+
 		gameLogic(delta);
 
 		uiStage.act(delta);
