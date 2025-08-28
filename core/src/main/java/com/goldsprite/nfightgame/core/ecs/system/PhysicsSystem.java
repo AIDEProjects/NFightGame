@@ -39,24 +39,22 @@ public class PhysicsSystem {
 				Vector2 velocity = rigi1.getVelocity();
 
 				// 计算重力
-				velocity.y -= GRAVITY * 0.2f;
+				velocity.y -= GRAVITY * 3f;
 
-				// ---------- 先移动X ----------
+				//分轴碰撞检测
 				float oldX = pos1.x;
 				pos1.x += velocity.x * delta;
-
-				if (checkCollision(c1)) { // 如果X方向有碰撞
+				if (checkCollision(c1)) {
 					isColl = true;
-					pos1.x = oldX;        // 回退X
-					velocity.x = 0;       // 停止X方向速度
+					pos1.x = oldX;
+					velocity.x = 0;
 				}
 				float oldY = pos1.y;
 				pos1.y += velocity.y * delta;
-
-				if (checkCollision(c1)) { // 如果Y方向有碰撞
+				if (checkCollision(c1)) {
 					isColl = true;
-					pos1.y = oldY;        // 回退Y
-					velocity.y = 0;       // 停止Y方向速度
+					pos1.y = oldY; 
+					velocity.y = 0;
 				}
 			}
 			c1.setIsCollision(isColl);
