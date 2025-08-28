@@ -19,6 +19,10 @@ public class Component implements IComponent{
 	}
 
 	@Override
+	public void fixedUpdate(float fixedDelta) {
+	}
+
+	@Override
 	public GObject getGObject() {
 		return gObject;
 	}

@@ -13,9 +13,6 @@ import com.goldsprite.nfightgame.core.Rocker;
 import com.goldsprite.nfightgame.core.RoleControllerComponent;
 import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.*;
-import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
-import com.goldsprite.nfightgame.core.ecs.renderer.TextureRenderer;
-import com.goldsprite.nfightgame.core.ecs.system.PhysicsSystem;
 import com.goldsprite.utils.math.Vector2Int;
 import com.goldsprite.nfightgame.core.ecs.system.*;
 
@@ -30,9 +27,9 @@ public class MainGameScreen extends GScreen {
 
 	@Override
 	public void create() {
-		GameSystem.setCamera(getCamera());
-		gm = GameSystem.getInstance();
-		
+		gm = new GameSystem();
+		gm.setCamera(getCamera());
+
 		createUI();
 
 		createGObjects();
@@ -44,6 +41,11 @@ public class MainGameScreen extends GScreen {
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
 		hero.transform.setScale(1.5f);
+
+		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
+		roleController.setRocker(rocker);
+		roleController.setTarget(hero.transform);
+		roleController.setSpeed(500);
 
 		RigidbodyComponent rigi = hero.addComponent(new RigidbodyComponent());
 		rigi.setGravity(true);
@@ -68,20 +70,11 @@ public class MainGameScreen extends GScreen {
 		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
 		heroFootCollider.setOffsetPosition(0, 15);
 		heroFootCollider.setRadius(15);
-		gm.getPhysicsSystem().addGObject(heroFootCollider);
 
 		CircleColliderComponent heroAtkCollider = hero.addComponent(new CircleColliderComponent());
 		heroAtkCollider.setTrigger(true);
 		heroAtkCollider.setOffsetPosition(53, 60);
 		heroAtkCollider.setRadius(24);
-		gm.getPhysicsSystem().addGObject(heroAtkCollider);
-
-		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
-		roleController.setRocker(rocker);
-		roleController.setTarget(hero.transform);
-		roleController.setSpeed(500);
-
-		gm.getTextureRenderer().addGObject(hero);
 
 
 		wall = new GObject();
@@ -89,7 +82,6 @@ public class MainGameScreen extends GScreen {
 
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
 		wallCollider.setSize(100, 200);
-		gm.getPhysicsSystem().addGObject(wallCollider);
 
 
 		ground = new GObject();
@@ -97,7 +89,6 @@ public class MainGameScreen extends GScreen {
 
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
 		groundCollider.setSize(600, 40);
-		gm.getPhysicsSystem().addGObject(groundCollider);
 	}
 
 	private void createUI() {
@@ -123,16 +114,7 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void gameLogic(float delta) {
-
-		gm.getPhysicsSystem().update(delta);
-
-		hero.update(delta);
-		wall.update(delta);
-		ground.update(delta);
-
-		gm.getTextureRenderer().render(delta);
-
-		gm.getGizmosRenderer().render(delta);
+		gm.gameLoop(delta);
 	}
 
 	public TextureRegion[] splitFrames(String path, int col, int count){

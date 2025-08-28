@@ -12,7 +12,7 @@ public class RoleControllerComponent extends Component {
 
 	private Rocker rocker;
 	private TransformComponent target;
-	private float speed = 500;
+	private float speed = 100;
 
 	public void setRocker(Rocker rocker) {
 		this.rocker = rocker;
@@ -25,6 +25,7 @@ public class RoleControllerComponent extends Component {
 
 	private void moveRole(float delta) {
 		Vector2 vel = rocker.getValue();
+//		vel.x = 1;
 
 		//位移
 		float velX = vel.x * speed;

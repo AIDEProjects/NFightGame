@@ -1,13 +1,15 @@
 package com.goldsprite.nfightgame.core.ecs.component;
 
 import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ecs.IRunnable;
 
-public interface IComponent {
+public interface IComponent extends IRunnable {
 	void update(float delta);
+	void fixedUpdate(float fixedDelta);
 
 	GObject getGObject();
 
-	<T extends IComponent> T getComponent(Class<T> type);
-
 	void setGObject(GObject gObject);
+
+	<T extends IComponent> T getComponent(Class<T> type);
 }

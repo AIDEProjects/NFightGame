@@ -6,7 +6,7 @@ import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.utils.math.Vector2Int;
 
 public class TextureComponent extends Component {
-	private static final TextureRegion emptyRegion = new TextureRegion();
+	public static final TextureRegion emptyRegion = new TextureRegion();
 	private TextureRegion region = emptyRegion;//材质
 	private Vector2 size = new Vector2(1, 1);//大小
 	private Vector2Int originOffset = new Vector2Int();//原点距左下偏移

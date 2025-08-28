@@ -1,4 +1,4 @@
-package com.goldsprite.nfightgame.core.ecs.renderer;
+package com.goldsprite.nfightgame.core.ecs.system.renderer;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,12 +13,14 @@ public class TextureRenderer extends Renderer {
 		batch = new SpriteBatch();
 	}
 
-	public void render(float delta){
-		batch.setProjectionMatrix(camera.combined);
+	@Override
+	public void update(float delta){
+		batch.setProjectionMatrix(gm.getCamera().combined);
 		batch.begin();
 		for(GObject gobject : gobjects){
 			TextureComponent texComp = gobject.getComponent(TextureComponent.class);
 			TextureRegion region = texComp.getRegion();
+			if(TextureComponent.emptyRegion.equals(region)) continue;
 			texComp.updateRegionFlip();
 			Vector2 leftDownPos = texComp.getLeftDownPos();
 			Vector2 renderSize = texComp.getRenderSize();

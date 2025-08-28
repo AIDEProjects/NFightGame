@@ -1,17 +1,19 @@
-package com.goldsprite.nfightgame.core.ecs.system;
+package com.goldsprite.nfightgame.core.ecs.system.manager;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.ColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.RectColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.RigidbodyComponent;
+import com.goldsprite.nfightgame.core.ecs.system.System;
 import com.goldsprite.utils.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhysicsSystem {
+public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
+	private static float gravity_scale = 2f;
 
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();
@@ -25,7 +27,7 @@ public class PhysicsSystem {
 		colliders.remove(collider);
 	}
 
-	public void update(float delta) {
+	public void fixedUpdate(float delta) {
 		for (ColliderComponent c1 : colliders) {
 			RigidbodyComponent rigi1 = c1.getComponent(RigidbodyComponent.class);
 			if (rigi1 == null) continue;
@@ -37,25 +39,25 @@ public class PhysicsSystem {
 			}else{
 				Vector2 pos1 = c1.getTransform().getPosition();
 				Vector2 velocity = rigi1.getVelocity();
+				lastPosition.set(pos1);
 
 				// 计算重力
-				velocity.y -= GRAVITY * 3f;
+				velocity.y -= GRAVITY * gravity_scale;
 
 				//分轴碰撞检测
-				float oldX = pos1.x;
 				pos1.x += velocity.x * delta;
 				if (checkCollision(c1)) {
 					isColl = true;
-					pos1.x = oldX;
+					pos1.setX(lastPosition.x);
 					velocity.x = 0;
 				}
-				float oldY = pos1.y;
 				pos1.y += velocity.y * delta;
 				if (checkCollision(c1)) {
 					isColl = true;
-					pos1.y = oldY; 
+					pos1.setY(lastPosition.y);
 					velocity.y = 0;
 				}
+//				pos1.set(lastPosition);//位置应用留到渲染帧进行
 			}
 			c1.setIsCollision(isColl);
 		}

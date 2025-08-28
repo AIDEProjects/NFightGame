@@ -8,9 +8,9 @@ import com.badlogic.gdx.utils.*;
 import com.goldsprite.gdxcore.screens.*;
 import com.goldsprite.nfightgame.core.ecs.*;
 import com.goldsprite.nfightgame.core.ecs.component.*;
-import com.goldsprite.nfightgame.core.ecs.renderer.*;
+import com.goldsprite.nfightgame.core.ecs.system.manager.PhysicsSystem;
+import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
 import com.goldsprite.utils.math.*;
-import com.goldsprite.nfightgame.core.ecs.system.*;
 
 public class RoleCollisionExamples extends GScreen {
 	private PhysicsSystem physics;
@@ -26,8 +26,6 @@ public class RoleCollisionExamples extends GScreen {
 		physics = new PhysicsSystem();
 
 		gizmos = Gizmos.getInstance();
-		gizmos.setCamera(getCamera());
-
 
 		role = new GObject();
 		role.transform.setPosition(200, 300);
@@ -83,12 +81,12 @@ public class RoleCollisionExamples extends GScreen {
 		physics.update(delta);
 
 		//应用组件更新
-		obj.update(delta);
-		obj2.update(delta);
-		role.update(delta);
+		obj.fixedUpdate(delta);
+		obj2.fixedUpdate(delta);
+		role.fixedUpdate(delta);
 
 		//调试线绘制器
-		gizmos.render(delta);
+//		gizmos.render(delta);
 	}
 
 }

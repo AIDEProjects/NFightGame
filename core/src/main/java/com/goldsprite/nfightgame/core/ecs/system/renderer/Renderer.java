@@ -1,21 +1,14 @@
-package com.goldsprite.nfightgame.core.ecs.renderer;
+package com.goldsprite.nfightgame.core.ecs.system.renderer;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.goldsprite.nfightgame.core.ecs.GObject;
-import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
+import com.goldsprite.nfightgame.core.ecs.system.System;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Renderer implements IRenderer{
-	protected Camera camera;
+public class Renderer extends System implements IRenderer{
 	protected final List<GObject> gobjects = new ArrayList<GObject>();
-
-	@Override
-	public void setCamera(Camera camera) {
-		this.camera = camera;
-	}
-
 
 	@Override
 	public void addGObject(GObject gobject) {
@@ -25,9 +18,5 @@ public class Renderer implements IRenderer{
 	@Override
 	public void removeGObject(GObject gobject) {
 		gobjects.remove(gobject);
-	}
-
-	@Override
-	public void render(float delta) {
 	}
 }

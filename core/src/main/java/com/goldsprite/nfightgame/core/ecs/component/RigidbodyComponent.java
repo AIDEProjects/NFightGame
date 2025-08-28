@@ -17,4 +17,9 @@ public class RigidbodyComponent extends Component {
 	public void setGravity(boolean gravity) {
 		this.gravity = gravity;
 	}
+
+	@Override
+	public void update(float delta) {
+//		transform.getPosition().add(velocity.x * delta, velocity.y * delta);
+	}
 }

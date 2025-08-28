@@ -12,8 +12,8 @@ import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
 import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TextureComponent;
-import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
-import com.goldsprite.nfightgame.core.ecs.renderer.TextureRenderer;
+import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
+import com.goldsprite.nfightgame.core.ecs.system.renderer.TextureRenderer;
 import com.goldsprite.utils.math.Vector2Int;
 
 public class RoleRendererExamples extends GScreen {
@@ -40,10 +40,8 @@ public class RoleRendererExamples extends GScreen {
 		shapeRenderer = new ShapeRenderer();
 
 		textureRenderer = new TextureRenderer();
-		textureRenderer.setCamera(getCamera());
 
 		debugRenderer = Gizmos.getInstance();
-		debugRenderer.setCamera(getCamera());
 
 		roleTex = new Texture(Gdx.files.internal("hero/hero_sheet.png"));
 		TextureRegion idleRegion = new TextureRegion(roleTex, 0, 0, 256, 256);
@@ -102,9 +100,9 @@ public class RoleRendererExamples extends GScreen {
 	public void render(float delta) {
 		ScreenUtils.clear(0.7f, 0.7f, 0.7f, 1f);
 
-		role.update(delta);
-		role2.update(delta);
-		textureRenderer.render(delta);
+		role.fixedUpdate(delta);
+		role2.fixedUpdate(delta);
+//		textureRenderer.render(delta);
 
 		shapeRenderer.setProjectionMatrix(getCamera().combined);
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -114,7 +112,7 @@ public class RoleRendererExamples extends GScreen {
 		shapeRenderer.end();
 
 		//调试线绘制器
-		debugRenderer.render(delta);
+//		debugRenderer.render(delta);
 	}
 
 }

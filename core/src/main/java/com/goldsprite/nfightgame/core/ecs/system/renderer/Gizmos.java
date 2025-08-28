@@ -1,13 +1,15 @@
-package com.goldsprite.nfightgame.core.ecs.renderer;
+package com.goldsprite.nfightgame.core.ecs.system.renderer;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Pool;
+import com.goldsprite.nfightgame.core.ecs.system.GameSystem;
+import com.goldsprite.nfightgame.core.ecs.system.System;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gizmos {
+public class Gizmos extends System {
 	// 单例实例
 	private static Gizmos instance;
 
@@ -81,24 +83,15 @@ public class Gizmos {
 
 	private List<ShapeData> shapes = new ArrayList<>();
 	private ShapeRenderer shapeRenderer;
-	private Camera camera;
 
 	// 获取单例实例
 	public static Gizmos getInstance() {
-		if (instance == null) {
-			instance = new Gizmos();
-		}
 		return instance;
 	}
 
-	// 私有构造函数，初始化ShapeRenderer
-	private Gizmos() {
+	public Gizmos() {
+		instance = this;
 		shapeRenderer = new ShapeRenderer();
-	}
-
-	// 设置相机（必须在render前调用）
-	public void setCamera(Camera camera) {
-		this.camera = camera;
 	}
 
 	// 设置当前颜色
@@ -127,13 +120,9 @@ public class Gizmos {
 		renderer.shapes.add(data);
 	}
 
-	// 绘制所有存储的形状
-	public void render(float delta) {
-		if (camera == null) {
-			throw new IllegalStateException("Camera must be set before rendering.");
-		}
-
-		shapeRenderer.setProjectionMatrix(camera.combined);
+	@Override
+	public void update(float delta) {
+		shapeRenderer.setProjectionMatrix(gm.getCamera().combined);
 
 		// 按形状类型分组绘制以减少状态切换
 		renderByShapeType(ShapeRenderer.ShapeType.Filled);
