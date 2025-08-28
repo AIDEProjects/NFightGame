@@ -14,7 +14,7 @@ public class GlobalAssets {
 
 	//静态路径
 	public static String skinPath = "ui_skins/shade/skin/uiskin.json";
-	
+
 	//预设常量
 	public static final int editorFontSize = 40;
 	public static final float editorFontScl = 0.5f;
@@ -25,7 +25,7 @@ public class GlobalAssets {
 	//实例资源
 	public Texture cellTextures;
 	public Texture avatarTex;
-	
+
 	public Skin defaultSkin;
 	public BitmapFont font;
 
@@ -37,7 +37,7 @@ public class GlobalAssets {
 		instance = this;
 
 		//材质
-		
+
 		//默认主题
 		defaultSkin = new Skin(Gdx.files.internal(skinPath));
 		font = FontUtils.generate();
@@ -49,38 +49,38 @@ public class GlobalAssets {
 			editorFontGray = FontUtils.generate(editorFontSize);
 			editorFontGray.getData().setScale(editorFontScl);
 			editorFontGray.setColor(Color.GRAY);
-			
+
 			BitmapFont loggerFont = FontUtils.generate(editorFontSize);
 			loggerFont.getData().setScale(loggerFontScl);
-			
+
 			editorSkin = new Skin(Gdx.files.internal(GlobalAssets.skinPath));
-			
+
 			Label.LabelStyle labelStyle = editorSkin.get(Label.LabelStyle.class);
 			labelStyle.font = editorFont;
 
 			Label.LabelStyle loggerLabelStyle = editorSkin.get(Label.LabelStyle.class);
 			loggerLabelStyle.font = loggerFont;
 			editorSkin.add("loggerLabelStyle", loggerLabelStyle);
-			
+
 			TextButton.TextButtonStyle textButtonStyle = editorSkin.get(TextButton.TextButtonStyle.class);
 			textButtonStyle.font = editorFont;
-			
+
 			TextField.TextFieldStyle textFieldStyle = editorSkin.get(TextField.TextFieldStyle.class);
 			textFieldStyle.font = editorFont;
 			textFieldStyle.messageFont = editorFontGray;
-			
+
 			SplitPane.SplitPaneStyle splitPaneStyle = editorSkin.get("default-vertical", SplitPane.SplitPaneStyle.class);
 			Drawable handle = splitPaneStyle.handle;
 			handle.setMinHeight(editorSplitHandleSize);
 			SplitPane.SplitPaneStyle splitPaneStyleHori = editorSkin.get("default-horizontal", SplitPane.SplitPaneStyle.class);
 			Drawable handleHori = splitPaneStyleHori.handle;
 			handleHori.setMinWidth(editorSplitHandleSize);
-			
+
 			Touchpad.TouchpadStyle touchpadStyle = editorSkin.get(Touchpad.TouchpadStyle.class);
 			Drawable knob = touchpadStyle.knob;
-			knob.setMinWidth(40);
-			knob.setMinHeight(40);
-			
+			knob.setMinWidth(55);
+			knob.setMinHeight(55);
+
 			List.ListStyle listStyle = editorSkin.get(List.ListStyle.class);
 			listStyle.font = editorFont;
 		}

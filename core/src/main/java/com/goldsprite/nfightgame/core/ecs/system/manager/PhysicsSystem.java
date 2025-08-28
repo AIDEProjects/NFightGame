@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
-	private static final float gravity_scale = 0.2f;//2
+	private static final float gravity_scale = 1.5f;//2
 
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();

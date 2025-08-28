@@ -1,11 +1,13 @@
 package com.goldsprite.nfightgame.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector3;
 import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
 import com.goldsprite.nfightgame.core.ecs.component.Component;
 import com.goldsprite.nfightgame.core.ecs.component.RigidbodyComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
+import com.goldsprite.nfightgame.core.ecs.system.GameSystem;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.nfightgame.core.ecs.component.*;
 import java.util.function.*;
@@ -50,6 +52,12 @@ public class RoleControllerComponent extends Component {
 		int frameIndex = getAnimator().anims.get(getAnimator().current).getKeyFrameIndex(getAnimator().stateTime);
 		boolean enable = isAtk && frameIndex == 1;
 		attackTrigger.setEnable(enable);
+
+		//跟随相机
+		Vector3 camPos = GameSystem.getInstance().getCamera().position;
+		camPos.x = transform.getPosition().x;
+		camPos.y = transform.getPosition().y;
+		GameSystem.getInstance().getCamera().update();
 	}
 
 	private void moveRole(float delta) {

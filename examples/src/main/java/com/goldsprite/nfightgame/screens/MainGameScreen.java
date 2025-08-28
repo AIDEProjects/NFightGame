@@ -7,7 +7,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.screens.GScreen;
+import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
 import com.goldsprite.nfightgame.core.DummyControllerComponent;
 import com.goldsprite.nfightgame.core.Rocker;
@@ -34,11 +37,26 @@ public class MainGameScreen extends GScreen {
 
 	private SpriteBatch batch;
 	private Texture backTex;
+	private FitViewport worldViewport, uiViewport;
+	private Camera worldCamera, uiCamera;
+	int viewWidth = 1440, viewHeight = 810;
+	private Label fpsLabel;
+	private BitmapFont font;
+
+	@Override
+	public Viewport getViewport() {
+		return uiViewport;
+	}
 
 	@Override
 	public void create() {
+		worldViewport = new FitViewport(viewWidth, viewHeight, worldCamera = new OrthographicCamera());
+		worldViewport.apply(true);
+		uiViewport = new FitViewport(viewWidth, viewHeight, uiCamera = new OrthographicCamera());
+		uiViewport.apply(true);
+
 		gm = new GameSystem();
-		gm.setCamera(getCamera());
+		gm.setCamera(worldCamera);
 
 		createBackImage();
 
@@ -59,12 +77,18 @@ public class MainGameScreen extends GScreen {
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
 		wallCollider.setSize(100, 200);
 
+		GObject wall2 = new GObject();
+		wall2.transform.setPosition(800, 350);
+
+		RectColliderComponent wall2Collider = wall2.addComponent(new RectColliderComponent());
+		wall2Collider.setSize(200, 100);
+
 
 		ground = new GObject();
-		ground.transform.setPosition(400, 150);
+		ground.transform.setPosition(600, 150);
 
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
-		groundCollider.setSize(600, 40);
+		groundCollider.setSize(1000, 40);
 	}
 
 	private void createHero() {
@@ -73,9 +97,12 @@ public class MainGameScreen extends GScreen {
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
 
-		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
-		heroFootCollider.setOffsetPosition(0, 22.5f);
-		heroFootCollider.setRadius(22.5f);
+//		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
+//		heroFootCollider.setOffsetPosition(0, 22.5f);
+//		heroFootCollider.setRadius(22.5f);
+		RectColliderComponent heroBodyCollider = hero.addComponent(new RectColliderComponent());
+		heroBodyCollider.setOffsetPosition(5, 50);
+		heroBodyCollider.setSize(35, 110);
 
 		CircleColliderComponent heroAtkTrigger = hero.addComponent(new CircleColliderComponent());
 		heroAtkTrigger.setTrigger(true);
@@ -141,13 +168,15 @@ public class MainGameScreen extends GScreen {
 
 	private void createUI() {
 		uiSkin = GlobalAssets.getInstance().editorSkin;
-		uiStage = new Stage();
-		uiStage.setViewport(getViewport());
+		font = FontUtils.generate(35);
+		font.getData().setScale(1f);
+
+		uiStage = new Stage(uiViewport);
 		getImp().addProcessor(uiStage);
 
 		rocker = new Rocker(0, uiSkin);
-		rocker.setPosition(20, 20);
-		rocker.setSize(150, 150);
+		rocker.setPosition(30, 30);
+		rocker.setSize(225, 225);
 		uiStage.addActor(rocker);
 
 		TextButton atkBtn = new TextButton("平A", uiSkin);
@@ -156,8 +185,8 @@ public class MainGameScreen extends GScreen {
 				hero.getComponent(AnimatorComponent.class).setCurAnim("attack");
 			}
 		});
-		atkBtn.setSize(80, 80);
-		atkBtn.setPosition(getViewSize().x-50, 50, Align.bottomRight);
+		atkBtn.setSize(100, 100);
+		atkBtn.setPosition(getViewSize().x-75, 75, Align.bottomRight);
 		uiStage.addActor(atkBtn);
 	}
 
@@ -173,9 +202,13 @@ public class MainGameScreen extends GScreen {
 	public void render(float delta) {
 		ScreenUtils.clear(.7f, .7f, .7f, 1);
 
+
+		batch.setProjectionMatrix(uiCamera.combined);
 		batch.begin();
-		batch.setProjectionMatrix(getCamera().combined);
+
 		batch.draw(backTex, 0, 0, getViewSize().x, getViewSize().y);
+		font.draw(batch, "FPS: "+Gdx.graphics.getFramesPerSecond(), 20, getViewSize().y - 20);
+
 		batch.end();
 
 		gameLogic(delta);

@@ -1,9 +1,10 @@
-# NFightGame 0.7.0
+# NFightGame 0.8.x
 
 ## [Java Doc](readme/docs/javadoc/index.html) 仅本地
 
 ## 待办
 - [ ] 解决不同帧率下物理步频不一致的问题
+- [ ] 速度过快空气墙问题
 
 ## 项目配置
 - `libgdx`-1.12.1
@@ -96,3 +97,7 @@
 - [x] 敌人受击播放受击动画结束后回到待机
 - [x] 增加spriteFace用于定义角色图像初始的朝向
 - [x] 将所有Texturexxx更名为Sprite渲染器, sprite组件等等
+
+### 0.9.0
+- [x] 增大到1.5倍画面分辨率, 让视野更广, 并添加更多障碍
+- [x] 跟随相机
