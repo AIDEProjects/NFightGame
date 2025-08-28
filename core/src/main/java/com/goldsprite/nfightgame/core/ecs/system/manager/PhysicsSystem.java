@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
-	private static float gravity_scale = 2f;
+	private static float gravity_scale = 0.2f;//2
 
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();
@@ -30,13 +30,14 @@ public class PhysicsSystem extends System {
 	public void fixedUpdate(float delta) {
 		for (ColliderComponent c1 : colliders) {
 			RigidbodyComponent rigi1 = c1.getComponent(RigidbodyComponent.class);
-			if (rigi1 == null) continue;
+			if (rigi1 == null)
+				continue;
 
 			boolean isColl = false;
 
-			if(c1.isTrigger()){
-				isColl = checkCollision(c1);
-			}else{
+			if (c1.isTrigger()) {
+				isColl = checkOtherCollision(c1);
+			} else {
 				Vector2 pos1 = c1.getTransform().getPosition();
 				Vector2 velocity = rigi1.getVelocity();
 				lastPosition.set(pos1);
@@ -46,37 +47,60 @@ public class PhysicsSystem extends System {
 
 				//分轴碰撞检测
 				pos1.x += velocity.x * delta;
-				if (checkCollision(c1)) {
+				if (checkOtherCollision(c1)) {
 					isColl = true;
 					pos1.setX(lastPosition.x);
 					velocity.x = 0;
 				}
 				pos1.y += velocity.y * delta;
-				if (checkCollision(c1)) {
+				if (checkOtherCollision(c1)) {
 					isColl = true;
 					pos1.setY(lastPosition.y);
 					velocity.y = 0;
 				}
-//				pos1.set(lastPosition);//位置应用留到渲染帧进行
 			}
 			c1.setIsCollision(isColl);
 		}
 	}
 
-	private boolean checkCollision(ColliderComponent c1) {
+	private boolean checkOtherCollision(ColliderComponent c1) {
 		for (ColliderComponent c2 : colliders) {
-			if (c2 == c1) continue;
-			if (c2.getGObject() == c1.getGObject()) continue;
-
-			if (circleToCircleCollision(c1, c2)) return true;
-			if (circleToRectCollision(c1, c2)) return true;
-			if (rectToCircleCollision(c1, c2)) return true;
+			if (c2 == c1)
+				continue;
+			if (c2.getGObject() == c1.getGObject())
+				continue;
+			
+			boolean collied = checkCollision(c1, c2);
+			if(collied && !c1.isCollisingTarget(c2)){
+				c1.addCollisingTarget(c2);
+				if(c2.isTrigger()) c2.onTriggerEnter(c1);
+			}
+			if(!collied && c1.isCollisingTarget(c2)){
+				c1.removeCollisingTarget(c2);
+			}
+			
+			if(c2.isTrigger()) continue;
+			if(collied) return true;
 		}
 		return false;
 	}
 
+private boolean checkCollision(ColliderComponent c1, ColliderComponent c2) {
+	if (circleToCircleCollision(c1, c2))
+		return true;
+	if (circleToRectCollision(c1, c2))
+		return true;
+	if (rectToCircleCollision(c1, c2))
+		return true;
+	if (rectToRectCollision(c1, c2))
+		return true;
+	
+	return false;
+}
+
 	private boolean circleToCircleCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof CircleColliderComponent && c2 instanceof CircleColliderComponent)) return false;
+		if (!(c1 instanceof CircleColliderComponent && c2 instanceof CircleColliderComponent))
+			return false;
 		float cx = c1.getCenter().x;
 		float cy = c1.getCenter().y;
 		float r = ((CircleColliderComponent) c1).getRadius();
@@ -92,12 +116,14 @@ public class PhysicsSystem extends System {
 	}
 
 	private boolean rectToCircleCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof RectColliderComponent && c2 instanceof CircleColliderComponent)) return false;
+		if (!(c1 instanceof RectColliderComponent && c2 instanceof CircleColliderComponent))
+			return false;
 		return circleToRectCollision(c2, c1);
 	}
 
 	private boolean circleToRectCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof CircleColliderComponent && c2 instanceof RectColliderComponent)) return false;
+		if (!(c1 instanceof CircleColliderComponent && c2 instanceof RectColliderComponent))
+			return false;
 		float cx = c1.getCenter().x;
 		float cy = c1.getCenter().y;
 		float r = ((CircleColliderComponent) c1).getRadius();
@@ -115,8 +141,19 @@ public class PhysicsSystem extends System {
 
 	private boolean rectToRectCollision(ColliderComponent c1, ColliderComponent c2) {
 		if (!(c1 instanceof RectColliderComponent && c2 instanceof RectColliderComponent)) return false;
-
-		return false;
+		float rx = c1.getCenter().x;
+		float ry = c1.getCenter().y;
+		float rw = ((RectColliderComponent) c1).getSize().x;
+		float rh = ((RectColliderComponent) c1).getSize().y;
+		float r2x = c2.getCenter().x;
+		float r2y = c2.getCenter().y;
+		float r2w = ((RectColliderComponent) c2).getSize().x;
+		float r2h = ((RectColliderComponent) c2).getSize().y;
+		
+		//AABB
+		float minX = rx - rw / 2, maxX = rx + rw / 2, minY = ry - rh / 2, maxY = ry + rh / 2;
+		float min2X = r2x - r2w / 2, max2X = r2x + r2w / 2, min2Y = r2y - r2h / 2, max2Y = r2y + r2h / 2;
+		return !(minX > max2X || min2X > maxX || minY > max2Y || min2Y > maxY);
 	}
 }
 

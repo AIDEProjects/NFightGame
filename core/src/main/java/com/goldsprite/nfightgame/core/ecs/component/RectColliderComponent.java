@@ -24,7 +24,7 @@ public class RectColliderComponent extends ColliderComponent {
 	public void drawGizmos() {
 		Gizmos.setColor(!isCollision? Color.GREEN: Color.RED);
 		Gizmos.setHollow(true);
-		Gizmos.rect(getCenter().x, getCenter().y, size.x, size.y);
+		Gizmos.rect(getCenter().x, getCenter().y, getSize().x, getSize().y);
 	}
 
 }

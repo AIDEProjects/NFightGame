@@ -8,6 +8,7 @@ import com.goldsprite.nfightgame.core.ecs.component.RigidbodyComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.nfightgame.core.ecs.component.*;
+import java.util.function.*;
 
 public class RoleControllerComponent extends Component {
 
@@ -16,6 +17,16 @@ public class RoleControllerComponent extends Component {
 	private float speed = 100;
 
 	private AnimatorComponent animator;
+	private CircleColliderComponent attackTrigger;
+
+	public void bindAttackTrigger(CircleColliderComponent trigger) {
+		this.attackTrigger = trigger;
+		Consumer<ColliderComponent> onTargetBeHurtListener = (collider) -> {
+			AnimatorComponent animator = collider.getComponent(AnimatorComponent.class);
+			animator.setCurAnim("hurt");
+		};
+		trigger.addOnTriggerEnterListener(onTargetBeHurtListener);
+	}
 
 	public void setRocker(Rocker rocker) {
 		this.rocker = rocker;
@@ -36,7 +47,7 @@ public class RoleControllerComponent extends Component {
 		//攻击帧时才启用攻击碰撞器
 		int frameIndex = getAnimator().anims.get(getAnimator().current).getKeyFrameIndex(getAnimator().stateTime);
 		boolean enable = isAtk && frameIndex == 1;
-		target.getComponent(CircleColliderComponent.class, 1).setEnable(enable);
+		attackTrigger.setEnable(enable);
 	}
 
 	private void moveRole(float delta) {

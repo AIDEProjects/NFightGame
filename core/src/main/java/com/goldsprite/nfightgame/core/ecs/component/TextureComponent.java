@@ -9,6 +9,7 @@ public class TextureComponent extends Component {
 	public static final TextureRegion emptyRegion = new TextureRegion();
 	private TextureRegion region = emptyRegion;//材质
 	private Vector2 size = new Vector2(1, 1);//大小
+	private Vector2 scale = new Vector2(1, 1);
 	private Vector2Int originOffset = new Vector2Int();//原点距左下偏移
 
 	public TextureRegion getRegion() {
@@ -58,18 +59,26 @@ public class TextureComponent extends Component {
 		flipOriginOffset.set(originOffset.x, originOffset.y);
 		if(region.isFlipX()) flipOriginOffset.x = getTextureSize().x-originOffset.x;
 		if(region.isFlipY()) flipOriginOffset.y = getTextureSize().y-originOffset.y;
-		flipOriginOffset.scl(transform.getScale());
+		flipOriginOffset.scl(scale).scl(transform.getScale());
 		//返回左下位置
 		return leftDownPos.set(transform.getPosition().x - getFlipOriginOffset().x, transform.getPosition().y - getFlipOriginOffset().y);
 	}
 
 	private Vector2 renderSize = new Vector2();
 	public Vector2 getRenderSize() {
-		return renderSize.set(getTextureSize()).scl(transform.getScale());
+		return renderSize.set(getTextureSize()).scl(scale).scl(transform.getScale());
 	}
 
 	public Vector2 getTextureSize() {
 		return size;
+	}
+	
+	public Vector2 getScale(){
+		return scale;
+	}
+
+	public void setScale(float sclX, float sclY) {
+		this.scale.set(sclX, sclY);
 	}
 
 	public void setSize(float sizeX, float sizeY) {

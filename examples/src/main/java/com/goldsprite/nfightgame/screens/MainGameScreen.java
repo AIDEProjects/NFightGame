@@ -25,7 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.*;
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
 
-	private GObject hero, wall, ground;
+	private GObject hero, dummy, wall, ground;
 
 	private Skin uiSkin;
 	private Stage uiStage;
@@ -47,21 +47,51 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createGObjects() {
+		createDummy();
+		
+		createHero();
+		
+
+		wall = new GObject();
+		wall.transform.setPosition(500, 300);
+
+		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
+		wallCollider.setSize(100, 200);
+
+
+		ground = new GObject();
+		ground.transform.setPosition(400, 150);
+
+		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
+		groundCollider.setSize(600, 40);
+	}
+
+	private void createHero() {
 		hero = new GObject();
 
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
-		hero.transform.setScale(1.5f);
+
+		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
+		heroFootCollider.setOffsetPosition(0, 22.5f);
+		heroFootCollider.setRadius(22.5f);
+
+		CircleColliderComponent heroAtkTrigger = hero.addComponent(new CircleColliderComponent());
+		heroAtkTrigger.setTrigger(true);
+		heroAtkTrigger.setOffsetPosition(79.5f, 90);
+		heroAtkTrigger.setRadius(36);
 
 		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
 		roleController.setRocker(rocker);
 		roleController.setTarget(hero.transform);
 		roleController.setSpeed(500);
+		roleController.bindAttackTrigger(heroAtkTrigger);
 
 		RigidbodyComponent rigi = hero.addComponent(new RigidbodyComponent());
 		rigi.setGravity(true);
 
 		TextureComponent texture = hero.addComponent(new TextureComponent());
+		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 36);
 
 		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));
@@ -77,29 +107,31 @@ public class MainGameScreen extends GScreen {
 		animator.addAnim("idle", anim1);
 		animator.addAnim("run", anim2);
 		animator.addAnim("attack", anim3);
+	}
 
-		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
-		heroFootCollider.setOffsetPosition(0, 15);
-		heroFootCollider.setRadius(15);
+	private void createDummy() {
+		dummy = new GObject();
+		dummy.transform.setPosition(220, 300);
+		dummy.transform.setScale(1.2f);
 
-		CircleColliderComponent heroAtkCollider = hero.addComponent(new CircleColliderComponent());
-		heroAtkCollider.setTrigger(true);
-		heroAtkCollider.setOffsetPosition(53, 60);
-		heroAtkCollider.setRadius(24);
+		RigidbodyComponent drigi = dummy.addComponent(new RigidbodyComponent());
 
+		TextureComponent dummyTexture = dummy.addComponent(new TextureComponent());
+		dummyTexture.getScale().set(0.6f);
+		dummyTexture.setOriginOffset(130, 120);
 
-		wall = new GObject();
-		wall.transform.setPosition(500, 300);
+		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
+		TextureRegion[] dframes1 = splitFrames("monster1/monster1_sheet.png", 0, 3);
+		TextureRegion[] dframes2 = splitFrames("monster1/monster1_sheet.png", 1, 2);
+		Animation<TextureRegion> danim1 = new Animation<>(.25f, dframes1);
+		danim1.setPlayMode(Animation.PlayMode.LOOP);
+		Animation<TextureRegion> danim2 = new Animation<>(.2f, dframes2);
+		danim2.setPlayMode(Animation.PlayMode.NORMAL);
+		dummyAnimator.addAnim("idle", danim1);
+		dummyAnimator.addAnim("hurt", danim2);
 
-		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
-		wallCollider.setSize(100, 200);
-
-
-		ground = new GObject();
-		ground.transform.setPosition(400, 150);
-
-		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
-		groundCollider.setSize(600, 40);
+		RectColliderComponent dummyCollider = dummy.addComponent(new RectColliderComponent());
+		dummyCollider.setSize(40, 100);
 	}
 
 	private void createUI() {
