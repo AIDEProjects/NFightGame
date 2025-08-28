@@ -15,6 +15,12 @@ import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.*;
 import com.goldsprite.utils.math.Vector2Int;
 import com.goldsprite.nfightgame.core.ecs.system.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
+import com.badlogic.gdx.scenes.scene2d.*;
 
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
@@ -25,11 +31,16 @@ public class MainGameScreen extends GScreen {
 	private Stage uiStage;
 	private Rocker rocker;
 
+	private SpriteBatch batch;
+	private Texture backTex;
+
 	@Override
 	public void create() {
 		gm = new GameSystem();
 		gm.setCamera(getCamera());
 
+		createBackImage();
+		
 		createUI();
 
 		createGObjects();
@@ -59,7 +70,7 @@ public class MainGameScreen extends GScreen {
 		TextureRegion[] frames3 = splitFrames("hero/hero_sheet.png", 2, 2);
 		Animation<TextureRegion> anim1 = new Animation<>(.25f, frames1);
 		anim1.setPlayMode(Animation.PlayMode.LOOP);
-		Animation<TextureRegion> anim2 = new Animation<>(.2f, frames2);
+		Animation<TextureRegion> anim2 = new Animation<>(.15f, frames2);
 		anim2.setPlayMode(Animation.PlayMode.LOOP);
 		Animation<TextureRegion> anim3 = new Animation<>(.2f, frames3);
 		anim3.setPlayMode(Animation.PlayMode.NORMAL);
@@ -96,17 +107,40 @@ public class MainGameScreen extends GScreen {
 		uiStage = new Stage();
 		uiStage.setViewport(getViewport());
 		getImp().addProcessor(uiStage);
-
+		
 		rocker = new Rocker(0, uiSkin);
 		rocker.setPosition(20, 20);
 		rocker.setSize(150, 150);
 		uiStage.addActor(rocker);
+		
+		TextButton atkBtn = new TextButton("平A", uiSkin);
+		atkBtn.addListener(new ClickListener(){
+			public void clicked(InputEvent e, float x, float y){
+				hero.getComponent(AnimatorComponent.class).setCurAnim("attack");
+			}
+		});
+		atkBtn.setSize(80, 80);
+		atkBtn.setPosition(getViewSize().x-50, 50, Align.bottomRight);
+		uiStage.addActor(atkBtn);
+	}
+
+	private void createBackImage() {
+		batch = new SpriteBatch();
+		Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+		pm.setColor(0.5f, 0.5f, 0.5f, 1);
+		pm.fill();
+		backTex = new Texture(pm);
 	}
 
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(.7f, .7f, .7f, 1);
-
+		
+		batch.begin();
+		batch.setProjectionMatrix(getCamera().combined);
+		batch.draw(backTex, 0, 0, getViewSize().x, getViewSize().y);
+		batch.end();
+		
 		gameLogic(delta);
 
 		uiStage.act(delta);

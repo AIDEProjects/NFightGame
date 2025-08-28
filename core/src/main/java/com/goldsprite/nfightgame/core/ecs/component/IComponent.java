@@ -12,4 +12,7 @@ public interface IComponent extends IRunnable {
 	void setGObject(GObject gObject);
 
 	<T extends IComponent> T getComponent(Class<T> type);
+	
+
+	<T extends IComponent> T getComponent(Class<T> type, int index);
 }

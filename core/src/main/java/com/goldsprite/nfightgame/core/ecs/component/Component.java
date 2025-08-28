@@ -31,6 +31,11 @@ public class Component implements IComponent{
 	public <T extends IComponent> T getComponent(Class<T> type) {
 		return gObject.getComponent(type);
 	}
+	
+	@Override
+	public <T extends IComponent> T getComponent(Class<T> type, int index) {
+		return gObject.getComponent(type, index);
+	}
 
 	public TransformComponent getTransform(){
 		return transform;

@@ -7,6 +7,7 @@ import com.goldsprite.nfightgame.core.ecs.component.Component;
 import com.goldsprite.nfightgame.core.ecs.component.RigidbodyComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
 import com.goldsprite.utils.math.Vector2;
+import com.goldsprite.nfightgame.core.ecs.component.*;
 
 public class RoleControllerComponent extends Component {
 
@@ -14,13 +15,28 @@ public class RoleControllerComponent extends Component {
 	private TransformComponent target;
 	private float speed = 100;
 
+	private AnimatorComponent animator;
+
 	public void setRocker(Rocker rocker) {
 		this.rocker = rocker;
 	}
 
 	@Override
 	public void update(float delta) {
+		//移动角色
 		moveRole(delta);
+		
+		//攻击播放完自动关闭
+		boolean isAtk = getAnimator().current.equals("attack");
+		boolean playFinish = getAnimator().anims.get(getAnimator().current).isAnimationFinished(getAnimator().stateTime);
+		if(isAtk && playFinish){
+			getAnimator().setCurAnim("idle");
+		}
+		
+		//攻击帧时才启用攻击碰撞器
+		int frameIndex = getAnimator().anims.get(getAnimator().current).getKeyFrameIndex(getAnimator().stateTime);
+		boolean enable = isAtk && frameIndex == 1;
+		target.getComponent(CircleColliderComponent.class, 1).setEnable(enable);
 	}
 
 	private void moveRole(float delta) {
@@ -33,14 +49,18 @@ public class RoleControllerComponent extends Component {
 		rigi.getVelocity().setX(velX);
 		if(vel.y!=0) rigi.getVelocity().setY(vel.y * speed);
 		//动画
-		AnimatorComponent animator = target.getComponent(AnimatorComponent.class);
-		animator.setCurAnim(vel.x==0?"idle":"run");
+		if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
+		if(getAnimator().current.equals("idle") && vel.x != 0) getAnimator().setCurAnim("run");
 		//翻转
 		if(vel.x != 0) target.getFace().setX((int)Math.signum(vel.x));
 	}
 
 	public void setTarget(TransformComponent target) {
 		this.target = target;
+	}
+	
+	public AnimatorComponent getAnimator(){
+		return target.getComponent(AnimatorComponent.class);
 	}
 
 	public float getSpeed() {

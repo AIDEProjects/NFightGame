@@ -8,6 +8,7 @@ import com.goldsprite.utils.math.Vector2;
 
 public class ColliderComponent extends Component {
 	public Vector2 lastPos = new Vector2();
+	protected boolean isEnabled = true;
 	protected boolean showGizmos = true;
 	protected boolean isCollision = false;
 	protected boolean isTrigger = false;
@@ -20,7 +21,7 @@ public class ColliderComponent extends Component {
 
 	public Vector2 getCenter() {
 		return centerPosition.set(offsetPosition).scl(transform.getFace()).scl(transform.getScale())
-			.add(transform.getPosition());
+				.add(transform.getPosition());
 	}
 
 	public void setOffsetPosition(float offsetX, float offsetY) {
@@ -29,7 +30,7 @@ public class ColliderComponent extends Component {
 
 	@Override
 	public void update(float delta) {
-		if (showGizmos)
+		if (isEnabled && showGizmos)
 			drawGizmos();
 	}
 
@@ -50,6 +51,14 @@ public class ColliderComponent extends Component {
 
 	public void setTrigger(boolean trigger) {
 		isTrigger = trigger;
+	}
+	
+	public void setEnable(boolean isEnable) {
+		this.isEnabled = isEnable;
+	}
+
+	public boolean isEnable() {
+		return isEnabled;
 	}
 }
 
