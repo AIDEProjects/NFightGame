@@ -25,6 +25,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.scenes.scene2d.*;
+import com.goldsprite.nfightgame.core.*;
 
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
@@ -56,7 +57,7 @@ public class MainGameScreen extends GScreen {
 		uiViewport.apply(true);
 
 		gm = new GameSystem();
-		gm.setCamera(worldCamera);
+		gm.setViewport(worldViewport);
 
 		createBackImage();
 
@@ -70,7 +71,6 @@ public class MainGameScreen extends GScreen {
 
 		createHero();
 
-
 		wall = new GObject();
 		wall.transform.setPosition(500, 300);
 
@@ -82,7 +82,6 @@ public class MainGameScreen extends GScreen {
 
 		RectColliderComponent wall2Collider = wall2.addComponent(new RectColliderComponent());
 		wall2Collider.setSize(200, 100);
-
 
 		ground = new GObject();
 		ground.transform.setPosition(600, 150);
@@ -97,9 +96,9 @@ public class MainGameScreen extends GScreen {
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
 
-//		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
-//		heroFootCollider.setOffsetPosition(0, 22.5f);
-//		heroFootCollider.setRadius(22.5f);
+		//		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
+		//		heroFootCollider.setOffsetPosition(0, 22.5f);
+		//		heroFootCollider.setRadius(22.5f);
 		RectColliderComponent heroBodyCollider = hero.addComponent(new RectColliderComponent());
 		heroBodyCollider.setOffsetPosition(5, 50);
 		heroBodyCollider.setSize(35, 110);
@@ -122,19 +121,18 @@ public class MainGameScreen extends GScreen {
 		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 36);
 
+		String path = "sprites/roles/hero/hero_sheet.png";
 		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));
-		TextureRegion[] frames1 = splitFrames("hero/hero_sheet.png", 0, 3);
-		TextureRegion[] frames2 = splitFrames("hero/hero_sheet.png", 1, 4);
-		TextureRegion[] frames3 = splitFrames("hero/hero_sheet.png", 2, 2);
-		Animation<TextureRegion> anim1 = new Animation<>(.25f, frames1);
-		anim1.setPlayMode(Animation.PlayMode.LOOP);
-		Animation<TextureRegion> anim2 = new Animation<>(.15f, frames2);
-		anim2.setPlayMode(Animation.PlayMode.LOOP);
-		Animation<TextureRegion> anim3 = new Animation<>(.2f, frames3);
-		anim3.setPlayMode(Animation.PlayMode.NORMAL);
-		animator.addAnim("idle", anim1);
-		animator.addAnim("run", anim2);
-		animator.addAnim("attack", anim3);
+		animator.addAnim("idle", new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
+		animator.addAnim("run", new Animation<TextureRegion>(.15f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim("attack",
+				new Animation<TextureRegion>(.25f, splitFrames(path, 2, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim("crouch",
+				new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim("crouchMove",
+				new Animation<TextureRegion>(.25f, splitFrames(path, 4, 4), Animation.PlayMode.LOOP));
+		animator.addAnim("sliding",
+				new Animation<TextureRegion>(.1f, splitFrames(path, 5, 3), Animation.PlayMode.NORMAL));
 	}
 
 	private void createDummy() {
@@ -151,16 +149,39 @@ public class MainGameScreen extends GScreen {
 		dummyTexture.setSpriteFace(-1, 1);
 		dummyTexture.getScale().set(0.6f);
 		dummyTexture.setOriginOffset(140, 120);
-
+		
+		/*String[] pathes = {
+			"sprites/gui/healthBar/health_bar_back.png", 
+			"sprites/gui/healthBar/health_bar_bar.png", 
+			"sprites/gui/healthBar/health_bar_frame.png", 
+		};
+		for(int i=0;i<pathes.length;i++){
+			Texture tex = new Texture(Gdx.files.internal(pathes[i]));
+			TextureRegion region = new TextureRegion(tex);
+			region.setRegionX(5);
+			SpriteComponent s = dummy.addComponent(new SpriteComponent());
+			s.setRegion(region);
+			s.getScale().set(2f);
+			s.setOriginOffset(15, 3-30);
+		}
+		*/
+		String[] pathes = {
+			"sprites/gui/healthBar/health_bar_back.png", 
+			"sprites/gui/healthBar/health_bar_bar.png", 
+			"sprites/gui/healthBar/health_bar_frame.png", 
+		};
+		HealthBarComponent dummyHealthBar = dummy.addComponent(new HealthBarComponent());
+		dummyHealthBar.loadRegions(pathes);
+		dummyHealthBar.initHealthBar(30, 6);
+		dummyHealthBar.getScale().set(2f);
+		dummyHealthBar.setOriginOffset(15, 3);
+		
+		String path = "sprites/roles/monster1/monster1_sheet.png";
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
-		TextureRegion[] dframes1 = splitFrames("monster1/monster1_sheet.png", 0, 3);
-		TextureRegion[] dframes2 = splitFrames("monster1/monster1_sheet.png", 1, 2);
-		Animation<TextureRegion> danim1 = new Animation<>(.25f, dframes1);
-		danim1.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
-		Animation<TextureRegion> danim2 = new Animation<>(.2f, dframes2);
-		danim2.setPlayMode(Animation.PlayMode.NORMAL);
-		dummyAnimator.addAnim("idle", danim1);
-		dummyAnimator.addAnim("hurt", danim2);
+		dummyAnimator.addAnim("idle",
+				new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
+		dummyAnimator.addAnim("hurt",
+				new Animation<TextureRegion>(.2f, splitFrames(path, 1, 2), Animation.PlayMode.NORMAL));
 
 		RectColliderComponent dummyCollider = dummy.addComponent(new RectColliderComponent());
 		dummyCollider.setSize(45, 100);
@@ -180,14 +201,32 @@ public class MainGameScreen extends GScreen {
 		uiStage.addActor(rocker);
 
 		TextButton atkBtn = new TextButton("平A", uiSkin);
-		atkBtn.addListener(new ClickListener(){
-			public void clicked(InputEvent e, float x, float y){
+		atkBtn.addListener(new ClickListener() {
+			public void clicked(InputEvent e, float x, float y) {
 				hero.getComponent(AnimatorComponent.class).setCurAnim("attack");
 			}
 		});
 		atkBtn.setSize(100, 100);
-		atkBtn.setPosition(getViewSize().x-75, 75, Align.bottomRight);
+		atkBtn.setPosition(getViewSize().x - 75, 75, Align.bottomRight);
 		uiStage.addActor(atkBtn);
+
+		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
+		cgAnimBtn.setSize(180, 100);
+		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
+		uiStage.addActor(cgAnimBtn);
+
+		cgAnimBtn.addListener(new ClickListener() {
+			int index;
+			AnimatorComponent animator;
+			String[] animNames;
+			public void clicked(InputEvent e, float x, float y) {
+				if (animator == null) {
+					animator = hero.getComponent(AnimatorComponent.class);
+					animNames = animator.anims.keySet().toArray(new String[]{});
+				}
+				animator.setCurAnim(animNames[index++ % animNames.length]);
+			}
+		});
 	}
 
 	private void createBackImage() {
@@ -202,12 +241,11 @@ public class MainGameScreen extends GScreen {
 	public void render(float delta) {
 		ScreenUtils.clear(.7f, .7f, .7f, 1);
 
-
 		batch.setProjectionMatrix(uiCamera.combined);
 		batch.begin();
 
 		batch.draw(backTex, 0, 0, getViewSize().x, getViewSize().y);
-		font.draw(batch, "帧率FPS: "+Gdx.graphics.getFramesPerSecond(), 20, getViewSize().y - 20);
+		font.draw(batch, "帧率FPS: " + Gdx.graphics.getFramesPerSecond(), 20, getViewSize().y - 20);
 
 		batch.end();
 
@@ -221,14 +259,15 @@ public class MainGameScreen extends GScreen {
 		gm.gameLoop(delta);
 	}
 
-	public TextureRegion[] splitFrames(String path, int col, int count){
+	public Array<TextureRegion> splitFrames(String path, int col, int count) {
 		Texture hero_sheet = new Texture(Gdx.files.internal(path));
 		Vector2Int cell = new Vector2Int(256, 256);
-		TextureRegion[] frames = new TextureRegion[count];
+		Array<TextureRegion> frames = new Array<>();
 		for (int i = 0; i < count; i++) {
-			frames[i] = new TextureRegion(hero_sheet, i*cell.x, col*cell.y, cell.x, cell.y);
+			frames.add(new TextureRegion(hero_sheet, i * cell.x, col * cell.y, cell.x, cell.y));
 		}
 		return frames;
 	}
 
 }
+

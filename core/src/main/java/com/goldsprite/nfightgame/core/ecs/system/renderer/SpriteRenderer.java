@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
 import com.goldsprite.utils.math.Vector2;
+import com.goldsprite.nfightgame.core.ecs.component.*;
 
 public class SpriteRenderer extends Renderer {
 	private final SpriteBatch batch;
@@ -17,8 +18,8 @@ public class SpriteRenderer extends Renderer {
 	public void update(float delta){
 		batch.setProjectionMatrix(gm.getCamera().combined);
 		batch.begin();
-		for(GObject gobject : gobjects){
-			SpriteComponent texComp = gobject.getComponent(SpriteComponent.class);
+		for(IComponent component : gobjects){
+			SpriteComponent texComp = (SpriteComponent)component;
 			TextureRegion region = texComp.getRegion();
 			if(SpriteComponent.emptyRegion.equals(region)) continue;
 			texComp.updateRegionFlip();

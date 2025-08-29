@@ -18,7 +18,7 @@ public class FontUtils {
 
 	public static BitmapFont generate(int fntSize) {
 		// 加载字体
-		String fntPath = fnt3Path;
+		String fntPath = fnt2Path;
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(fntPath));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = fntSize; // 字体大小

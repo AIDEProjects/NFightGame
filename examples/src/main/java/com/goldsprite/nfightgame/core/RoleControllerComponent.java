@@ -70,7 +70,7 @@ public class RoleControllerComponent extends Component {
 		rigi.getVelocity().setX(velX);
 		if(vel.y!=0) rigi.getVelocity().setY(vel.y * speed);
 		//动画
-		if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
+		//if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
 		if(getAnimator().current.equals("idle") && vel.x != 0) getAnimator().setCurAnim("run");
 		//翻转
 		if(vel.x != 0) target.getFace().setX((int)Math.signum(vel.x));

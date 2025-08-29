@@ -3,11 +3,11 @@ package com.goldsprite.nfightgame.core.ecs.component;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class AnimatorComponent extends Component {
 	private final SpriteComponent texComp;
-	public HashMap<String, Animation<TextureRegion>> anims = new HashMap<>();
+	public Map<String, Animation<TextureRegion>> anims = new LinkedHashMap<>();
 	public float stateTime;
 	public String current;
 

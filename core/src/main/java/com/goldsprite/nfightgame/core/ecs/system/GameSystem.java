@@ -11,11 +11,12 @@ import com.goldsprite.nfightgame.core.ecs.system.renderer.SpriteRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.badlogic.gdx.utils.viewport.*;
 
 public class GameSystem {
 	private static GameSystem instance;
 
-	private Camera camera;
+	private Viewport viewport;
 	private SpriteRenderer spriteRenderer;
 	private Gizmos gizmosRenderer;
 	private PhysicsSystem physicsSystem;
@@ -46,10 +47,10 @@ public class GameSystem {
 		if (component instanceof SpriteComponent) {
 			switch (mode) {
 				case ADD:
-					getInstance().spriteRenderer.addGObject(component.getGObject());
+					getInstance().spriteRenderer.addGObject(component);
 					break;
 				case REMOVE:
-					getInstance().spriteRenderer.removeGObject(component.getGObject());
+					getInstance().spriteRenderer.removeGObject(component);
 					break;
 			}
 		}
@@ -114,11 +115,14 @@ public class GameSystem {
 
 	// getters / setters
 	public Camera getCamera() {
-		return camera;
+		return viewport.getCamera();
+	}
+	public Viewport getViewport() {
+		return viewport;
 	}
 
-	public void setCamera(Camera camera) {
-		this.camera = camera;
+	public void setViewport(Viewport viewport) {
+		this.viewport = viewport;
 	}
 
 	public SpriteRenderer getTextureRenderer() {

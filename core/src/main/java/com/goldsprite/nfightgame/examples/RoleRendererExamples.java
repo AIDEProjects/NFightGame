@@ -54,7 +54,6 @@ public class RoleRendererExamples extends GScreen {
 		SpriteComponent texComp = role.addComponent(new SpriteComponent());
 		texComp.setRegion(idleRegion);
 		texComp.setOriginOffset(119, 36);
-		spriteRenderer.addGObject(role);
 
 
 		role2 = new GObject();
@@ -82,8 +81,6 @@ public class RoleRendererExamples extends GScreen {
 		CircleColliderComponent collComp = role2.addComponent(new CircleColliderComponent());
 		collComp.setOffsetPosition(53, 60);
 		collComp.setRadius(24);
-
-		spriteRenderer.addGObject(role2);
 	}
 
 	public TextureRegion[] splitFrames(String path, int col, int count){
