@@ -207,7 +207,7 @@ public class MainGameScreen extends GScreen {
 		batch.begin();
 
 		batch.draw(backTex, 0, 0, getViewSize().x, getViewSize().y);
-		font.draw(batch, "FPS: "+Gdx.graphics.getFramesPerSecond(), 20, getViewSize().y - 20);
+		font.draw(batch, "帧率FPS: "+Gdx.graphics.getFramesPerSecond(), 20, getViewSize().y - 20);
 
 		batch.end();
 
