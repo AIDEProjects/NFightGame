@@ -30,7 +30,7 @@ import com.goldsprite.nfightgame.core.*;
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
 
-	private GObject hero, dummy, wall, ground;
+	private GObject hero, dummy, dummyHealthBar, wall, ground;
 
 	private Skin uiSkin;
 	private Stage uiStage;
@@ -56,8 +56,7 @@ public class MainGameScreen extends GScreen {
 		uiViewport = new FitViewport(viewWidth, viewHeight, uiCamera = new OrthographicCamera());
 		uiViewport.apply(true);
 
-		gm = new GameSystem();
-		gm.setViewport(worldViewport);
+		createGM();
 
 		createBackImage();
 
@@ -66,13 +65,20 @@ public class MainGameScreen extends GScreen {
 		createGObjects();
 	}
 
+	private void createGM() {
+		gm = new GameSystem();
+		gm.setViewport(worldViewport);
+
+//		gm.getGizmosRenderer().setEnabled(false);
+	}
+
 	private void createGObjects() {
 		createDummy();
 
 		createHero();
 
 		wall = new GObject();
-		wall.transform.setPosition(500, 300);
+		wall.transform.setPosition(500, 345);
 
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
 		wallCollider.setSize(100, 200);
@@ -96,11 +102,8 @@ public class MainGameScreen extends GScreen {
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
 
-		//		CircleColliderComponent heroFootCollider = hero.addComponent(new CircleColliderComponent());
-		//		heroFootCollider.setOffsetPosition(0, 22.5f);
-		//		heroFootCollider.setRadius(22.5f);
 		RectColliderComponent heroBodyCollider = hero.addComponent(new RectColliderComponent());
-		heroBodyCollider.setOffsetPosition(5, 50);
+		heroBodyCollider.setOffsetPosition(0, 50);
 		heroBodyCollider.setSize(35, 110);
 
 		CircleColliderComponent heroAtkTrigger = hero.addComponent(new CircleColliderComponent());
@@ -141,6 +144,10 @@ public class MainGameScreen extends GScreen {
 		dummy.transform.setPosition(220, 300);
 		dummy.transform.setScale(1.2f);
 
+		EntityComponent dummyEnt = dummy.addComponent(new EntityComponent());
+		dummyEnt.setMaxHealth(20);
+		dummyEnt.setHealth(20);
+
 		DummyControllerComponent dummyController = dummy.addComponent(new DummyControllerComponent());
 
 		RigidbodyComponent drigi = dummy.addComponent(new RigidbodyComponent());
@@ -148,33 +155,9 @@ public class MainGameScreen extends GScreen {
 		SpriteComponent dummyTexture = dummy.addComponent(new SpriteComponent());
 		dummyTexture.setSpriteFace(-1, 1);
 		dummyTexture.getScale().set(0.6f);
-		dummyTexture.setOriginOffset(140, 120);
+		dummyTexture.setOriginOffset(140, 40);
 
-		/*String[] pathes = {
-			"sprites/gui/healthBar/health_bar_back.png",
-			"sprites/gui/healthBar/health_bar_bar.png",
-			"sprites/gui/healthBar/health_bar_frame.png",
-		};
-		for(int i=0;i<pathes.length;i++){
-			Texture tex = new Texture(Gdx.files.internal(pathes[i]));
-			TextureRegion region = new TextureRegion(tex);
-			region.setRegionX(5);
-			SpriteComponent s = dummy.addComponent(new SpriteComponent());
-			s.setRegion(region);
-			s.getScale().set(2f);
-			s.setOriginOffset(15, 3-30);
-		}
-		*/
-//		String[] pathes = {
-//			"sprites/gui/healthBar/health_bar_back.png",
-//			"sprites/gui/healthBar/health_bar_bar.png",
-//			"sprites/gui/healthBar/health_bar_frame.png",
-//		};
-//		HealthBarComponent dummyHealthBar = dummy.addComponent(new HealthBarComponent());
-//		dummyHealthBar.loadRegions(pathes);
-//		dummyHealthBar.initHealthBar(30, 6);
-//		dummyHealthBar.getScale().set(2f);
-//		dummyHealthBar.setOriginOffset(15, 3);
+		createDummyHealthBar();
 
 		String path = "sprites/roles/monster1/monster1_sheet.png";
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
@@ -185,6 +168,34 @@ public class MainGameScreen extends GScreen {
 
 		RectColliderComponent dummyCollider = dummy.addComponent(new RectColliderComponent());
 		dummyCollider.setSize(45, 100);
+		dummyCollider.setOffsetPosition(0, 45);
+	}
+
+	private void createDummyHealthBar() {
+		dummyHealthBar = new GObject();
+		dummyHealthBar.transform.setPosition(300, 300);
+
+		String[] pathes = {
+			"sprites/gui/healthBar/health_bar_back.png",
+			"sprites/gui/healthBar/health_bar_bar.png",
+			"sprites/gui/healthBar/health_bar_frame.png",
+		};
+		SpriteComponent[] textures = new SpriteComponent[pathes.length];
+		for(int i=0;i<pathes.length;i++){
+			Texture tex = new Texture(Gdx.files.internal(pathes[i]));
+			TextureRegion region = new TextureRegion(tex);
+//			region.setRegionX(5);
+			SpriteComponent s = dummyHealthBar.addComponent(new SpriteComponent());
+			textures[i] = s;
+			s.setRegion(region);
+			s.getScale().set(2.6f);
+			s.setOriginOffset(15, 3);
+		}
+
+		HealthBarComponent dummyHealthBarController = dummyHealthBar.addComponent(new HealthBarComponent());
+		dummyHealthBarController.setHealthBarTextures(textures[1]);
+		dummyHealthBarController.bindEntity(dummy.transform);
+		dummyHealthBarController.setPositionOffset(0, 140);
 	}
 
 	private void createUI() {
@@ -203,30 +214,39 @@ public class MainGameScreen extends GScreen {
 		TextButton atkBtn = new TextButton("平A", uiSkin);
 		atkBtn.addListener(new ClickListener() {
 			public void clicked(InputEvent e, float x, float y) {
-				hero.getComponent(AnimatorComponent.class).setCurAnim("attack");
+				hero.getComponent(RoleControllerComponent.class).attack();
 			}
 		});
 		atkBtn.setSize(100, 100);
 		atkBtn.setPosition(getViewSize().x - 75, 75, Align.bottomRight);
 		uiStage.addActor(atkBtn);
 
-		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
-		cgAnimBtn.setSize(180, 100);
-		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
-		uiStage.addActor(cgAnimBtn);
-
-		cgAnimBtn.addListener(new ClickListener() {
-			int index;
-			AnimatorComponent animator;
-			String[] animNames;
+		TextButton jumpBtn = new TextButton("跳", uiSkin);
+		jumpBtn.addListener(new ClickListener() {
 			public void clicked(InputEvent e, float x, float y) {
-				if (animator == null) {
-					animator = hero.getComponent(AnimatorComponent.class);
-					animNames = animator.anims.keySet().toArray(new String[]{});
-				}
-				animator.setCurAnim(animNames[index++ % animNames.length]);
+				hero.getComponent(RoleControllerComponent.class).jump();
 			}
 		});
+		jumpBtn.setSize(100, 100);
+		jumpBtn.setPosition(getViewSize().x - 75 - 100 - 50, 75, Align.bottomRight);
+		uiStage.addActor(jumpBtn);
+
+//		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
+//		cgAnimBtn.setSize(180, 100);
+//		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
+//		uiStage.addActor(cgAnimBtn);
+//		cgAnimBtn.addListener(new ClickListener() {
+//			int index;
+//			AnimatorComponent animator;
+//			String[] animNames;
+//			public void clicked(InputEvent e, float x, float y) {
+//				if (animator == null) {
+//					animator = hero.getComponent(AnimatorComponent.class);
+//					animNames = animator.anims.keySet().toArray(new String[]{});
+//				}
+//				animator.setCurAnim(animNames[index++ % animNames.length]);
+//			}
+//		});
 	}
 
 	private void createBackImage() {

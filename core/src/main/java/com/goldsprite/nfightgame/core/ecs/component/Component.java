@@ -5,6 +5,8 @@ import com.goldsprite.nfightgame.core.ecs.GObject;
 public class Component implements IComponent{
 	protected GObject gObject;
 	protected TransformComponent transform;
+	protected boolean isEnabled = true;
+	protected boolean showGizmos = true;
 
 	public Component() {
 	}
@@ -16,6 +18,8 @@ public class Component implements IComponent{
 
 	@Override
 	public void update(float delta) {
+		if (isEnabled && showGizmos)
+			drawGizmos();
 	}
 
 	@Override
@@ -35,5 +39,16 @@ public class Component implements IComponent{
 
 	public TransformComponent getTransform(){
 		return transform;
+	}
+
+	protected void drawGizmos() {
+	}
+
+	public void setEnable(boolean isEnable) {
+		this.isEnabled = isEnable;
+	}
+
+	public boolean isEnable() {
+		return isEnabled;
 	}
 }

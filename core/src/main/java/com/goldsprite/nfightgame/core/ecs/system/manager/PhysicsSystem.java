@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
-	private static final float gravity_scale = 2.5f * 60;//2
+	private static final float gravity_scale = 5f * 60;//2
 
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();
@@ -28,6 +28,8 @@ public class PhysicsSystem extends System {
 	}
 
 	public void update(float delta) {
+		if(!isEnabled()) return;
+
 		for (ColliderComponent c1 : colliders) {
 			RigidbodyComponent rigi1 = c1.getComponent(RigidbodyComponent.class);
 			if (rigi1 == null)

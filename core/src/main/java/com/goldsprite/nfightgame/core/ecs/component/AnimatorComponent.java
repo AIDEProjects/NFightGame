@@ -16,7 +16,10 @@ public class AnimatorComponent extends Component {
 	}
 
 	public void setCurAnim(String animName){
-		if(!current.equals(animName)) stateTime = 0;
+		setCurAnim(animName, true);
+	}
+	public void setCurAnim(String animName, boolean reset){
+		if(!current.equals(animName) && reset) stateTime = 0;
 		current = animName;
 	}
 
@@ -37,5 +40,9 @@ public class AnimatorComponent extends Component {
 
 	private Animation<TextureRegion> getAnim(String animName) {
 		return anims.get(animName);
+	}
+
+	public boolean isAnim(String animName) {
+		return anims.containsKey(animName) && current.equals(animName);
 	}
 }

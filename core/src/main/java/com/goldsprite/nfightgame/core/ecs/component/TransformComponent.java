@@ -1,5 +1,7 @@
 package com.goldsprite.nfightgame.core.ecs.component;
 
+import com.badlogic.gdx.graphics.Color;
+import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.utils.math.Vector2Int;
 
@@ -31,4 +33,10 @@ public class TransformComponent extends Component {
 		face.set(faceX, faceY);
 	}
 
+	@Override
+	protected void drawGizmos() {
+		Gizmos.setColor(Color.YELLOW);
+		Gizmos.setHollow(true);
+		Gizmos.circle(position.x, position.y, 5);
+	}
 }

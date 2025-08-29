@@ -122,6 +122,8 @@ public class Gizmos extends System {
 
 	@Override
 	public void update(float delta) {
+		if(!isEnabled()) return;
+
 		shapeRenderer.setProjectionMatrix(gm.getCamera().combined);
 
 		// 按形状类型分组绘制以减少状态切换

@@ -16,6 +16,8 @@ public class SpriteRenderer extends Renderer {
 
 	@Override
 	public void update(float delta){
+		if(!isEnabled()) return;
+
 		batch.setProjectionMatrix(gm.getCamera().combined);
 		batch.begin();
 		for(IComponent component : gobjects){

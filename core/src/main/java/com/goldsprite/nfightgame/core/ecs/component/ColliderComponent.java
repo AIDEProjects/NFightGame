@@ -9,8 +9,6 @@ import java.util.*;
 import java.util.function.*;
 
 public class ColliderComponent extends Component {
-	protected boolean isEnabled = true;
-	protected boolean showGizmos = true;
 	protected boolean isCollision = false;
 	protected boolean isTrigger = false;
 	protected Vector2 centerPosition = new Vector2();
@@ -34,15 +32,6 @@ public class ColliderComponent extends Component {
 
 	public void setOffsetPosition(float offsetX, float offsetY) {
 		offsetPosition.set(offsetX, offsetY);
-	}
-
-	@Override
-	public void update(float delta) {
-		if (isEnabled && showGizmos)
-			drawGizmos();
-	}
-
-	protected void drawGizmos() {
 	}
 
 	public boolean isCollision() {
@@ -71,14 +60,6 @@ public class ColliderComponent extends Component {
 
 	public void setTrigger(boolean trigger) {
 		isTrigger = trigger;
-	}
-
-	public void setEnable(boolean isEnable) {
-		this.isEnabled = isEnable;
-	}
-
-	public boolean isEnable() {
-		return isEnabled;
 	}
 }
 

@@ -1,6 +1,7 @@
 package com.goldsprite.nfightgame.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
@@ -16,7 +17,7 @@ public class RoleControllerComponent extends Component {
 
 	private Rocker rocker;
 	private TransformComponent target;
-	private float speed = 100;
+	private float speed = 100, jumpForce = 1000;
 
 	private AnimatorComponent animator;
 	private CircleColliderComponent attackTrigger;
@@ -28,6 +29,8 @@ public class RoleControllerComponent extends Component {
 			animator.setCurAnim("hurt");
 			int facingPlayer = (int)Math.signum(transform.getPosition().x - collider.getTransform().getPosition().x);
 			collider.getTransform().getFace().setX(facingPlayer);
+			EntityComponent targetEnt = collider.getComponent(EntityComponent.class);
+			targetEnt.hurt(5);
 		};
 		trigger.onTriggerEnterListeners.add(onTargetBeHurtListener);
 	}
@@ -62,18 +65,54 @@ public class RoleControllerComponent extends Component {
 
 	private void moveRole(float delta) {
 		Vector2 vel = rocker.getValue();
-//		vel.x = 1;
+		boolean crouching = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
+		if(Gdx.input.isKeyPressed(Input.Keys.A)) vel.x = -1;
+		if(Gdx.input.isKeyPressed(Input.Keys.D)) vel.x = 1;
+		if(Gdx.input.isKeyPressed(Input.Keys.W)) vel.y = 1;
+		if(Gdx.input.isKeyPressed(Input.Keys.S)) vel.y = -1;
+		if(Gdx.input.isKeyPressed(Input.Keys.J)) attack();
+		if((crouching && vel.x == 0 && !getAnimator().isAnim("crouchMove")) || vel.y < -0.5f) enterCrouch();
 
+		float downVal = 0.3f;
 		//位移
 		float velX = vel.x * speed;
-		RigidbodyComponent rigi = target.getComponent(RigidbodyComponent.class);
-		rigi.getVelocity().setX(velX);
-		if(vel.y!=0) rigi.getVelocity().setY(vel.y * speed);
+		RigidbodyComponent rigi = getRigi();
+		if(Math.abs(vel.x)>downVal || vel.x==0) rigi.getVelocity().setX(velX);
+//		if(vel.y!=0) rigi.getVelocity().setY(vel.y * speed);
 		//动画
-		//if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
-		if(getAnimator().current.equals("idle") && vel.x != 0) getAnimator().setCurAnim("run");
+		String moveType = crouching?"crouchMove":"run";
+		if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
+		if(Math.abs(vel.x)>downVal) getAnimator().setCurAnim(moveType);
+		if(Math.abs(vel.x)<downVal && getAnimator().isAnim("crouchMove")) getAnimator().setCurAnim("crouch", false);
 		//翻转
-		if(vel.x != 0) target.getFace().setX((int)Math.signum(vel.x));
+		if(Math.abs(vel.x)>downVal) target.getFace().setX((int)Math.signum(vel.x));
+
+		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) jump();
+
+		RectColliderComponent bodyCollider = target.getComponent(RectColliderComponent.class);
+		if(getAnimator().isAnim("crouch") || getAnimator().isAnim("crouchMove")){
+			bodyCollider.setOffsetPosition(0, 30);
+			bodyCollider.setSize(35, 70);
+		}else{
+			bodyCollider.setOffsetPosition(0, 50);
+			bodyCollider.setSize(35, 110);
+		}
+	}
+
+	public void enterCrouch() {
+		getAnimator().setCurAnim("crouch");
+	}
+
+	private RigidbodyComponent getRigi() {
+		return target.getComponent(RigidbodyComponent.class);
+	}
+
+	public void jump() {
+		getRigi().getVelocity().add(0, jumpForce);
+	}
+
+	public void attack() {
+		getAnimator().setCurAnim("attack");
 	}
 
 	public void setTarget(TransformComponent target) {
