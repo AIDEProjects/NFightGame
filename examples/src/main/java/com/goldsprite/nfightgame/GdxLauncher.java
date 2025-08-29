@@ -23,9 +23,9 @@ public class GdxLauncher extends ApplicationAdapter {
 		screenManager.setViewport(new FitViewport(960, 540, new OrthographicCamera()));
 //		screenManager.setCurScreen(RoleRendererExamples.class, true);
 //		screenManager.setCurScreen(RoleCollisionExamples.class, true);
-		//screenManager.setCurScreen(MainGameScreen.class, true);
-		screenManager.setCurScreen(FBOExampleScreen.class, true);
-		
+		screenManager.setCurScreen(MainGameScreen.class, true);
+//		screenManager.setCurScreen(FBOExampleScreen.class, true);
+
 
 		/*imp = new InputMultiplexer();
 		uiSkin = GlobalAssets.getInstance().editorSkin;

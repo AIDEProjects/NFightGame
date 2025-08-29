@@ -149,11 +149,11 @@ public class MainGameScreen extends GScreen {
 		dummyTexture.setSpriteFace(-1, 1);
 		dummyTexture.getScale().set(0.6f);
 		dummyTexture.setOriginOffset(140, 120);
-		
+
 		/*String[] pathes = {
-			"sprites/gui/healthBar/health_bar_back.png", 
-			"sprites/gui/healthBar/health_bar_bar.png", 
-			"sprites/gui/healthBar/health_bar_frame.png", 
+			"sprites/gui/healthBar/health_bar_back.png",
+			"sprites/gui/healthBar/health_bar_bar.png",
+			"sprites/gui/healthBar/health_bar_frame.png",
 		};
 		for(int i=0;i<pathes.length;i++){
 			Texture tex = new Texture(Gdx.files.internal(pathes[i]));
@@ -165,17 +165,17 @@ public class MainGameScreen extends GScreen {
 			s.setOriginOffset(15, 3-30);
 		}
 		*/
-		String[] pathes = {
-			"sprites/gui/healthBar/health_bar_back.png", 
-			"sprites/gui/healthBar/health_bar_bar.png", 
-			"sprites/gui/healthBar/health_bar_frame.png", 
-		};
-		HealthBarComponent dummyHealthBar = dummy.addComponent(new HealthBarComponent());
-		dummyHealthBar.loadRegions(pathes);
-		dummyHealthBar.initHealthBar(30, 6);
-		dummyHealthBar.getScale().set(2f);
-		dummyHealthBar.setOriginOffset(15, 3);
-		
+//		String[] pathes = {
+//			"sprites/gui/healthBar/health_bar_back.png",
+//			"sprites/gui/healthBar/health_bar_bar.png",
+//			"sprites/gui/healthBar/health_bar_frame.png",
+//		};
+//		HealthBarComponent dummyHealthBar = dummy.addComponent(new HealthBarComponent());
+//		dummyHealthBar.loadRegions(pathes);
+//		dummyHealthBar.initHealthBar(30, 6);
+//		dummyHealthBar.getScale().set(2f);
+//		dummyHealthBar.setOriginOffset(15, 3);
+
 		String path = "sprites/roles/monster1/monster1_sheet.png";
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
 		dummyAnimator.addAnim("idle",
