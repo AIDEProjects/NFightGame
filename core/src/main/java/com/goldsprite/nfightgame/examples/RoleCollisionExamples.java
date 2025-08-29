@@ -81,9 +81,9 @@ public class RoleCollisionExamples extends GScreen {
 		physics.update(delta);
 
 		//应用组件更新
-		obj.fixedUpdate(delta);
-		obj2.fixedUpdate(delta);
-		role.fixedUpdate(delta);
+		obj.update(delta);
+		obj2.update(delta);
+		role.update(delta);
 
 		//调试线绘制器
 //		gizmos.render(delta);

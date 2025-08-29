@@ -78,42 +78,16 @@ public class GameSystem {
 	}
 
 	public void gameLoop(float delta) {
-//		delta = 1/120f;
-
-		// 1. 获取本帧delta，限制最大值（避免长时间挂起导致跳几秒逻辑）
-		delta = Math.min(delta, MAX_DELTA);
-		// 2. 累加时间
-		accumulator += delta;
-		// 3. 逻辑步进
-		while (accumulator >= STEP) {
-			fixedUpdate(STEP); // 固定逻辑步长
-			accumulator -= STEP;
-		}
-//		// 4. 计算插值因子 (0~1)，用于渲染时平滑
-//		alpha = delta / STEP;
-		// 5. 渲染（带插值）
-		update(delta);
-	}
-
-	private void fixedUpdate(float fixedDelta) {
-		physicsSystem.fixedUpdate(fixedDelta);
-
-		for (GObject obj : gobjects) {
-			obj.fixedUpdate(fixedDelta);
-		}
-	}
-
-	private void update(float delta) {
-
 		for (GObject obj : gobjects) {
 			obj.update(delta);
 		}
+
+		physicsSystem.update(delta);
 
 		spriteRenderer.update(delta);
 		gizmosRenderer.update(delta);
 	}
 
-	// getters / setters
 	public Camera getCamera() {
 		return viewport.getCamera();
 	}

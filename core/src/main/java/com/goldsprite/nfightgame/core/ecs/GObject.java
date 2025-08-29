@@ -59,11 +59,4 @@ public class GObject {
 		}
 	}
 
-	public void fixedUpdate(float delta) {
-		for (List<IComponent> list : components.values()) {
-			for (IComponent component : list) {
-				component.fixedUpdate(delta);
-			}
-		}
-	}
 }

@@ -10,8 +10,4 @@ public class System implements ISystem {
 	@Override
 	public void update(float delta) {
 	}
-
-	@Override
-	public void fixedUpdate(float fixedDelta) {
-	}
 }

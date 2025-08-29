@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
-	private static final float gravity_scale = 1.5f;//2
+	private static final float gravity_scale = 2.5f * 60;//2
 
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();
@@ -27,7 +27,7 @@ public class PhysicsSystem extends System {
 		colliders.remove(collider);
 	}
 
-	public void fixedUpdate(float delta) {
+	public void update(float delta) {
 		for (ColliderComponent c1 : colliders) {
 			RigidbodyComponent rigi1 = c1.getComponent(RigidbodyComponent.class);
 			if (rigi1 == null)
@@ -43,7 +43,7 @@ public class PhysicsSystem extends System {
 				lastPosition.set(pos1);
 
 				// 计算重力
-				velocity.y -= GRAVITY * gravity_scale;
+				velocity.y -= GRAVITY * gravity_scale * delta;
 
 				//分轴碰撞检测
 				pos1.x += velocity.x * delta;

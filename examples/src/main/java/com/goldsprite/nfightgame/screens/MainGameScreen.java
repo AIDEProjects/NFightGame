@@ -249,14 +249,10 @@ public class MainGameScreen extends GScreen {
 
 		batch.end();
 
-		gameLogic(delta);
+		gm.gameLoop(delta);
 
 		uiStage.act(delta);
 		uiStage.draw();
-	}
-
-	private void gameLogic(float delta) {
-		gm.gameLoop(delta);
 	}
 
 	public Array<TextureRegion> splitFrames(String path, int col, int count) {
