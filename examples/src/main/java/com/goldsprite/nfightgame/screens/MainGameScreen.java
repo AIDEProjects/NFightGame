@@ -12,20 +12,18 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.screens.GScreen;
 import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
-import com.goldsprite.nfightgame.core.DummyControllerComponent;
-import com.goldsprite.nfightgame.core.Rocker;
-import com.goldsprite.nfightgame.core.RoleControllerComponent;
+import com.goldsprite.nfightgame.Tools;
+import com.goldsprite.nfightgame.core.components.*;
+import com.goldsprite.nfightgame.core.ui.Rocker;
 import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ecs.GameSystem;
 import com.goldsprite.nfightgame.core.ecs.component.*;
+import com.goldsprite.nfightgame.core.fsms.enums.StateType;
 import com.goldsprite.utils.math.Vector2Int;
-import com.goldsprite.nfightgame.core.ecs.system.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.scenes.scene2d.utils.*;
-import com.badlogic.gdx.scenes.scene2d.*;
-import com.goldsprite.nfightgame.core.*;
 
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
@@ -58,9 +56,11 @@ public class MainGameScreen extends GScreen {
 		uiViewport = new FitViewport(viewWidth, viewHeight, uiCamera = new OrthographicCamera());
 		uiViewport.apply(true);
 
+		batch = new SpriteBatch();
+
 		createGM();
 
-		createBackImage();
+		backTex = Tools.createBackImage(new Color(0.5f, 0.5f, 0.5f, 1));
 
 		createUI();
 
@@ -71,7 +71,7 @@ public class MainGameScreen extends GScreen {
 		gm = new GameSystem();
 		gm.setViewport(worldViewport);
 
-		gm.getGizmosRenderer().setEnabled(false);
+		gm.getGizmosRenderer().setEnabled(true);
 	}
 
 	private void createGObjects() {
@@ -94,10 +94,10 @@ public class MainGameScreen extends GScreen {
 		wall2Collider.setSize(200, 100);
 
 		ground = new GObject();
-		ground.transform.setPosition(600, 150);
+		ground.transform.setPosition(200, 150);
 
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
-		groundCollider.setSize(1000, 40);
+		groundCollider.setSize(1500, 40);
 	}
 
 	private void createMonster2() {
@@ -121,54 +121,72 @@ public class MainGameScreen extends GScreen {
 		String path = "sprites/roles/monster2/monster2_sheet.png";
 
 		AnimatorComponent animator = monster2.addComponent(new AnimatorComponent(texture));
-		animator.addAnim("idle", new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
-		animator.addAnim("walk", new Animation<TextureRegion>(.25f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
-		animator.addAnim("attack", new Animation<TextureRegion>(.15f, splitFrames(path, 2, 9), Animation.PlayMode.NORMAL));
-		animator.addAnim("hurt", new Animation<TextureRegion>(.15f, splitFrames(path, 3, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim("death", new Animation<TextureRegion>(.2f, splitFrames(path, 4, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Walk, new Animation<TextureRegion>(.25f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.15f, splitFrames(path, 2, 9), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(path, 3, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(path, 4, 3), Animation.PlayMode.NORMAL));
 	}
 
 	private void createHero() {
 		hero = new GObject();
-
+		//变换属性
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
 
+		//身体碰撞器
 		RectColliderComponent heroBodyCollider = hero.addComponent(new RectColliderComponent());
 		heroBodyCollider.setOffsetPosition(0, 50);
 		heroBodyCollider.setSize(35, 110);
 
+		//攻击触发器
 		CircleColliderComponent heroAtkTrigger = hero.addComponent(new CircleColliderComponent());
 		heroAtkTrigger.setTrigger(true);
 		heroAtkTrigger.setEnable(false);
 		heroAtkTrigger.setOffsetPosition(79.5f, 90);
 		heroAtkTrigger.setRadius(36);
 
-		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
-		roleController.setRocker(rocker);
-		roleController.setTarget(hero.transform);
-		roleController.setSpeed(500);
-		roleController.bindAttackTrigger(heroAtkTrigger);
-
+		//物理特性
 		RigidbodyComponent rigi = hero.addComponent(new RigidbodyComponent());
 		rigi.setGravity(true);
 
+		//材质组件
 		SpriteComponent texture = hero.addComponent(new SpriteComponent());
 		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 36);
 
+		EntityComponent ent = hero.addComponent(new EntityComponent());
+		ent.setMaxHealth(20, true);
+		ent.setSpeed(300);
+
+		//动画器组件
 		String path = "sprites/roles/hero/hero_sheet.png";
 		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));
-		animator.addAnim("idle", new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
-		animator.addAnim("run", new Animation<TextureRegion>(.15f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
-		animator.addAnim("attack", new Animation<TextureRegion>(.25f, splitFrames(path, 2, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim("crouch", new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim("crouchReverse", new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.REVERSED));
-		animator.addAnim("crouchMove", new Animation<TextureRegion>(.25f, splitFrames(path, 4, 4), Animation.PlayMode.LOOP));
-		animator.addAnim("sliding", new Animation<TextureRegion>(.1f, splitFrames(path, 5, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim("hurt", new Animation<TextureRegion>(.15f, splitFrames(path, 6, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim("death", new Animation<TextureRegion>(.2f, splitFrames(path, 7, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim("jump", new Animation<TextureRegion>(.1f, splitFrames(path, 8, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Run, new Animation<TextureRegion>(.15f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.25f, splitFrames(path, 2, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Crouching, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Standing, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.REVERSED));
+		animator.addAnim(StateType.CrouchWalk, new Animation<TextureRegion>(.25f, splitFrames(path, 4, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Sliding, new Animation<TextureRegion>(.1f, splitFrames(path, 5, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(path, 6, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(path, 7, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(path, 8, 2), Animation.PlayMode.NORMAL));
+
+		//状态机组件
+		HeroStateMachineComponent fsm = hero.addComponent(new HeroStateMachineComponent());
+		fsm.init();
+
+		//跟随相机组件
+		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());
+		camfollower.setTarget(hero.transform);
+
+//		//角色控制器
+//		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
+//		roleController.setRocker(rocker);
+//		roleController.setTarget(hero.transform);
+//		roleController.setSpeed(500);
+//		roleController.bindAttackTrigger(heroAtkTrigger);
 	}
 
 	private void createDummy() {
@@ -194,9 +212,9 @@ public class MainGameScreen extends GScreen {
 
 		String path = "sprites/roles/monster1/monster1_sheet.png";
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
-		dummyAnimator.addAnim("idle",
+		dummyAnimator.addAnim(StateType.Idle,
 				new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
-		dummyAnimator.addAnim("hurt",
+		dummyAnimator.addAnim(StateType.Hurt,
 				new Animation<TextureRegion>(.2f, splitFrames(path, 1, 2), Animation.PlayMode.NORMAL));
 
 		RectColliderComponent dummyCollider = dummy.addComponent(new RectColliderComponent());
@@ -237,94 +255,86 @@ public class MainGameScreen extends GScreen {
 		uiStage = new Stage(uiViewport);
 		getImp().addProcessor(uiStage);
 
-		rocker = new Rocker(0, uiSkin);
-		rocker.setPosition(30, 30);
-		rocker.setSize(225, 225);
-		uiStage.addActor(rocker);
-
-		TextButton atkBtn = new TextButton("平A", uiSkin);
-		atkBtn.addListener(new ClickListener() {
-			public void clicked(InputEvent e, float x, float y) {
-				hero.getComponent(RoleControllerComponent.class).attack();
-			}
-		});
-		atkBtn.setSize(100, 100);
-		atkBtn.setPosition(getViewSize().x - 75, 75, Align.bottomRight);
-		uiStage.addActor(atkBtn);
-
-		TextButton jumpBtn = new TextButton("跳", uiSkin);
-		jumpBtn.addListener(new ClickListener() {
-			public void clicked(InputEvent e, float x, float y) {
-				hero.getComponent(RoleControllerComponent.class).jump();
-			}
-		});
-		jumpBtn.setSize(100, 100);
-		jumpBtn.setPosition(getViewSize().x - 75 - (100 + 50), 75, Align.bottomRight);
-		uiStage.addActor(jumpBtn);
-
-		TextButton crouchBtn = new TextButton("蹲", uiSkin);
-		crouchBtn.addListener(new ClickListener() {
-			public void clicked(InputEvent e, float x, float y) {
-				RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
-				controller.crouching = !controller.crouching;
-			}
-		});
-		crouchBtn.setSize(100, 100);
-		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
-		uiStage.addActor(crouchBtn);
-
-		TextButton slidingBtn = new TextButton("滑铲", uiSkin);
-		slidingBtn.addListener(new ClickListener() {
-			public void clicked(InputEvent e, float x, float y) {
-				RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
-				controller.sliding = !controller.sliding;
-			}
-		});
-		slidingBtn.setSize(100, 100);
-		slidingBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
-		uiStage.addActor(slidingBtn);
-
-		TextButton cgAnimTargetBtn = new TextButton("切换动画目标", uiSkin);
-		cgAnimTargetBtn.setSize(180, 100);
-		cgAnimTargetBtn.setPosition(getViewSize().x - 75 - (180 + 50), getViewSize().y - 75, Align.topRight);
-		uiStage.addActor(cgAnimTargetBtn);
-		cgAnimTargetBtn.addListener(new ClickListener() {
-			public void clicked(InputEvent e, float x, float y) {
-				m = m==0?1:0;
-			}
-		});
-		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
-		cgAnimBtn.setSize(180, 100);
-		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
-		uiStage.addActor(cgAnimBtn);
-		cgAnimBtn.addListener(new ClickListener() {
-			int index, index2;
-			AnimatorComponent animator, animator2;
-			String[] animNames, animNames2;
-			public void clicked(InputEvent e, float x, float y) {
-				if (m == 0) {
-					if (animator == null) {
-						animator = hero.getComponent(AnimatorComponent.class);
-						animNames = animator.anims.keySet().toArray(new String[]{});
-					}
-					animator.setCurAnim(animNames[++index % animNames.length]);
-				} else if(m==1) {
-					if (animator2 == null) {
-						animator2 = monster2.getComponent(AnimatorComponent.class);
-						animNames2 = animator2.anims.keySet().toArray(new String[]{});
-					}
-					animator2.setCurAnim(animNames2[++index2 % animNames2.length]);
-				}
-			}
-		});
-	}
-
-	private void createBackImage() {
-		batch = new SpriteBatch();
-		Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-		pm.setColor(0.5f, 0.5f, 0.5f, 1);
-		pm.fill();
-		backTex = new Texture(pm);
+//		rocker = new Rocker(0, uiSkin);
+//		rocker.setPosition(30, 30);
+//		rocker.setSize(225, 225);
+//		uiStage.addActor(rocker);
+//
+//		TextButton atkBtn = new TextButton("平A", uiSkin);
+//		atkBtn.addListener(new ClickListener() {
+//			public void clicked(InputEvent e, float x, float y) {
+//				hero.getComponent(RoleControllerComponent.class).attack();
+//			}
+//		});
+//		atkBtn.setSize(100, 100);
+//		atkBtn.setPosition(getViewSize().x - 75, 75, Align.bottomRight);
+//		uiStage.addActor(atkBtn);
+//
+//		TextButton jumpBtn = new TextButton("跳", uiSkin);
+//		jumpBtn.addListener(new ClickListener() {
+//			public void clicked(InputEvent e, float x, float y) {
+//				hero.getComponent(RoleControllerComponent.class).jump();
+//			}
+//		});
+//		jumpBtn.setSize(100, 100);
+//		jumpBtn.setPosition(getViewSize().x - 75 - (100 + 50), 75, Align.bottomRight);
+//		uiStage.addActor(jumpBtn);
+//
+//		TextButton crouchBtn = new TextButton("蹲", uiSkin);
+//		crouchBtn.addListener(new ClickListener() {
+//			public void clicked(InputEvent e, float x, float y) {
+//				RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
+//				controller.crouching = !controller.crouching;
+//			}
+//		});
+//		crouchBtn.setSize(100, 100);
+//		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
+//		uiStage.addActor(crouchBtn);
+//
+//		TextButton slidingBtn = new TextButton("滑铲", uiSkin);
+//		slidingBtn.addListener(new ClickListener() {
+//			public void clicked(InputEvent e, float x, float y) {
+//				RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
+//				controller.sliding = !controller.sliding;
+//			}
+//		});
+//		slidingBtn.setSize(100, 100);
+//		slidingBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
+//		uiStage.addActor(slidingBtn);
+//
+//		TextButton cgAnimTargetBtn = new TextButton("切换动画目标", uiSkin);
+//		cgAnimTargetBtn.setSize(180, 100);
+//		cgAnimTargetBtn.setPosition(getViewSize().x - 75 - (180 + 50), getViewSize().y - 75, Align.topRight);
+//		uiStage.addActor(cgAnimTargetBtn);
+//		cgAnimTargetBtn.addListener(new ClickListener() {
+//			public void clicked(InputEvent e, float x, float y) {
+//				m = m==0?1:0;
+//			}
+//		});
+//		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
+//		cgAnimBtn.setSize(180, 100);
+//		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
+//		uiStage.addActor(cgAnimBtn);
+//		cgAnimBtn.addListener(new ClickListener() {
+//			int index, index2;
+//			AnimatorComponent animator, animator2;
+//			String[] keys, keys2;
+//			public void clicked(InputEvent e, float x, float y) {
+//				if (m == 0) {
+//					if (animator == null) {
+//						animator = hero.getComponent(AnimatorComponent.class);
+//						keys = animator.anims.keySet().toArray(new String[]{});
+//					}
+//					animator.setCurAnim(keys[++index % keys.length]);
+//				} else if(m==1) {
+//					if (animator2 == null) {
+//						animator2 = monster2.getComponent(AnimatorComponent.class);
+//						keys2 = animator2.anims.keySet().toArray(new String[]{});
+//					}
+//					animator2.setCurAnim(keys2[++index2 % keys2.length]);
+//				}
+//			}
+//		});
 	}
 
 	@Override

@@ -1,14 +1,15 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
-import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ui.Rocker;
 import com.goldsprite.nfightgame.core.ecs.component.AnimatorComponent;
 import com.goldsprite.nfightgame.core.ecs.component.Component;
 import com.goldsprite.nfightgame.core.ecs.component.RigidbodyComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
-import com.goldsprite.nfightgame.core.ecs.system.GameSystem;
+import com.goldsprite.nfightgame.core.ecs.GameSystem;
+import com.goldsprite.nfightgame.core.fsms.enums.StateType;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.nfightgame.core.ecs.component.*;
 import java.util.function.*;
@@ -26,7 +27,7 @@ public class RoleControllerComponent extends Component {
 		this.attackTrigger = trigger;
 		Consumer<ColliderComponent> onTargetBeHurtListener = (collider) -> {
 			AnimatorComponent animator = collider.getComponent(AnimatorComponent.class);
-			animator.setCurAnim("hurt");
+			animator.setCurAnim(StateType.Hurt);
 			int facingPlayer = (int)Math.signum(transform.getPosition().x - collider.getTransform().getPosition().x);
 			collider.getTransform().getFace().setX(facingPlayer);
 			EntityComponent targetEnt = collider.getComponent(EntityComponent.class);
@@ -45,14 +46,14 @@ public class RoleControllerComponent extends Component {
 		moveRole(delta);
 
 		//攻击播放完自动关闭
-		boolean isAtk = getAnimator().current.equals("attack");
+		boolean isAtk = getAnimator().current.equals(StateType.Attack);
 		boolean playFinish = getAnimator().anims.get(getAnimator().current).isAnimationFinished(getAnimator().stateTime);
 		if(isAtk && playFinish){
-			getAnimator().setCurAnim("idle");
+			getAnimator().setCurAnim(StateType.Idle);
 		}
-		boolean isSliding = getAnimator().current.equals("sliding");
+		boolean isSliding = getAnimator().current.equals(StateType.Sliding);
 		if(isSliding && playFinish){
-			getAnimator().setCurAnim("idle");
+			getAnimator().setCurAnim(StateType.Idle);
 		}
 
 		//攻击帧时才启用攻击碰撞器
@@ -77,9 +78,9 @@ public class RoleControllerComponent extends Component {
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) vel.y = 1;
 		if(Gdx.input.isKeyPressed(Input.Keys.S)) vel.y = -1;
 		if(Gdx.input.isKeyPressed(Input.Keys.J)) attack();
-		//if((crouching && vel.x == 0 && !getAnimator().isAnim("crouchMove")) || vel.y < -0.5f) enterCrouch();
+		//if((crouching && vel.x == 0 && !getAnimator().isAnim(StateType.CrouchWalk)) || vel.y < -0.5f) enterCrouch();
 		if(sliding){
-			getAnimator().setCurAnim("sliding");
+			getAnimator().setCurAnim(StateType.Sliding);
 			vel.x = target.getTransform().getFace().getX();
 		}
 
@@ -91,17 +92,17 @@ public class RoleControllerComponent extends Component {
 		if(Math.abs(vel.x)>downVal || vel.x==0) rigi.getVelocity().setX(velX);
 //		if(vel.y!=0) rigi.getVelocity().setY(vel.y * speed);
 		//动画
-		String moveType = crouching?"crouchMove":"run";
-		//if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
+		StateType moveType = crouching?StateType.CrouchWalk:StateType.Run;
+		//if(getAnimator().current.equals(StateType.Run) && vel.x == 0) getAnimator().setCurAnim(StateType.Idle);
 		if(Math.abs(vel.x)>downVal) getAnimator().setCurAnim(moveType);
-		//if(Math.abs(vel.x)<downVal && getAnimator().isAnim("crouchMove")) getAnimator().setCurAnim("crouch", false);
+		//if(Math.abs(vel.x)<downVal && getAnimator().isAnim(StateType.CrouchWalk)) getAnimator().setCurAnim(StateType.Crouch, false);
 		//翻转
 		if(Math.abs(vel.x)>downVal) target.getFace().setX((int)Math.signum(vel.x));
 
 		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) jump();
 
 		RectColliderComponent bodyCollider = target.getComponent(RectColliderComponent.class);
-		if(getAnimator().isAnim("crouch") || getAnimator().isAnim("crouchMove")){
+		if(getAnimator().isAnim(StateType.Crouching) || getAnimator().isAnim(StateType.CrouchWalk)){
 			bodyCollider.setOffsetPosition(0, 30);
 			bodyCollider.setSize(35, 70);
 		}else{
@@ -111,11 +112,11 @@ public class RoleControllerComponent extends Component {
 	}
 
 	private void enterSliding() {
-		getAnimator().setCurAnim("sliding");
+		getAnimator().setCurAnim(StateType.Sliding);
 	}
 
 	public void enterCrouch() {
-		getAnimator().setCurAnim("crouch");
+		getAnimator().setCurAnim(StateType.Crouching);
 	}
 
 	private RigidbodyComponent getRigi() {
@@ -127,7 +128,7 @@ public class RoleControllerComponent extends Component {
 	}
 
 	public void attack() {
-		getAnimator().setCurAnim("attack");
+		getAnimator().setCurAnim(StateType.Attack);
 	}
 
 	public void setTarget(TransformComponent target) {

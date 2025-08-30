@@ -1,4 +1,4 @@
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.ui;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;

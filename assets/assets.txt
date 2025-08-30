@@ -16,6 +16,7 @@ sprites/roles/monster1/monster1_sheet.png
 sprites/roles/monster2/monster2.aseprite
 sprites/roles/monster2/monster2.gif
 sprites/roles/monster2/monster2_sheet.png
+sprites/tiles/tiles1.aseprite
 ui_skins/shade/README.md
 ui_skins/shade/preview.png
 ui_skins/shade/raw/README.md

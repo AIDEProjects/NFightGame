@@ -1,9 +1,8 @@
-package com.goldsprite.nfightgame.core.ecs.system.renderer;
+package com.goldsprite.nfightgame.core.ecs.renderer;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Pool;
-import com.goldsprite.nfightgame.core.ecs.system.GameSystem;
 import com.goldsprite.nfightgame.core.ecs.system.System;
 
 import java.util.ArrayList;

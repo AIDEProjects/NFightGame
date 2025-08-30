@@ -1,7 +1,7 @@
 package com.goldsprite.nfightgame.core.ecs.component;
 
 import com.badlogic.gdx.graphics.Color;
-import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
+import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.utils.math.Vector2Int;
 

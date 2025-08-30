@@ -2,7 +2,7 @@
  * @Author
  * @AIDE AIDE+
  */
-package com.goldsprite.nfightgame.core;
+package com.goldsprite.nfightgame.core.components;
 
 import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;

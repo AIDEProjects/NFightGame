@@ -1,4 +1,4 @@
-package com.goldsprite.nfightgame.core.ecs.system.renderer;
+package com.goldsprite.nfightgame.core.ecs.renderer;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.goldsprite.nfightgame.core.ecs.GObject;

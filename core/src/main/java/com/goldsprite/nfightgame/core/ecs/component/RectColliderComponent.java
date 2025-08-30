@@ -4,7 +4,7 @@
 */
 package com.goldsprite.nfightgame.core.ecs.component;
 
-import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
+import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
 import com.goldsprite.utils.math.*;
 import com.badlogic.gdx.graphics.*;
 

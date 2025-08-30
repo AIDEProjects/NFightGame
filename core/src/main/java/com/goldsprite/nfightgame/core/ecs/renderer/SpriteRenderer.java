@@ -1,8 +1,7 @@
-package com.goldsprite.nfightgame.core.ecs.system.renderer;
+package com.goldsprite.nfightgame.core.ecs.renderer;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.nfightgame.core.ecs.component.*;

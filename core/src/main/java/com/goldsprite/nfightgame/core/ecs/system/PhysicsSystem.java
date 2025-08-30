@@ -1,11 +1,10 @@
-package com.goldsprite.nfightgame.core.ecs.system.manager;
+package com.goldsprite.nfightgame.core.ecs.system;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.ColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.RectColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.RigidbodyComponent;
-import com.goldsprite.nfightgame.core.ecs.system.System;
 import com.goldsprite.utils.math.Vector2;
 
 import java.util.ArrayList;

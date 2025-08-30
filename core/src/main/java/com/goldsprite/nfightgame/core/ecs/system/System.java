@@ -1,5 +1,7 @@
 package com.goldsprite.nfightgame.core.ecs.system;
 
+import com.goldsprite.nfightgame.core.ecs.GameSystem;
+
 public class System implements ISystem {
 	protected GameSystem gm;
 

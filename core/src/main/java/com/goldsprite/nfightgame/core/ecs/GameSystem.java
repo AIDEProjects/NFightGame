@@ -1,13 +1,12 @@
-package com.goldsprite.nfightgame.core.ecs.system;
+package com.goldsprite.nfightgame.core.ecs;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.ColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.IComponent;
 import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
-import com.goldsprite.nfightgame.core.ecs.system.manager.PhysicsSystem;
-import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
-import com.goldsprite.nfightgame.core.ecs.system.renderer.SpriteRenderer;
+import com.goldsprite.nfightgame.core.ecs.system.PhysicsSystem;
+import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
+import com.goldsprite.nfightgame.core.ecs.renderer.SpriteRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +78,7 @@ public class GameSystem {
 
 	public void gameLoop(float delta) {
 		physicsSystem.update(delta);
-		
+
 		for (GObject obj : gobjects) {
 			obj.update(delta);
 		}

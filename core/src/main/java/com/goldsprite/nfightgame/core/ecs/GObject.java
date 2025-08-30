@@ -2,9 +2,8 @@ package com.goldsprite.nfightgame.core.ecs;
 
 import com.goldsprite.nfightgame.core.ecs.component.IComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
-import com.goldsprite.nfightgame.core.ecs.system.GameSystem;
-import com.goldsprite.nfightgame.core.ecs.system.ManageMode;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +18,15 @@ public class GObject {
 		GameSystem.manageGObject(this, ManageMode.ADD);
 	}
 
+	public <T extends IComponent> T addComponent(Class<T> clazz) {
+		try {
+			T comp = clazz.getConstructor().newInstance();
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return null;
+	}
 	public <T extends IComponent> T addComponent(T component) {
 		List<IComponent> list = components.get(component.getClass());
 		if (list == null) list = new ArrayList<>();

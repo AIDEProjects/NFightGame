@@ -7,25 +7,25 @@ import java.util.*;
 
 public class AnimatorComponent extends Component {
 	private final SpriteComponent texComp;
-	public Map<String, Animation<TextureRegion>> anims = new LinkedHashMap<>();
+	public Map<Enum, Animation<TextureRegion>> anims = new LinkedHashMap<>();
 	public float stateTime;
-	public String current;
+	public Enum current;
 
 	public AnimatorComponent(SpriteComponent texComp){
 		this.texComp = texComp;
 	}
 
-	public void setCurAnim(String animName){
-		setCurAnim(animName, true);
+	public void setCurAnim(Enum key){
+		setCurAnim(key, true);
 	}
-	public void setCurAnim(String animName, boolean reset){
-		if(!current.equals(animName) && reset) stateTime = 0;
-		current = animName;
+	public void setCurAnim(Enum key, boolean reset){
+		if(!current.equals(key) && reset) stateTime = 0;
+		current = key;
 	}
 
-	public void addAnim(String animName, Animation<TextureRegion> anim){
-		if(current == null) current = animName;
-		anims.put(animName, anim);
+	public void addAnim(Enum key, Animation<TextureRegion> anim){
+		if(current == null) current = key;
+		anims.put(key, anim);
 	}
 
 	@Override
@@ -38,11 +38,11 @@ public class AnimatorComponent extends Component {
 		stateTime += delta;
 	}
 
-	private Animation<TextureRegion> getAnim(String animName) {
-		return anims.get(animName);
+	private Animation<TextureRegion> getAnim(Enum key) {
+		return anims.get(key);
 	}
 
-	public boolean isAnim(String animName) {
-		return anims.containsKey(animName) && current.equals(animName);
+	public boolean isAnim(Enum key) {
+		return anims.containsKey(key) && current.equals(key);
 	}
 }

@@ -1,7 +1,7 @@
 package com.goldsprite.nfightgame.core.ecs.component;
 
 import com.badlogic.gdx.graphics.*;
-import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
+import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
 
 public class CircleColliderComponent extends ColliderComponent{
 	private float radius;

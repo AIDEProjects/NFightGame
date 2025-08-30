@@ -8,8 +8,8 @@ import com.badlogic.gdx.utils.*;
 import com.goldsprite.gdxcore.screens.*;
 import com.goldsprite.nfightgame.core.ecs.*;
 import com.goldsprite.nfightgame.core.ecs.component.*;
-import com.goldsprite.nfightgame.core.ecs.system.manager.PhysicsSystem;
-import com.goldsprite.nfightgame.core.ecs.system.renderer.Gizmos;
+import com.goldsprite.nfightgame.core.ecs.system.PhysicsSystem;
+import com.goldsprite.nfightgame.core.ecs.renderer.Gizmos;
 import com.goldsprite.utils.math.*;
 
 public class RoleCollisionExamples extends GScreen {
