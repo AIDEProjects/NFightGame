@@ -136,8 +136,8 @@ public class MainGameScreen extends GScreen {
 
 		//身体碰撞器
 		RectColliderComponent heroBodyCollider = hero.addComponent(new RectColliderComponent());
-		heroBodyCollider.setOffsetPosition(0, 50);
-		heroBodyCollider.setSize(34, 110);
+		heroBodyCollider.setOffsetPosition(0, 55);
+		heroBodyCollider.setSize(34, 120);
 
 		//脚底触发器
 		CircleColliderComponent footTrigger = hero.addComponent(new CircleColliderComponent());
@@ -173,6 +173,7 @@ public class MainGameScreen extends GScreen {
 		animator.addAnim(StateType.Run, new Animation<TextureRegion>(.15f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
 		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.25f, splitFrames(path, 2, 2), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Crouching, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Crouch, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 2, 1), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Standing, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.REVERSED));
 		animator.addAnim(StateType.CrouchWalk, new Animation<TextureRegion>(.25f, splitFrames(path, 4, 4), Animation.PlayMode.LOOP));
 		animator.addAnim(StateType.Sliding, new Animation<TextureRegion>(.1f, splitFrames(path, 5, 3), Animation.PlayMode.NORMAL));
@@ -184,6 +185,7 @@ public class MainGameScreen extends GScreen {
 		HeroStateMachineComponent fsm = hero.addComponent(new HeroStateMachineComponent());
 		fsm.init();
 		fsm.setFootCollider(footTrigger);
+		fsm.setBodyCollider(heroBodyCollider);
 
 		//跟随相机组件
 		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());
@@ -364,11 +366,19 @@ public class MainGameScreen extends GScreen {
 	}
 
 	public Array<TextureRegion> splitFrames(String path, int col, int count) {
+		return splitFrames(path, col, count, 0);
+	}
+	public Array<TextureRegion> splitFrames(String path, int col, int count, int mode) {
 		Texture hero_sheet = new Texture(Gdx.files.internal(path));
 		Vector2Int cell = new Vector2Int(256, 256);
 		Array<TextureRegion> frames = new Array<>();
-		for (int i = 0; i < count; i++) {
-			frames.add(new TextureRegion(hero_sheet, i * cell.x, col * cell.y, cell.x, cell.y));
+		if(mode == 0){
+			for (int i = 0; i < count; i++) {
+				frames.add(new TextureRegion(hero_sheet, i * cell.x, col * cell.y, cell.x, cell.y));
+			}
+		}
+		if(mode == 1){
+			frames.add(new TextureRegion(hero_sheet, count * cell.x, col * cell.y, cell.x, cell.y));
 		}
 		return frames;
 	}

@@ -30,6 +30,10 @@ public class ColliderComponent extends Component {
 				.add(transform.getPosition());
 	}
 
+	public Vector2 getOffsetPosition() {
+		return offsetPosition;
+	}
+
 	public void setOffsetPosition(float offsetX, float offsetY) {
 		offsetPosition.set(offsetX, offsetY);
 	}

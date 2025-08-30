@@ -12,6 +12,9 @@ public class RectColliderComponent extends ColliderComponent {
 	private Vector2 size = new Vector2();
 	private Vector2 sclSize = new Vector2();
 
+	public Vector2 getOriSize(){
+		return size;
+	}
 	public Vector2 getSize(){
 		return this.sclSize.set(size).scl(transform.getScale());
 	}

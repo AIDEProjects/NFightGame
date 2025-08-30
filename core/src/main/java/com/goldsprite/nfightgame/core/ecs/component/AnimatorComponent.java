@@ -38,11 +38,17 @@ public class AnimatorComponent extends Component {
 		stateTime += delta;
 	}
 
-	private Animation<TextureRegion> getAnim(Enum key) {
+	public Animation<TextureRegion> getAnim(Enum key) {
 		return anims.get(key);
 	}
 
 	public boolean isAnim(Enum key) {
 		return anims.containsKey(key) && current.equals(key);
+	}
+	public Animation<TextureRegion> getCurrentAnim(){
+		return getAnim(current);
+	}
+	public boolean isFinished() {
+		return getAnim(current).isAnimationFinished(stateTime);
 	}
 }
