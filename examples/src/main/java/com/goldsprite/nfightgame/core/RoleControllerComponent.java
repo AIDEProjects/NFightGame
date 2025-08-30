@@ -50,6 +50,10 @@ public class RoleControllerComponent extends Component {
 		if(isAtk && playFinish){
 			getAnimator().setCurAnim("idle");
 		}
+		boolean isSliding = getAnimator().current.equals("sliding");
+		if(isSliding && playFinish){
+			getAnimator().setCurAnim("idle");
+		}
 
 		//攻击帧时才启用攻击碰撞器
 		int frameIndex = getAnimator().anims.get(getAnimator().current).getKeyFrameIndex(getAnimator().stateTime);
@@ -63,16 +67,22 @@ public class RoleControllerComponent extends Component {
 		GameSystem.getInstance().getCamera().update();
 	}
 
+	public boolean crouching, sliding;
 	private void moveRole(float delta) {
 		Vector2 vel = rocker.getValue();
-		boolean crouching = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT);
+		if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))crouching = true;
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) vel.x = -1;
 		if(Gdx.input.isKeyPressed(Input.Keys.D)) vel.x = 1;
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) vel.y = 1;
 		if(Gdx.input.isKeyPressed(Input.Keys.S)) vel.y = -1;
 		if(Gdx.input.isKeyPressed(Input.Keys.J)) attack();
 		if((crouching && vel.x == 0 && !getAnimator().isAnim("crouchMove")) || vel.y < -0.5f) enterCrouch();
-
+		if(sliding){
+			getAnimator().setCurAnim("sliding");
+			vel.x = target.transform.getFace().x;
+		}
+		
+		
 		float downVal = 0.3f;
 		//位移
 		float velX = vel.x * speed;
@@ -97,6 +107,10 @@ public class RoleControllerComponent extends Component {
 			bodyCollider.setOffsetPosition(0, 50);
 			bodyCollider.setSize(35, 110);
 		}
+	}
+
+	private void enterSliding() {
+		getAnimator().setCurAnim("sliding");
 	}
 
 	public void enterCrouch() {

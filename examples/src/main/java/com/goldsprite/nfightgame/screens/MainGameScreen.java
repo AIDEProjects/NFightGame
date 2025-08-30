@@ -229,25 +229,31 @@ public class MainGameScreen extends GScreen {
 			}
 		});
 		jumpBtn.setSize(100, 100);
-		jumpBtn.setPosition(getViewSize().x - 75 - 100 - 50, 75, Align.bottomRight);
+		jumpBtn.setPosition(getViewSize().x - 75 - (100 + 50), 75, Align.bottomRight);
 		uiStage.addActor(jumpBtn);
 
-//		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
-//		cgAnimBtn.setSize(180, 100);
-//		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
-//		uiStage.addActor(cgAnimBtn);
-//		cgAnimBtn.addListener(new ClickListener() {
-//			int index;
-//			AnimatorComponent animator;
-//			String[] animNames;
-//			public void clicked(InputEvent e, float x, float y) {
-//				if (animator == null) {
-//					animator = hero.getComponent(AnimatorComponent.class);
-//					animNames = animator.anims.keySet().toArray(new String[]{});
-//				}
-//				animator.setCurAnim(animNames[index++ % animNames.length]);
-//			}
-//		});
+		TextButton crouchBtn = new TextButton("蹲", uiSkin);
+		crouchBtn.addListener(new ClickListener() {
+				public void clicked(InputEvent e, float x, float y) {
+					RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
+					controller.crouching = !controller.crouching;
+				}
+			});
+		crouchBtn.setSize(100, 100);
+		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50)*2, 75, Align.bottomRight);
+		uiStage.addActor(crouchBtn);
+
+		TextButton slidingBtn = new TextButton("滑铲", uiSkin);
+		slidingBtn.addListener(new ClickListener() {
+				public void clicked(InputEvent e, float x, float y) {
+					RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
+					controller.sliding = !controller.sliding;
+				}
+			});
+		slidingBtn.setSize(100, 100);
+		slidingBtn.setPosition(getViewSize().x - 75 - (100 + 50)*2, 75, Align.bottomRight);
+		uiStage.addActor(slidingBtn);
+		
 	}
 
 	private void createBackImage() {

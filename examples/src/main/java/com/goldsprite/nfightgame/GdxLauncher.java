@@ -25,7 +25,7 @@ public class GdxLauncher extends ApplicationAdapter {
 //		screenManager.setCurScreen(RoleRendererExamples.class, true);
 //		screenManager.setCurScreen(RoleCollisionExamples.class, true);
 		screenManager.setCurScreen(MainGameScreen.class, true);
-//		screenManager.setCurScreen(TestDeltaScreen.class, true);
+//	screenManager.setCurScreen(TestDeltaScreen.class, true);
 
 
 		/*imp = new InputMultiplexer();

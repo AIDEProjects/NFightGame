@@ -44,6 +44,7 @@ public class TestDeltaScreen extends GScreen {
 		lastFpsUpdate = TimeUtils.millis();
 	}
 
+	float vx1, vx2, vx3;
 	@Override
 	public void render(float delta) {
 		// 控制帧率（如果启用）
@@ -69,9 +70,12 @@ public class TestDeltaScreen extends GScreen {
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		// 更新使用deltaTime的物体
-		deltaObjectX += DELTA_OBJECT_SPEED * deltaTime;
+		
+		vx1 += DELTA_OBJECT_SPEED * deltaTime*deltaTime*2;
+		deltaObjectX += vx1;
 		if (deltaObjectX > Gdx.graphics.getWidth()) {
 			deltaObjectX = 50;
+			vx1 = 0;
 		}
 
 		// 更新不使用deltaTime的物体（基于帧数）
@@ -83,7 +87,8 @@ public class TestDeltaScreen extends GScreen {
 		// 使用固定时间步长更新物体
 		accumulator += deltaTime;
 		while (accumulator >= FIXED_TIME_STEP) {
-			fixedObjectX += FIXED_OBJECT_SPEED * FIXED_TIME_STEP;
+			vx3 += DELTA_OBJECT_SPEED * FIXED_TIME_STEP /60f*2;
+			fixedObjectX += vx3;
 			if (fixedObjectX > Gdx.graphics.getWidth()) {
 				fixedObjectX = 50;
 			}
