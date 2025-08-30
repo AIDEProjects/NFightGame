@@ -40,9 +40,9 @@ public class GObject {
 	}
 
 	public void removeComponent(IComponent component) {
-		components.remove(component.getClass());
-
 		GameSystem.manageGameComponent(component, ManageMode.REMOVE);
+
+		components.remove(component.getClass());
 	}
 
 	public boolean hasComponent(Class<? extends IComponent> type) {

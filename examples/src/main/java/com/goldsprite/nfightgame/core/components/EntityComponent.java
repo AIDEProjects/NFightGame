@@ -5,6 +5,7 @@ import com.goldsprite.nfightgame.core.ecs.component.Component;
 
 public class EntityComponent extends Component {
 	private float speed = 300;
+	public float jumpForce = 1100;
 	private float maxHealth = 20;
 	private float health = maxHealth;
 

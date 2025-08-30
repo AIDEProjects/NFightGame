@@ -137,7 +137,13 @@ public class MainGameScreen extends GScreen {
 		//身体碰撞器
 		RectColliderComponent heroBodyCollider = hero.addComponent(new RectColliderComponent());
 		heroBodyCollider.setOffsetPosition(0, 50);
-		heroBodyCollider.setSize(35, 110);
+		heroBodyCollider.setSize(34, 110);
+
+		//脚底触发器
+		CircleColliderComponent footTrigger = hero.addComponent(new CircleColliderComponent());
+		footTrigger.setTrigger(true);
+		footTrigger.setOffsetPosition(0, 0);
+		footTrigger.setRadius(17);
 
 		//攻击触发器
 		CircleColliderComponent heroAtkTrigger = hero.addComponent(new CircleColliderComponent());
@@ -155,6 +161,7 @@ public class MainGameScreen extends GScreen {
 		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 36);
 
+		//实体属性
 		EntityComponent ent = hero.addComponent(new EntityComponent());
 		ent.setMaxHealth(20, true);
 		ent.setSpeed(300);
@@ -176,6 +183,7 @@ public class MainGameScreen extends GScreen {
 		//状态机组件
 		HeroStateMachineComponent fsm = hero.addComponent(new HeroStateMachineComponent());
 		fsm.init();
+		fsm.setFootCollider(footTrigger);
 
 		//跟随相机组件
 		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());

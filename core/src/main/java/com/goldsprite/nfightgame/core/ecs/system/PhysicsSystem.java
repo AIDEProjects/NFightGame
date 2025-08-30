@@ -1,6 +1,7 @@
 package com.goldsprite.nfightgame.core.ecs.system;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.component.CircleColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.ColliderComponent;
 import com.goldsprite.nfightgame.core.ecs.component.RectColliderComponent;
@@ -12,30 +13,42 @@ import java.util.List;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
-	private static final float gravity_scale = 2.5f * 1;//2
+	private static final float gravity_scale = 6.25f;//2
 
+	protected final List<GObject> gObjects = new ArrayList<GObject>();
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();
-	Vector2 tempVec = new Vector2();
 
 	public void addGObject(ColliderComponent collider) {
 		colliders.add(collider);
+		if(!gObjects.contains(collider.getGObject()))gObjects.add(collider.getGObject());
 	}
 
 	public void removeGObject(ColliderComponent collider) {
 		colliders.remove(collider);
+		//检测该所属gobject已无物理组件则将其移除
+		boolean remove = true;
+		for(ColliderComponent c : colliders) {
+			if(c.getGObject().equals(collider.getGObject())){
+				remove = false;
+				break;
+			}
+		};
+		if(remove) gObjects.remove(collider.getGObject());
 	}
 
 	public void update(float delta) {
 		if (!isEnabled())
 			return;
 
+		//使用固定步长的物理重力
 		accumulator += delta;
 		if(accumulator >= fixedTimeStep){
 			updateGravity(fixedTimeStep);
 			accumulator -= fixedTimeStep;
 		}
 
+		//碰撞检测
 		for (ColliderComponent c1 : colliders) {
 			RigidbodyComponent rigi1 = c1.getComponent(RigidbodyComponent.class);
 			if (rigi1 == null)
@@ -63,16 +76,26 @@ public class PhysicsSystem extends System {
 					pos1.setY(lastPosition.y);
 					velocity.y = 0;
 				}
+				pos1.set(lastPosition);
 			}
 			c1.setIsCollision(isColl);
 		}
+
+		//速度结算
+		for(GObject obj : gObjects) {
+			RigidbodyComponent rigi1 = obj.getComponent(RigidbodyComponent.class);
+			if (rigi1 == null) continue;
+			Vector2 vel = rigi1.getVelocity();
+			obj.transform.getPosition().add(vel.x * delta, vel.y * delta);
+		}
+
 	}
 
 	float accumulator = 0;
 	float fixedTimeStep = 1/60f;
 	private void updateGravity(float fixedDelta) {
-		for(ColliderComponent c : colliders){
-			RigidbodyComponent rigi1 = c.getComponent(RigidbodyComponent.class);
+		for(GObject obj : gObjects){
+			RigidbodyComponent rigi1 = obj.getComponent(RigidbodyComponent.class);
 			if (rigi1 == null) continue;
 			Vector2 velocity = rigi1.getVelocity();
 			// 计算重力
