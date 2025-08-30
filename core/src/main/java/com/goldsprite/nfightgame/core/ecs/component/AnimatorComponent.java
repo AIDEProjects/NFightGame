@@ -42,6 +42,10 @@ public class AnimatorComponent extends Component {
 		return anims.get(key);
 	}
 
+	public int getAnimFrameIndex(Enum key){
+		return getAnim(key).getKeyFrameIndex(stateTime);
+	}
+
 	public boolean isAnim(Enum key) {
 		return anims.containsKey(key) && current.equals(key);
 	}

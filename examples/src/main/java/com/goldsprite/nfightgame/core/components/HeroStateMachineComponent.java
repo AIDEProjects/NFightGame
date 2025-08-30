@@ -16,12 +16,13 @@ public class HeroStateMachineComponent extends Component implements IStateMachin
 	private Map<Class, HeroState> states = new LinkedHashMap<>();
 	private Class current;
 	private float key_dirX;
-	private boolean key_jump, key_crouch;
+	private boolean key_jump, key_crouch, key_attack;
 	public EntityComponent ent;
 	public AnimatorComponent anim;
 	public RigidbodyComponent rigi;
 	private ColliderComponent footCollider;
 	private RectColliderComponent bodyCollider;
+	private ColliderComponent attackTrigger;
 	private Vector2 standBodyCollOffset, standBodyCollSize;
 	private Vector2 crouchBodyCollOffset, crouchBodyCollSize;
 	private boolean resetAnim;
@@ -81,16 +82,23 @@ public class HeroStateMachineComponent extends Component implements IStateMachin
 		crouchBodyCollSize = standBodyCollSize.clone().div(1, 2);
 	}
 
+	public ColliderComponent getAttackTrigger(){
+		return attackTrigger;
+	}
+
+	public void setAttackTrigger(ColliderComponent c){
+		attackTrigger = c;
+	}
+
 
 	//Input Area
 	private void inputHandle() {
 		//持续左右
 		boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.A);
 		boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.D);
-		//跳
-		key_jump = Gdx.input.isKeyJustPressed(Input.Keys.K);
-		//蹲
-		key_crouch = Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_LEFT);
+		key_jump = Gdx.input.isKeyJustPressed(Input.Keys.K);//跳
+		key_crouch = Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_LEFT);//蹲
+		key_attack = Gdx.input.isKeyJustPressed(Input.Keys.J);//攻击
 
 		if(leftPressed) key_dirX = -1;
 		if(rightPressed) key_dirX = 1;
@@ -100,11 +108,17 @@ public class HeroStateMachineComponent extends Component implements IStateMachin
 	public float getKeyDirX() {
 		return key_dirX;
 	}
+	public void setKeyDirX(float key_dirX) {
+		this.key_dirX = key_dirX;
+	}
 	public boolean getKeyJump(){
 		return key_jump;
 	}
 	public boolean getKeyCrouch(){
 		return key_crouch;
+	}
+	public boolean getKeyAttack(){
+		return key_attack;
 	}
 
 
@@ -136,6 +150,7 @@ public class HeroStateMachineComponent extends Component implements IStateMachin
 		addState(new CrouchingState());
 		addState(new CrouchWalkState());
 		addState(new StandingState());
+		addState(new AttackState());
 	}
 
 	public void addState(HeroState state) {
@@ -197,6 +212,10 @@ public class HeroStateMachineComponent extends Component implements IStateMachin
 			if(fsm.getKeyCrouch()){
 				fsm.changeState(CrouchingState.class);
 			}
+			//攻击
+			if(fsm.getKeyAttack()){
+				fsm.changeState(AttackState.class);
+			}
 		}
 	}
 
@@ -228,6 +247,10 @@ public class HeroStateMachineComponent extends Component implements IStateMachin
 			//进入跳跃 按下跳跃或正在坠落
 			if(fsm.getKeyJump() || (fsm.isFalling() && !fsm.isGround())){
 				fsm.changeState(JumpState.class);
+			}
+			//攻击
+			if(fsm.getKeyAttack()){
+				fsm.changeState(AttackState.class);
 			}
 		}
 	}
@@ -338,6 +361,36 @@ public class HeroStateMachineComponent extends Component implements IStateMachin
 				fsm.bodyCollider.getOffsetPosition().set(fsm.standBodyCollOffset);
 				fsm.bodyCollider.getOriSize().set(fsm.standBodyCollSize);
 				fsm.changeState(IdleState.class);
+			}
+		}
+	}
+
+	public class AttackState extends HeroState {
+		int atkFrame = 1;
+		@Override
+		public void enter() {
+			fsm.anim.setCurAnim(StateType.Attack);
+		}
+
+		@Override
+		public void exit() {
+			attackTrigger.setEnable(false);
+		}
+
+		@Override
+		public void running(float delta) {
+			/// TODO: 这里后面可以改为动画器的帧事件
+			//攻击帧时才启用攻击碰撞器
+			int frameIndex = fsm.anim.getAnimFrameIndex(fsm.anim.current);
+			if(frameIndex == atkFrame)attackTrigger.setEnable(true);
+
+			//动画结束退出
+			if(fsm.anim.isFinished()){
+				fsm.changeState(IdleState.class);
+			}
+			//移动退出
+			if(fsm.getKeyDirX() != 0){
+				fsm.changeState(RunState.class);
 			}
 		}
 	}

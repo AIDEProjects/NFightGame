@@ -186,6 +186,7 @@ public class MainGameScreen extends GScreen {
 		fsm.init();
 		fsm.setFootCollider(footTrigger);
 		fsm.setBodyCollider(heroBodyCollider);
+		fsm.setAttackTrigger(heroAtkTrigger);
 
 		//跟随相机组件
 		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());
