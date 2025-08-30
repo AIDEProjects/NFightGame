@@ -30,7 +30,7 @@ import com.goldsprite.nfightgame.core.*;
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
 
-	private GObject hero, dummy, dummyHealthBar, wall, ground;
+	private GObject hero, dummy, dummyHealthBar, monster2, wall, ground;
 
 	private Skin uiSkin;
 	private Stage uiStage;
@@ -39,7 +39,7 @@ public class MainGameScreen extends GScreen {
 	private SpriteBatch batch;
 	private Texture backTex;
 	private FitViewport worldViewport, uiViewport;
-	private Camera worldCamera, uiCamera;
+	private OrthographicCamera worldCamera, uiCamera;
 	int viewWidth = 1440, viewHeight = 810;
 	private Label fpsLabel;
 	private BitmapFont font;
@@ -52,6 +52,8 @@ public class MainGameScreen extends GScreen {
 	@Override
 	public void create() {
 		worldViewport = new FitViewport(viewWidth, viewHeight, worldCamera = new OrthographicCamera());
+		worldCamera.zoom = 0.65f;
+		worldCamera.update();
 		worldViewport.apply(true);
 		uiViewport = new FitViewport(viewWidth, viewHeight, uiCamera = new OrthographicCamera());
 		uiViewport.apply(true);
@@ -69,11 +71,13 @@ public class MainGameScreen extends GScreen {
 		gm = new GameSystem();
 		gm.setViewport(worldViewport);
 
-//		gm.getGizmosRenderer().setEnabled(false);
+		//		gm.getGizmosRenderer().setEnabled(false);
 	}
 
 	private void createGObjects() {
 		createDummy();
+
+		createMonster2();
 
 		createHero();
 
@@ -94,6 +98,34 @@ public class MainGameScreen extends GScreen {
 
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
 		groundCollider.setSize(1000, 40);
+	}
+
+	private void createMonster2() {
+		monster2 = new GObject();
+		monster2.transform.setPosition(400, 200);
+		monster2.transform.setFace(-1, 1);
+
+		RectColliderComponent heroBodyCollider = monster2.addComponent(new RectColliderComponent());
+		heroBodyCollider.setOffsetPosition(0, 50);
+		heroBodyCollider.setSize(35, 110);
+
+		//		CircleColliderComponent m2AtkTrigger = monster2.addComponent(new CircleColliderComponent());
+		//		m2AtkTrigger.setTrigger(true);
+		//		m2AtkTrigger.setEnable(true);
+		//		m2AtkTrigger.setOffsetPosition(79.5f, 90);
+		//		m2AtkTrigger.setRadius(36);
+
+		SpriteComponent texture = monster2.addComponent(new SpriteComponent());
+		texture.getScale().set(1.5f);
+		texture.setOriginOffset(119, 36);
+		String path = "sprites/roles/monster2/monster2_sheet.png";
+
+		AnimatorComponent animator = monster2.addComponent(new AnimatorComponent(texture));
+		animator.addAnim("idle", new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
+		animator.addAnim("walk", new Animation<TextureRegion>(.25f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim("attack", new Animation<TextureRegion>(.15f, splitFrames(path, 2, 9), Animation.PlayMode.NORMAL));
+		animator.addAnim("hurt", new Animation<TextureRegion>(.15f, splitFrames(path, 3, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim("death", new Animation<TextureRegion>(.2f, splitFrames(path, 4, 3), Animation.PlayMode.NORMAL));
 	}
 
 	private void createHero() {
@@ -129,14 +161,14 @@ public class MainGameScreen extends GScreen {
 		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));
 		animator.addAnim("idle", new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
 		animator.addAnim("run", new Animation<TextureRegion>(.15f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
-		animator.addAnim("attack",
-				new Animation<TextureRegion>(.25f, splitFrames(path, 2, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim("crouch",
-				new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim("crouchMove",
-				new Animation<TextureRegion>(.25f, splitFrames(path, 4, 4), Animation.PlayMode.LOOP));
-		animator.addAnim("sliding",
-				new Animation<TextureRegion>(.1f, splitFrames(path, 5, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim("attack", new Animation<TextureRegion>(.25f, splitFrames(path, 2, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim("crouch", new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim("crouchReverse", new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.REVERSED));
+		animator.addAnim("crouchMove", new Animation<TextureRegion>(.25f, splitFrames(path, 4, 4), Animation.PlayMode.LOOP));
+		animator.addAnim("sliding", new Animation<TextureRegion>(.1f, splitFrames(path, 5, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim("hurt", new Animation<TextureRegion>(.15f, splitFrames(path, 6, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim("death", new Animation<TextureRegion>(.2f, splitFrames(path, 7, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim("jump", new Animation<TextureRegion>(.1f, splitFrames(path, 8, 2), Animation.PlayMode.NORMAL));
 	}
 
 	private void createDummy() {
@@ -176,16 +208,13 @@ public class MainGameScreen extends GScreen {
 		dummyHealthBar = new GObject();
 		dummyHealthBar.transform.setPosition(300, 300);
 
-		String[] pathes = {
-			"sprites/gui/healthBar/health_bar_back.png",
-			"sprites/gui/healthBar/health_bar_bar.png",
-			"sprites/gui/healthBar/health_bar_frame.png",
-		};
+		String[] pathes = {"sprites/gui/healthBar/health_bar_back.png", "sprites/gui/healthBar/health_bar_bar.png",
+				"sprites/gui/healthBar/health_bar_frame.png",};
 		SpriteComponent[] textures = new SpriteComponent[pathes.length];
-		for(int i=0;i<pathes.length;i++){
+		for (int i = 0; i < pathes.length; i++) {
 			Texture tex = new Texture(Gdx.files.internal(pathes[i]));
 			TextureRegion region = new TextureRegion(tex);
-//			region.setRegionX(5);
+			//			region.setRegionX(5);
 			SpriteComponent s = dummyHealthBar.addComponent(new SpriteComponent());
 			textures[i] = s;
 			s.setRegion(region);
@@ -199,6 +228,7 @@ public class MainGameScreen extends GScreen {
 		dummyHealthBarController.setPositionOffset(0, 140);
 	}
 
+	int m = 0;
 	private void createUI() {
 		uiSkin = GlobalAssets.getInstance().editorSkin;
 		font = FontUtils.generate(35);
@@ -234,26 +264,59 @@ public class MainGameScreen extends GScreen {
 
 		TextButton crouchBtn = new TextButton("蹲", uiSkin);
 		crouchBtn.addListener(new ClickListener() {
-				public void clicked(InputEvent e, float x, float y) {
-					RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
-					controller.crouching = !controller.crouching;
-				}
-			});
+			public void clicked(InputEvent e, float x, float y) {
+				RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
+				controller.crouching = !controller.crouching;
+			}
+		});
 		crouchBtn.setSize(100, 100);
-		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50)*2, 75, Align.bottomRight);
+		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
 		uiStage.addActor(crouchBtn);
 
 		TextButton slidingBtn = new TextButton("滑铲", uiSkin);
 		slidingBtn.addListener(new ClickListener() {
-				public void clicked(InputEvent e, float x, float y) {
-					RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
-					controller.sliding = !controller.sliding;
-				}
-			});
+			public void clicked(InputEvent e, float x, float y) {
+				RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
+				controller.sliding = !controller.sliding;
+			}
+		});
 		slidingBtn.setSize(100, 100);
-		slidingBtn.setPosition(getViewSize().x - 75 - (100 + 50)*2, 75, Align.bottomRight);
+		slidingBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
 		uiStage.addActor(slidingBtn);
-		
+
+		TextButton cgAnimTargetBtn = new TextButton("切换动画目标", uiSkin);
+		cgAnimTargetBtn.setSize(180, 100);
+		cgAnimTargetBtn.setPosition(getViewSize().x - 75 - (180 + 50), getViewSize().y - 75, Align.topRight);
+		uiStage.addActor(cgAnimTargetBtn);
+		cgAnimTargetBtn.addListener(new ClickListener() {
+			public void clicked(InputEvent e, float x, float y) {
+				m = m==0?1:0;
+			}
+		});
+		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
+		cgAnimBtn.setSize(180, 100);
+		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
+		uiStage.addActor(cgAnimBtn);
+		cgAnimBtn.addListener(new ClickListener() {
+			int index, index2;
+			AnimatorComponent animator, animator2;
+			String[] animNames, animNames2;
+			public void clicked(InputEvent e, float x, float y) {
+				if (m == 0) {
+					if (animator == null) {
+						animator = hero.getComponent(AnimatorComponent.class);
+						animNames = animator.anims.keySet().toArray(new String[]{});
+					}
+					animator.setCurAnim(animNames[index++ % animNames.length]);
+				} else if(m==1) {
+					if (animator2 == null) {
+						animator2 = monster2.getComponent(AnimatorComponent.class);
+						animNames2 = animator2.anims.keySet().toArray(new String[]{});
+					}
+					animator2.setCurAnim(animNames2[index2++ % animNames2.length]);
+				}
+			}
+		});
 	}
 
 	private void createBackImage() {

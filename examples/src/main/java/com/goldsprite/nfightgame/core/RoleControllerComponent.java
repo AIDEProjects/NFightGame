@@ -77,7 +77,7 @@ public class RoleControllerComponent extends Component {
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) vel.y = 1;
 		if(Gdx.input.isKeyPressed(Input.Keys.S)) vel.y = -1;
 		if(Gdx.input.isKeyPressed(Input.Keys.J)) attack();
-		if((crouching && vel.x == 0 && !getAnimator().isAnim("crouchMove")) || vel.y < -0.5f) enterCrouch();
+		//if((crouching && vel.x == 0 && !getAnimator().isAnim("crouchMove")) || vel.y < -0.5f) enterCrouch();
 		if(sliding){
 			getAnimator().setCurAnim("sliding");
 			vel.x = target.getTransform().getFace().getX();
@@ -92,9 +92,9 @@ public class RoleControllerComponent extends Component {
 //		if(vel.y!=0) rigi.getVelocity().setY(vel.y * speed);
 		//动画
 		String moveType = crouching?"crouchMove":"run";
-		if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
+		//if(getAnimator().current.equals("run") && vel.x == 0) getAnimator().setCurAnim("idle");
 		if(Math.abs(vel.x)>downVal) getAnimator().setCurAnim(moveType);
-		if(Math.abs(vel.x)<downVal && getAnimator().isAnim("crouchMove")) getAnimator().setCurAnim("crouch", false);
+		//if(Math.abs(vel.x)<downVal && getAnimator().isAnim("crouchMove")) getAnimator().setCurAnim("crouch", false);
 		//翻转
 		if(Math.abs(vel.x)>downVal) target.getFace().setX((int)Math.signum(vel.x));
 
