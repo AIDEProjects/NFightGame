@@ -1,4 +1,4 @@
-# NFightGame 0.8.x
+# NFightGame 0.9.x
 
 ## [Java Doc](readme/docs/javadoc/index.html) 仅本地
 
@@ -112,3 +112,6 @@
 - [x] 增加血条且能扣血
 - [x] 增加按键控制人物
 - [x] 增加ctrl下蹲与下蹲时行走
+
+### 0.9.0
+- [ ] 增加滑铲

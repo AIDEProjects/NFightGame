@@ -70,7 +70,8 @@ public class RoleControllerComponent extends Component {
 	public boolean crouching, sliding;
 	private void moveRole(float delta) {
 		Vector2 vel = rocker.getValue();
-		if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))crouching = true;
+		if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))crouching = !crouching;
+		if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))sliding = true;
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) vel.x = -1;
 		if(Gdx.input.isKeyPressed(Input.Keys.D)) vel.x = 1;
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) vel.y = 1;
@@ -79,10 +80,10 @@ public class RoleControllerComponent extends Component {
 		if((crouching && vel.x == 0 && !getAnimator().isAnim("crouchMove")) || vel.y < -0.5f) enterCrouch();
 		if(sliding){
 			getAnimator().setCurAnim("sliding");
-			vel.x = target.transform.getFace().x;
+			vel.x = target.getTransform().getFace().getX();
 		}
-		
-		
+
+
 		float downVal = 0.3f;
 		//位移
 		float velX = vel.x * speed;
