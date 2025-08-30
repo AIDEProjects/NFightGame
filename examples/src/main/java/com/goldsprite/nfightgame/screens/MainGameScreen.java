@@ -108,6 +108,7 @@ public class MainGameScreen extends GScreen {
 
 		CircleColliderComponent heroAtkTrigger = hero.addComponent(new CircleColliderComponent());
 		heroAtkTrigger.setTrigger(true);
+		heroAtkTrigger.setEnable(false);
 		heroAtkTrigger.setOffsetPosition(79.5f, 90);
 		heroAtkTrigger.setRadius(36);
 

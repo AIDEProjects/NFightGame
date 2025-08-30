@@ -17,7 +17,7 @@ public class RoleControllerComponent extends Component {
 
 	private Rocker rocker;
 	private TransformComponent target;
-	private float speed = 100, jumpForce = 1000;
+	private float speed = 100, jumpForce = 1100;
 
 	private AnimatorComponent animator;
 	private CircleColliderComponent attackTrigger;

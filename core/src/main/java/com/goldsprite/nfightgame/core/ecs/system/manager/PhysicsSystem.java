@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
-	private static final float gravity_scale = 5f * 60;//2
+	private static final float gravity_scale = 2.5f * 1;//2
 
 	protected final List<ColliderComponent> colliders = new ArrayList<ColliderComponent>();
 	Vector2 lastPosition = new Vector2();
@@ -28,7 +28,14 @@ public class PhysicsSystem extends System {
 	}
 
 	public void update(float delta) {
-		if(!isEnabled()) return;
+		if (!isEnabled())
+			return;
+
+		accumulator += delta;
+		if(accumulator >= fixedTimeStep){
+			updateGravity(fixedTimeStep);
+			accumulator -= fixedTimeStep;
+		}
 
 		for (ColliderComponent c1 : colliders) {
 			RigidbodyComponent rigi1 = c1.getComponent(RigidbodyComponent.class);
@@ -43,9 +50,6 @@ public class PhysicsSystem extends System {
 				Vector2 pos1 = c1.getTransform().getPosition();
 				Vector2 velocity = rigi1.getVelocity();
 				lastPosition.set(pos1);
-
-				// 计算重力
-				velocity.y -= GRAVITY * gravity_scale * delta;
 
 				//分轴碰撞检测
 				pos1.x += velocity.x * delta;
@@ -65,13 +69,28 @@ public class PhysicsSystem extends System {
 		}
 	}
 
+	float accumulator = 0;
+	float fixedTimeStep = 1/60f;
+	private void updateGravity(float fixedDelta) {
+		for(ColliderComponent c : colliders){
+			RigidbodyComponent rigi1 = c.getComponent(RigidbodyComponent.class);
+			if (rigi1 == null) continue;
+			Vector2 velocity = rigi1.getVelocity();
+			// 计算重力
+			velocity.y -= GRAVITY * gravity_scale * fixedDelta * 60;
+		}
+	}
+
 	private boolean checkOtherCollision(ColliderComponent c1) {
 		for (ColliderComponent c2 : colliders) {
-			if (c2 == c1) continue;
-			if (c2.getGObject() == c1.getGObject()) continue;
-			if (!c2.isEnable()){
-				if(c1.isCollisingTarget(c2)){
-					if (c2.isTrigger()) c2.onTriggerExit(c1);
+			if (c2 == c1)
+				continue;
+			if (c2.getGObject() == c1.getGObject())
+				continue;
+			if (!c2.isEnable()) {
+				if (c1.isCollisingTarget(c2)) {
+					if (c2.isTrigger())
+						c2.onTriggerExit(c1);
 					c1.removeCollisingTarget(c2);
 				}
 				continue;
@@ -80,15 +99,19 @@ public class PhysicsSystem extends System {
 			boolean collied = checkCollision(c1, c2);
 			if (collied && !c1.isCollisingTarget(c2)) {
 				c1.addCollisingTarget(c2);
-				if (c2.isTrigger()) c2.onTriggerEnter(c1);
+				if (c2.isTrigger())
+					c2.onTriggerEnter(c1);
 			}
 			if (!collied && c1.isCollisingTarget(c2)) {
-				if (c2.isTrigger()) c2.onTriggerExit(c1);
+				if (c2.isTrigger())
+					c2.onTriggerExit(c1);
 				c1.removeCollisingTarget(c2);
 			}
 
-			if (c2.isTrigger()) continue;
-			if (collied) return true;
+			if (c2.isTrigger())
+				continue;
+			if (collied)
+				return true;
 		}
 		return false;
 	}
@@ -145,7 +168,8 @@ public class PhysicsSystem extends System {
 	}
 
 	private boolean rectToRectCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof RectColliderComponent && c2 instanceof RectColliderComponent)) return false;
+		if (!(c1 instanceof RectColliderComponent && c2 instanceof RectColliderComponent))
+			return false;
 		float rx = c1.getCenter().x;
 		float ry = c1.getCenter().y;
 		float rw = ((RectColliderComponent) c1).getSize().x;

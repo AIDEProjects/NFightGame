@@ -78,11 +78,11 @@ public class GameSystem {
 	}
 
 	public void gameLoop(float delta) {
+		physicsSystem.update(delta);
+		
 		for (GObject obj : gobjects) {
 			obj.update(delta);
 		}
-
-		physicsSystem.update(delta);
 
 		spriteRenderer.update(delta);
 		gizmosRenderer.update(delta);
