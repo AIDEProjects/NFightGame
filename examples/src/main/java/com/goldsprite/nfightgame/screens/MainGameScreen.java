@@ -71,7 +71,7 @@ public class MainGameScreen extends GScreen {
 		gm = new GameSystem();
 		gm.setViewport(worldViewport);
 
-		//		gm.getGizmosRenderer().setEnabled(false);
+		gm.getGizmosRenderer().setEnabled(false);
 	}
 
 	private void createGObjects() {
@@ -307,13 +307,13 @@ public class MainGameScreen extends GScreen {
 						animator = hero.getComponent(AnimatorComponent.class);
 						animNames = animator.anims.keySet().toArray(new String[]{});
 					}
-					animator.setCurAnim(animNames[index++ % animNames.length]);
+					animator.setCurAnim(animNames[++index % animNames.length]);
 				} else if(m==1) {
 					if (animator2 == null) {
 						animator2 = monster2.getComponent(AnimatorComponent.class);
 						animNames2 = animator2.anims.keySet().toArray(new String[]{});
 					}
-					animator2.setCurAnim(animNames2[index2++ % animNames2.length]);
+					animator2.setCurAnim(animNames2[++index2 % animNames2.length]);
 				}
 			}
 		});

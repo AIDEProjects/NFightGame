@@ -9,9 +9,13 @@ sprites/gui/healthBar/health_bar_back.png
 sprites/gui/healthBar/health_bar_bar.png
 sprites/gui/healthBar/health_bar_frame.png
 sprites/roles/hero/hero.aseprite
+sprites/roles/hero/hero.gif
 sprites/roles/hero/hero_sheet.png
 sprites/roles/monster1/monster1.aseprite
 sprites/roles/monster1/monster1_sheet.png
+sprites/roles/monster2/monster2.aseprite
+sprites/roles/monster2/monster2.gif
+sprites/roles/monster2/monster2_sheet.png
 ui_skins/shade/README.md
 ui_skins/shade/preview.png
 ui_skins/shade/raw/README.md
