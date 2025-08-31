@@ -53,6 +53,11 @@ public class MainGameScreen extends GScreen {
 		"sprites/gui/healthBar/health_bar_frame.png",
 	};
 	TextureRegion[] healthBarRegions = new TextureRegion[healthBarPath.length];
+	private boolean showIntroduction = true;
+	private final String introduction = "."
+		+ "按键: WASD移动 JK攻击跳跃 Ctrl蹲下起立 蹲下时移动蹲行"
+		+ "\n" + "测试: Y主角受伤 R主角重生"
+		+ "\n" + "特殊: 可以蹭墙跳, 移动打断攻击, 跳跃攻击";
 
 	@Override
 	public Viewport getViewport() {
@@ -195,12 +200,12 @@ public class MainGameScreen extends GScreen {
 		animator.addAnim(StateType.Run, new Animation<TextureRegion>(.15f, splitFrames(heroPath, 1, 4), Animation.PlayMode.LOOP));
 		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.25f, splitFrames(heroPath, 2, 2), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Crouching, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Crouch, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 2, 1), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Standing, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 3), Animation.PlayMode.REVERSED));
 		animator.addAnim(StateType.CrouchWalk, new Animation<TextureRegion>(.25f, splitFrames(heroPath, 4, 4), Animation.PlayMode.LOOP));
 		animator.addAnim(StateType.Sliding, new Animation<TextureRegion>(.1f, splitFrames(heroPath, 5, 3), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(heroPath, 6, 2), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 7, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Respawn, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 7, 3), Animation.PlayMode.REVERSED));
 		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(heroPath, 8, 2), Animation.PlayMode.NORMAL));
 
 		//状态机组件
@@ -236,10 +241,9 @@ public class MainGameScreen extends GScreen {
 		createHealthBar(dummy.transform, 0, 140);
 
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
-		dummyAnimator.addAnim(StateType.Idle,
-				new Animation<TextureRegion>(.25f, splitFrames(monster1Path, 0, 3), Animation.PlayMode.LOOP));
-		dummyAnimator.addAnim(StateType.Hurt,
-				new Animation<TextureRegion>(.2f, splitFrames(monster1Path, 1, 2), Animation.PlayMode.NORMAL));
+		dummyAnimator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(monster1Path, 0, 3), Animation.PlayMode.LOOP));
+		dummyAnimator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.2f, splitFrames(monster1Path, 1, 2), Animation.PlayMode.NORMAL));
+		dummyAnimator.addAnim(StateType.Death, new Animation<TextureRegion>(.15f, splitFrames(monster1Path, 2, 5), Animation.PlayMode.NORMAL));
 
 		RectColliderComponent dummyBodyCollider = dummy.addComponent(new RectColliderComponent());
 		dummyBodyCollider.setSize(45, 100);
@@ -273,8 +277,8 @@ public class MainGameScreen extends GScreen {
 	int m = 0;
 	private void createUI() {
 		uiSkin = GlobalAssets.getInstance().editorSkin;
-		font = FontUtils.generate(35);
-		font.getData().setScale(1f);
+		font = FontUtils.generate(100);
+		font.getData().setScale(0.2f);
 
 		uiStage = new Stage(uiViewport);
 		getImp().addProcessor(uiStage);
@@ -369,7 +373,7 @@ public class MainGameScreen extends GScreen {
 		batch.begin();
 
 		batch.draw(backTex, 0, 0, getViewSize().x, getViewSize().y);
-		font.draw(batch, "帧率FPS: " + Gdx.graphics.getFramesPerSecond(), 20, getViewSize().y - 20);
+		font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond() +"\n"+ (showIntroduction?introduction:""), 20, getViewSize().y - 20);
 
 		batch.end();
 

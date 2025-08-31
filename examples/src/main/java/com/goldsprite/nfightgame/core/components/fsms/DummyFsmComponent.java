@@ -80,12 +80,6 @@ public class DummyFsmComponent extends EntityFsmComponent<DummyFsmComponent, Dum
 			//扣血
 			fsm.getEnt().hurt(fsm.getBeHurt_damage());
 
-			//被杀死转死亡
-			if (fsm.getEnt().isDead()) {
-				fsm.changeState(DeathState.class);
-				return;
-			}
-
 			//动画
 			fsm.anim.setCurAnim(StateType.Hurt);
 		}
@@ -98,6 +92,11 @@ public class DummyFsmComponent extends EntityFsmComponent<DummyFsmComponent, Dum
 
 		@Override
 		public void running(float delta) {
+			//被杀死转死亡
+			if (fsm.anim.isFinished() && fsm.getEnt().isDead()) {
+				fsm.changeState(DeathState.class);
+				return;
+			}
 			//回到待机
 			if (fsm.anim.isFinished()) {
 				fsm.changeState(IdleState.class);
@@ -108,8 +107,15 @@ public class DummyFsmComponent extends EntityFsmComponent<DummyFsmComponent, Dum
 	public class DeathState extends DummyState {
 		@Override
 		public void enter() {
+			fsm.anim.setCurAnim(StateType.Death);
+		}
+
+		@Override
+		public void running(float delta) {
 			//清理
-			fsm.getGObject().destroy();
+			if(fsm.anim.isFinished()) {
+				fsm.getGObject().destroy();
+			}
 		}
 	}
 }

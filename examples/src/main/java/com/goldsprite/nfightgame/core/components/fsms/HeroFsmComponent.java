@@ -38,8 +38,7 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 	}
 
 	public void respawn() {
-		ent.heal();
-		changeState(IdleState.class);
+		changeState(RespawnState.class);
 	}
 
 	private boolean isFalling() {
@@ -146,6 +145,7 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 		addState(new AttackState());
 		addState(new HurtState());
 		addState(new DeathState());
+		addState(new RespawnState());
 	}
 
 
@@ -265,7 +265,7 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 		@Override
 		public void running(float delta) {
 //			Gdx.app.log("", "isGround: "+fsm.isGround());
-			//已离开地面
+			//已离开地面或身体有接触点(碰撞)则标记已起跳
 			if (!fsm.isGround() || fsm.bodyCollider.isCollision()) isJumped = true;
 			//持续更新速度与朝向
 			fsm.move(fsm.getKeyDirX());
@@ -280,8 +280,11 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 			}
 			//受击
 			if (fsm.getKeyHurt()) {
-
 				fsm.changeState(HurtState.class);
+			}
+			//攻击
+			if(fsm.getKeyAttack()){
+				fsm.changeState(AttackState.class);
 			}
 		}
 
@@ -381,8 +384,8 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 			fsm.anim.setCurAnim(StateType.Attack);
 			//开启前摇保护
 			fsm.setMoveKeyProtect(true);
-			//停住玩家
-			fsm.move(0);
+			//在地面时停住玩家
+			if(fsm.isGround()) fsm.move(0);
 		}
 
 		@Override
@@ -418,12 +421,6 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 			//扣血
 			fsm.getEnt().hurt(fsm.getBeHurt_damage());
 
-			//被杀死转死亡
-			if (fsm.getEnt().isDead()) {
-				fsm.changeState(DeathState.class);
-				return;
-			}
-
 			//动画
 			fsm.anim.setCurAnim(StateType.Hurt);
 		}
@@ -436,6 +433,11 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 
 		@Override
 		public void running(float delta) {
+			//被杀死转死亡
+			if (fsm.anim.isFinished() && fsm.getEnt().isDead()) {
+				fsm.changeState(DeathState.class);
+				return;
+			}
 			//回到待机
 			if (fsm.anim.isFinished()) {
 				fsm.changeState(IdleState.class);
@@ -443,11 +445,34 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 		}
 	}
 
-	public class DeathState extends HeroState {
+	public static class DeathState extends HeroState {
 		@Override
 		public void enter() {
-			//动画
 			fsm.anim.setCurAnim(StateType.Death);
+		}
+
+		@Override
+		public void running(float delta) {
+//			//清理
+//			if(fsm.anim.isFinished()) {
+//				fsm.getGObject().destroy();
+//			}
+		}
+	}
+
+	public class RespawnState extends HeroState {
+		@Override
+		public void enter() {
+			fsm.anim.setCurAnim(StateType.Respawn);
+		}
+
+		@Override
+		public void running(float delta) {
+			//起身后治愈角色并回到待机
+			if (fsm.anim.isFinished()) {
+				ent.heal();
+				fsm.changeState(IdleState.class);
+			}
 		}
 	}
 }
