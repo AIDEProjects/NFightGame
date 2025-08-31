@@ -193,6 +193,7 @@ public class MainGameScreen extends GScreen {
 		EntityComponent ent = hero.addComponent(new EntityComponent());
 		ent.setMaxHealth(20, true);
 		ent.setSpeed(300);
+		ent.setBoostSpeedMultiplier(1.5f);
 
 		//动画器组件
 		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));

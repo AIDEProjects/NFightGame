@@ -5,6 +5,8 @@ import com.goldsprite.nfightgame.core.ecs.component.Component;
 
 public class EntityComponent extends Component {
 	private float speed = 300;
+	private boolean isSpeedBoost;
+	private float boostSpeedMultiplier = 1.5f;
 	public float jumpForce = 1100;
 	private float maxHealth = 20;
 	private float health = maxHealth;
@@ -34,11 +36,21 @@ public class EntityComponent extends Component {
 	}
 
 	public float getSpeed() {
+		//返回正常或疾跑速度
+		return  speed * (!isSpeedBoost ? 1 : boostSpeedMultiplier);
+	}
+	public float getOriSpeed(){
 		return speed;
 	}
 
 	public void setSpeed(float speed) {
 		this.speed = speed;
+	}
+	public float getBoostSpeedMultiplier() {
+		return boostSpeedMultiplier;
+	}
+	public void setBoostSpeedMultiplier(float boostSpeedMultiplier) {
+		this.boostSpeedMultiplier = boostSpeedMultiplier;
 	}
 
 	public boolean isDead() {
@@ -51,5 +63,9 @@ public class EntityComponent extends Component {
 
 	private void heal(float health) {
 		setHealth(health);
+	}
+
+	public void changeSpeedBoost(boolean speedBoost) {
+		this.isSpeedBoost = speedBoost;
 	}
 }

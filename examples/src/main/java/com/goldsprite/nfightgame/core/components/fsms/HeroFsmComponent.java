@@ -11,7 +11,7 @@ import com.goldsprite.utils.math.Vector2;
 
 public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroState> {
 	private float key_dirX;
-	private boolean key_jump, key_crouch, key_attack;
+	private boolean key_jump, key_crouch, key_attack, key_speedBoost;
 	private boolean moveKeyProtect;
 	private ColliderComponent footCollider;
 	private RectColliderComponent bodyCollider;
@@ -94,6 +94,7 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 		key_jump = Gdx.input.isKeyJustPressed(Input.Keys.K);//跳
 		key_crouch = Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_LEFT);//蹲
 		key_attack = Gdx.input.isKeyJustPressed(Input.Keys.J);//攻击
+		key_speedBoost = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);//疾跑
 		if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) beHurt(5);//受击(测试
 		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) respawn();//重生(测试
 
@@ -124,6 +125,10 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 		return key_attack;
 	}
 
+	public boolean getKeySpeedBoost() {
+		return key_speedBoost;
+	}
+
 	public boolean getMoveKeyProtect() {
 		return moveKeyProtect;
 	}
@@ -152,6 +157,7 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 	public static class HeroState implements IState<HeroFsmComponent> {
 		protected HeroFsmComponent fsm;
 
+		public void init(){}
 		@Override
 		public void enter() {}
 		@Override
@@ -161,6 +167,7 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 		@Override
 		public void setFsm(HeroFsmComponent fsm) {
 			this.fsm = fsm;
+			init();
 		}
 	}
 
@@ -205,6 +212,13 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 	}
 
 	public class RunState extends HeroState {
+		private float normalRunFrameDuration;
+
+		@Override
+		public void init() {
+			normalRunFrameDuration = fsm.anim.getAnim(StateType.Run).getFrameDuration();
+		}
+
 		@Override
 		public void enter() {
 //			Gdx.app.log("", "enter run"+(int)(new Random().nextFloat()*100));
@@ -224,6 +238,11 @@ public class HeroFsmComponent extends EntityFsmComponent<HeroFsmComponent, HeroS
 		public void running(float delta) {
 			//持续更新速度与朝向
 			fsm.move(fsm.getKeyDirX());
+			//切换疾跑
+			boolean speedBoost = fsm.getKeySpeedBoost();
+			float duration = normalRunFrameDuration / (!speedBoost ? 1 : fsm.ent.getBoostSpeedMultiplier());
+			fsm.ent.changeSpeedBoost(speedBoost);
+			fsm.anim.getCurrentAnim().setFrameDuration(duration);
 
 			//回到待机 横轴方向输入为0
 			if (fsm.getKeyDirX() == 0) {
