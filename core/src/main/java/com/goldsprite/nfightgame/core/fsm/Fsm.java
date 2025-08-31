@@ -5,7 +5,7 @@
 package com.goldsprite.nfightgame.core.fsm;
 import java.util.*;
 
-public class StateMachine implements IStateMachine{
+public class Fsm implements IFsm {
 	private Map<Enum, IState> states = new LinkedHashMap<>();
 	private Enum current;
 

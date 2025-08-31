@@ -1,6 +1,7 @@
 package com.goldsprite.nfightgame.core.ecs.component;
 
 import com.goldsprite.nfightgame.core.ecs.GObject;
+import com.goldsprite.nfightgame.core.ecs.GameSystem;
 
 public class Component implements IComponent{
 	protected GObject gObject;
@@ -50,5 +51,14 @@ public class Component implements IComponent{
 
 	public boolean isEnable() {
 		return isEnabled;
+	}
+
+	@Override
+	public void destroy() {
+		GameSystem.getInstance().addDestroyComponent(this);
+	}
+	@Override
+	public void destroyImmediate() {
+		gObject.removeComponent(this);
 	}
 }

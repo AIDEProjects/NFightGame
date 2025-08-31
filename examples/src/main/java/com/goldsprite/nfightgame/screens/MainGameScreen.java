@@ -14,6 +14,8 @@ import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
 import com.goldsprite.nfightgame.Tools;
 import com.goldsprite.nfightgame.core.components.*;
+import com.goldsprite.nfightgame.core.components.fsms.DummyFsmComponent;
+import com.goldsprite.nfightgame.core.components.fsms.HeroFsmComponent;
 import com.goldsprite.nfightgame.core.ui.Rocker;
 import com.goldsprite.nfightgame.core.ecs.GObject;
 import com.goldsprite.nfightgame.core.ecs.GameSystem;
@@ -42,6 +44,16 @@ public class MainGameScreen extends GScreen {
 	private Label fpsLabel;
 	private BitmapFont font;
 
+	String heroPath = "sprites/roles/hero/hero_sheet.png";
+	private final String monster1Path = "sprites/roles/monster1/monster1_sheet.png";
+	private final String monster2Path = "sprites/roles/monster2/monster2_sheet.png";
+	private final String[] healthBarPath = {
+		"sprites/gui/healthBar/health_bar_back.png",
+		"sprites/gui/healthBar/health_bar_bar.png",
+		"sprites/gui/healthBar/health_bar_frame.png",
+	};
+	TextureRegion[] healthBarRegions = new TextureRegion[healthBarPath.length];
+
 	@Override
 	public Viewport getViewport() {
 		return uiViewport;
@@ -58,6 +70,8 @@ public class MainGameScreen extends GScreen {
 
 		batch = new SpriteBatch();
 
+		loadTextures();
+
 		createGM();
 
 		backTex = Tools.createBackImage(new Color(0.5f, 0.5f, 0.5f, 1));
@@ -65,6 +79,14 @@ public class MainGameScreen extends GScreen {
 		createUI();
 
 		createGObjects();
+	}
+
+	private void loadTextures() {
+		//加载血条材质
+		for (int i = 0; i < healthBarPath.length; i++) {
+			Texture tex = new Texture(Gdx.files.internal(healthBarPath[i]));
+			healthBarRegions[i] = new TextureRegion(tex);
+		}
 	}
 
 	private void createGM() {
@@ -118,14 +140,13 @@ public class MainGameScreen extends GScreen {
 		SpriteComponent texture = monster2.addComponent(new SpriteComponent());
 		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 36);
-		String path = "sprites/roles/monster2/monster2_sheet.png";
 
 		AnimatorComponent animator = monster2.addComponent(new AnimatorComponent(texture));
-		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Walk, new Animation<TextureRegion>(.25f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.15f, splitFrames(path, 2, 9), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(path, 3, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(path, 4, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(monster2Path, 0, 3), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Walk, new Animation<TextureRegion>(.25f, splitFrames(monster2Path, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.15f, splitFrames(monster2Path, 2, 9), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(monster2Path, 3, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(monster2Path, 4, 3), Animation.PlayMode.NORMAL));
 	}
 
 	private void createHero() {
@@ -169,22 +190,21 @@ public class MainGameScreen extends GScreen {
 		ent.setSpeed(300);
 
 		//动画器组件
-		String path = "sprites/roles/hero/hero_sheet.png";
 		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));
-		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Run, new Animation<TextureRegion>(.15f, splitFrames(path, 1, 4), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.25f, splitFrames(path, 2, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Crouching, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Crouch, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 2, 1), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Standing, new Animation<TextureRegion>(.2f, splitFrames(path, 3, 3), Animation.PlayMode.REVERSED));
-		animator.addAnim(StateType.CrouchWalk, new Animation<TextureRegion>(.25f, splitFrames(path, 4, 4), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Sliding, new Animation<TextureRegion>(.1f, splitFrames(path, 5, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(path, 6, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(path, 7, 3), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(path, 8, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(heroPath, 0, 3), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Run, new Animation<TextureRegion>(.15f, splitFrames(heroPath, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.25f, splitFrames(heroPath, 2, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Crouching, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Crouch, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 2, 1), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Standing, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 3), Animation.PlayMode.REVERSED));
+		animator.addAnim(StateType.CrouchWalk, new Animation<TextureRegion>(.25f, splitFrames(heroPath, 4, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Sliding, new Animation<TextureRegion>(.1f, splitFrames(heroPath, 5, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(heroPath, 6, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 7, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(heroPath, 8, 2), Animation.PlayMode.NORMAL));
 
 		//状态机组件
-		HeroStateMachineComponent fsm = hero.addComponent(new HeroStateMachineComponent());
+		HeroFsmComponent fsm = hero.addComponent(new HeroFsmComponent());
 		fsm.init();
 		fsm.setFootCollider(footTrigger);
 		fsm.setBodyCollider(heroBodyCollider);
@@ -193,13 +213,6 @@ public class MainGameScreen extends GScreen {
 		//跟随相机组件
 		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());
 		camfollower.setTarget(hero.transform);
-
-//		//角色控制器
-//		RoleControllerComponent roleController = hero.addComponent(new RoleControllerComponent());
-//		roleController.setRocker(rocker);
-//		roleController.setTarget(hero.transform);
-//		roleController.setSpeed(500);
-//		roleController.bindAttackTrigger(heroAtkTrigger);
 	}
 
 	private void createDummy() {
@@ -209,10 +222,9 @@ public class MainGameScreen extends GScreen {
 		dummy.transform.setScale(1.2f);
 
 		EntityComponent dummyEnt = dummy.addComponent(new EntityComponent());
-		dummyEnt.setMaxHealth(20);
-		dummyEnt.setHealth(20);
+		dummyEnt.setMaxHealth(20, true);
 
-		DummyControllerComponent dummyController = dummy.addComponent(new DummyControllerComponent());
+//		DummyControllerComponent dummyController = dummy.addComponent(new DummyControllerComponent());
 
 		RigidbodyComponent drigi = dummy.addComponent(new RigidbodyComponent());
 
@@ -223,29 +235,28 @@ public class MainGameScreen extends GScreen {
 
 		createHealthBar(dummy.transform, 0, 140);
 
-		String path = "sprites/roles/monster1/monster1_sheet.png";
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
 		dummyAnimator.addAnim(StateType.Idle,
-				new Animation<TextureRegion>(.25f, splitFrames(path, 0, 3), Animation.PlayMode.LOOP));
+				new Animation<TextureRegion>(.25f, splitFrames(monster1Path, 0, 3), Animation.PlayMode.LOOP));
 		dummyAnimator.addAnim(StateType.Hurt,
-				new Animation<TextureRegion>(.2f, splitFrames(path, 1, 2), Animation.PlayMode.NORMAL));
+				new Animation<TextureRegion>(.2f, splitFrames(monster1Path, 1, 2), Animation.PlayMode.NORMAL));
 
-		RectColliderComponent dummyCollider = dummy.addComponent(new RectColliderComponent());
-		dummyCollider.setSize(45, 100);
-		dummyCollider.setOffsetPosition(0, 45);
+		RectColliderComponent dummyBodyCollider = dummy.addComponent(new RectColliderComponent());
+		dummyBodyCollider.setSize(45, 100);
+		dummyBodyCollider.setOffsetPosition(0, 45);
+
+		DummyFsmComponent dummyFsm = dummy.addComponent(new DummyFsmComponent());
+		dummyFsm.init();
+		dummyFsm.setBodyCollider(dummyBodyCollider);
 	}
 
 	private void createHealthBar(TransformComponent bindEnt, float barOffsetX, float barOffsetY) {
 		dummyHealthBar = new GObject();
 		dummyHealthBar.transform.setPosition(300, 300);
 
-		String[] pathes = {"sprites/gui/healthBar/health_bar_back.png", "sprites/gui/healthBar/health_bar_bar.png",
-				"sprites/gui/healthBar/health_bar_frame.png",};
-		SpriteComponent[] textures = new SpriteComponent[pathes.length];
-		for (int i = 0; i < pathes.length; i++) {
-			Texture tex = new Texture(Gdx.files.internal(pathes[i]));
-			TextureRegion region = new TextureRegion(tex);
-			//			region.setRegionX(5);
+		SpriteComponent[] textures = new SpriteComponent[healthBarRegions.length];
+		for (int i = 0; i < healthBarRegions.length; i++) {
+			TextureRegion region = new TextureRegion(healthBarRegions[i]);
 			SpriteComponent s = dummyHealthBar.addComponent(new SpriteComponent());
 			textures[i] = s;
 			s.setRegion(region);

@@ -4,13 +4,12 @@ import com.goldsprite.nfightgame.core.ecs.component.IComponent;
 import com.goldsprite.nfightgame.core.ecs.component.TransformComponent;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class GObject {
+	private boolean isDestroyed;
 	public final TransformComponent transform;
-	private final HashMap<Class<? extends IComponent>, List<IComponent>> components = new HashMap<>();
+	private final Map<Class<? extends IComponent>, List<IComponent>> components = new LinkedHashMap<>();
 
 	public GObject() {
 		addComponent(transform = new TransformComponent());
@@ -40,9 +39,13 @@ public class GObject {
 	}
 
 	public void removeComponent(IComponent component) {
+		//从系统中移除
 		GameSystem.manageGameComponent(component, ManageMode.REMOVE);
-
-		components.remove(component.getClass());
+		//从游戏物体自身中移除
+		List<IComponent> list = components.get(component.getClass());
+		if(list != null) {
+			list.remove(component);
+		}
 	}
 
 	public boolean hasComponent(Class<? extends IComponent> type) {
@@ -55,8 +58,19 @@ public class GObject {
 
 	public <T extends IComponent> T getComponent(Class<T> type, int index) {
 		List<IComponent> list = components.get(type);
-		if (list == null) return null;
-		return (T) (Object) list.get(index);
+		//找到同类型直接返回
+		if (list != null) return (T) list.get(index);
+		else {
+			for (Class<? extends IComponent> k : components.keySet()) {
+				List<IComponent> v = components.get(k);
+				//否则查找子类返回
+				if (type.isAssignableFrom(k)) {
+					return (T) v.get(index);
+				}
+			}
+		}
+		//找不到返回空
+		return null;
 	}
 
 	public void update(float delta) {
@@ -67,4 +81,20 @@ public class GObject {
 		}
 	}
 
+	public void destroy() {
+		isDestroyed = true;
+		GameSystem.getInstance().addDestroyGObject(this);
+	}
+	public void destroyImmediate() {
+		for (List<IComponent> list : components.values()) {
+			for(int i = list.size() - 1; i >= 0; i--) {
+				IComponent component = list.get(i);
+				component.destroyImmediate();//立即销毁组件并从自身移除
+			}
+		}
+	}
+
+	public boolean isDestroyed() {
+		return isDestroyed;
+	}
 }

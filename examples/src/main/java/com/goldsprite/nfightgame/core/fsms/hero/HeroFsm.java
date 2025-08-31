@@ -1,10 +1,10 @@
 /**
- * @Author 
+ * @Author
  * @AIDE AIDE+
 */
 package com.goldsprite.nfightgame.core.fsms.hero;
 import com.goldsprite.nfightgame.core.fsm.*;
 
-public class HeroStateMachine extends StateMachine{
-	
+public class HeroFsm extends Fsm {
+
 }

@@ -21,6 +21,12 @@ public class HealthBarComponent extends SpriteComponent {
 
 	@Override
 	public void update(float delta) {
+		//拥有者移除后同步移除自身
+		if(owner.getGObject().isDestroyed()){
+			gObject.destroy();
+			return;
+		}
+
 		//位置同步
 		transform.getPosition().set(positionOffset).add(owner.getPosition());
 

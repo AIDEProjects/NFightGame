@@ -2,6 +2,7 @@ package com.goldsprite.nfightgame.core.ecs;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.goldsprite.nfightgame.core.ecs.component.ColliderComponent;
+import com.goldsprite.nfightgame.core.ecs.component.Component;
 import com.goldsprite.nfightgame.core.ecs.component.IComponent;
 import com.goldsprite.nfightgame.core.ecs.component.SpriteComponent;
 import com.goldsprite.nfightgame.core.ecs.system.PhysicsSystem;
@@ -20,6 +21,8 @@ public class GameSystem {
 	private Gizmos gizmosRenderer;
 	private PhysicsSystem physicsSystem;
 	private List<GObject> gobjects = new ArrayList<GObject>();
+	private List<GObject> destroyGObjects = new ArrayList<GObject>();
+	private List<Component> destroyComponents = new ArrayList<Component>();
 
 	public static final float STEP = 1f / 60f; // 固定逻辑帧率 60Hz
 	private static final float MAX_DELTA = 0.25f; // 最大累积时间，避免卡死
@@ -79,12 +82,39 @@ public class GameSystem {
 	public void gameLoop(float delta) {
 		physicsSystem.update(delta);
 
-		for (GObject obj : gobjects) {
+
+		for(int i = gobjects.size() - 1; i >= 0; i--) {
+			GObject obj = gobjects.get(i);
+			if(obj.isDestroyed()) continue;;
+
 			obj.update(delta);
 		}
 
 		spriteRenderer.update(delta);
 		gizmosRenderer.update(delta);
+
+
+		for(int i = destroyGObjects.size() - 1; i >= 0; i--) {
+			GObject obj = destroyGObjects.get(i);
+			if(obj != null){
+				obj.destroyImmediate();
+				destroyGObjects.remove(obj);
+				gobjects.remove(obj);
+			}
+		}
+		for(int i = destroyComponents.size() - 1; i >= 0; i--) {
+			Component comp = destroyComponents.get(i);
+			if(comp != null){
+				comp.destroyImmediate();
+				destroyComponents.remove(comp);
+			}
+		}
+//		destroyComponents.forEach(comp -> {
+//			if(comp != null){
+//				comp.destroyImmediate();
+//				destroyComponents.remove(comp);
+//			}
+//		});
 	}
 
 	public Camera getCamera() {
@@ -108,5 +138,13 @@ public class GameSystem {
 
 	public PhysicsSystem getPhysicsSystem() {
 		return physicsSystem;
+	}
+
+	public void addDestroyGObject(GObject gObject) {
+		destroyGObjects.add(gObject);
+	}
+
+	public void addDestroyComponent(Component component) {
+		destroyComponents.add(component);
 	}
 }

@@ -14,4 +14,7 @@ public interface IComponent extends IRunnable {
 
 
 	<T extends IComponent> T getComponent(Class<T> type, int index);
+
+	void destroy();
+	void destroyImmediate();
 }
