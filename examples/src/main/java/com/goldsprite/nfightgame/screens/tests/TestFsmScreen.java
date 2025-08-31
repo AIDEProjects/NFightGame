@@ -9,12 +9,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.goldsprite.gdxcore.screens.*;
 import com.goldsprite.nfightgame.Tools;
-import com.goldsprite.nfightgame.core.ecs.GObject;
-import com.goldsprite.nfightgame.core.ecs.GameSystem;
+import com.goldsprite.gdxcore.ecs.GObject;
+import com.goldsprite.gdxcore.ecs.GameSystem;
 
 public class TestFsmScreen extends GScreen{
-	private SpriteBatch batch = new SpriteBatch();
-	private Color backColor = new Color(0.3f, 0.3f, 0.3f, 1);
+	private final SpriteBatch batch = new SpriteBatch();
+	private final Color backColor = new Color(0.3f, 0.3f, 0.3f, 1);
 	private Texture backTex;
 	private GObject hero;
 	private GameSystem gm;

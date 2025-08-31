@@ -12,17 +12,17 @@ public class TestDeltaScreen extends GScreen {
 
 	// 使用deltaTime的物体
 	private float deltaObjectX = 50;
-	private float deltaObjectY = 300;
+	private final float deltaObjectY = 300;
 	private final float DELTA_OBJECT_SPEED = 30; // 像素/秒
 
 	// 不使用deltaTime的物体（基于帧数）
 	private float frameObjectX = 50;
-	private float frameObjectY = 200;
+	private final float frameObjectY = 200;
 	private final float FRAME_OBJECT_SPEED = 1; // 像素/帧
 
 	// 固定时间步长的物体
 	private float fixedObjectX = 50;
-	private float fixedObjectY = 100;
+	private final float fixedObjectY = 100;
 	private final float FIXED_OBJECT_SPEED = 30; // 像素/秒
 	private float accumulator = 0;
 	private final float FIXED_TIME_STEP = 1/10f; // 60 FPS的固定时间步长
@@ -70,7 +70,7 @@ public class TestDeltaScreen extends GScreen {
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		// 更新使用deltaTime的物体
-		
+
 		vx1 += DELTA_OBJECT_SPEED * deltaTime*deltaTime*2;
 		deltaObjectX += vx1;
 		if (deltaObjectX > Gdx.graphics.getWidth()) {

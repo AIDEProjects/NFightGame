@@ -9,18 +9,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.gdxcore.screens.GScreen;
 import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
 import com.goldsprite.nfightgame.Tools;
-import com.goldsprite.nfightgame.core.components.*;
-import com.goldsprite.nfightgame.core.components.fsms.DummyFsmComponent;
-import com.goldsprite.nfightgame.core.components.fsms.HeroFsmComponent;
-import com.goldsprite.nfightgame.core.ui.Rocker;
-import com.goldsprite.nfightgame.core.ecs.GObject;
-import com.goldsprite.nfightgame.core.ecs.GameSystem;
-import com.goldsprite.nfightgame.core.ecs.component.*;
-import com.goldsprite.nfightgame.core.fsms.enums.StateType;
+import com.goldsprite.nfightgame.ecs.components.basics.EntityComponent;
+import com.goldsprite.nfightgame.ecs.components.basics.FollowCamComponent;
+import com.goldsprite.nfightgame.ecs.components.basics.HealthBarComponent;
+import com.goldsprite.nfightgame.ecs.components.fsm.fsms.DummyFsmComponent;
+import com.goldsprite.nfightgame.ecs.components.fsm.fsms.HeroFsmComponent;
+import com.goldsprite.nfightgame.ecs.components.fsm.fsms.LizardManFsmComponent;
+import com.goldsprite.nfightgame.ecs.ui.Rocker;
+import com.goldsprite.gdxcore.ecs.GObject;
+import com.goldsprite.gdxcore.ecs.GameSystem;
+import com.goldsprite.nfightgame.ecs.components.fsm.enums.StateType;
 import com.goldsprite.utils.math.Vector2Int;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
@@ -30,7 +33,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
 
-	private GObject hero, dummy, dummyHealthBar, monster2, wall, ground;
+	private GObject hero, dummy, dummyHealthBar, lizardMan, wall, ground;
 
 	private Skin uiSkin;
 	private Stage uiStage;
@@ -45,15 +48,15 @@ public class MainGameScreen extends GScreen {
 	private BitmapFont font;
 
 	String heroPath = "sprites/roles/hero/hero_sheet.png";
-	private final String monster1Path = "sprites/roles/monster1/monster1_sheet.png";
-	private final String monster2Path = "sprites/roles/monster2/monster2_sheet.png";
+	private final String dummyPath = "sprites/roles/dummy/dummy_sheet.png";
+	private final String lizardManPath = "sprites/roles/lizardMan/lizardMan_sheet.png";
 	private final String[] healthBarPath = {
 		"sprites/gui/healthBar/health_bar_back.png",
 		"sprites/gui/healthBar/health_bar_bar.png",
 		"sprites/gui/healthBar/health_bar_frame.png",
 	};
 	TextureRegion[] healthBarRegions = new TextureRegion[healthBarPath.length];
-	private boolean showIntroduction = true;
+	private final boolean showIntroduction = true;
 	private final String introduction = "."
 		+ "按键: WASD移动 JK攻击跳跃 Ctrl蹲下起立 蹲下时移动蹲行"
 		+ "\n" + "测试: Y主角受伤 R主角重生"
@@ -104,7 +107,7 @@ public class MainGameScreen extends GScreen {
 	private void createGObjects() {
 		createDummy();
 
-		createMonster2();
+		createLizardMan();
 
 		createHero();
 
@@ -127,31 +130,59 @@ public class MainGameScreen extends GScreen {
 		groundCollider.setSize(1500, 40);
 	}
 
-	private void createMonster2() {
-		monster2 = new GObject();
-		monster2.transform.setPosition(400, 200);
-		monster2.transform.setFace(-1, 1);
+	private void createLizardMan() {
+		lizardMan = new GObject();
+		lizardMan.transform.setScale(1.1f);
+		lizardMan.transform.setPosition(400, 200);
+		lizardMan.transform.setFace(-1, 1);
 
-		RectColliderComponent heroBodyCollider = monster2.addComponent(new RectColliderComponent());
-		heroBodyCollider.setOffsetPosition(0, 50);
-		heroBodyCollider.setSize(35, 110);
+		RigidbodyComponent rigi = lizardMan.addComponent(new RigidbodyComponent());
 
-		//		CircleColliderComponent m2AtkTrigger = monster2.addComponent(new CircleColliderComponent());
-		//		m2AtkTrigger.setTrigger(true);
-		//		m2AtkTrigger.setEnable(true);
-		//		m2AtkTrigger.setOffsetPosition(79.5f, 90);
-		//		m2AtkTrigger.setRadius(36);
+		//身体碰撞器
+		RectColliderComponent bodyCollider = lizardMan.addComponent(new RectColliderComponent());
+		bodyCollider.setOffsetPosition(0, 50);
+		bodyCollider.setSize(35, 110);
 
-		SpriteComponent texture = monster2.addComponent(new SpriteComponent());
+		//脚底触发器
+		CircleColliderComponent footTrigger = lizardMan.addComponent(new CircleColliderComponent());
+		footTrigger.setTrigger(true);
+		footTrigger.setOffsetPosition(0, 0);
+		footTrigger.setRadius(17);
+
+		//攻击触发器
+		CircleColliderComponent atkTrigger = lizardMan.addComponent(new CircleColliderComponent());
+		atkTrigger.setTrigger(true);
+		atkTrigger.setEnable(false);
+		atkTrigger.setOffsetPosition(65f, 65);
+		atkTrigger.setRadius(28);
+
+		createHealthBar(lizardMan.transform, 0, 120);
+
+		SpriteComponent texture = lizardMan.addComponent(new SpriteComponent());
 		texture.getScale().set(1.5f);
-		texture.setOriginOffset(119, 36);
+		texture.setOriginOffset(119, 40);
 
-		AnimatorComponent animator = monster2.addComponent(new AnimatorComponent(texture));
-		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(monster2Path, 0, 3), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Walk, new Animation<TextureRegion>(.25f, splitFrames(monster2Path, 1, 4), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.15f, splitFrames(monster2Path, 2, 9), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(monster2Path, 3, 2), Animation.PlayMode.NORMAL));
-		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(monster2Path, 4, 3), Animation.PlayMode.NORMAL));
+		//实体属性
+		EntityComponent ent = lizardMan.addComponent(new EntityComponent());
+		ent.setMaxHealth(20, true);
+		ent.setSpeed(140);
+		ent.setBoostSpeedMultiplier(1.5f);
+
+		AnimatorComponent animator = lizardMan.addComponent(new AnimatorComponent(texture));
+		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(lizardManPath, 0, 3), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Move, new Animation<TextureRegion>(.25f, splitFrames(lizardManPath, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.15f, splitFrames(lizardManPath, 2, 9), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(lizardManPath, 3, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(lizardManPath, 4, 3), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Respawn, new Animation<TextureRegion>(.2f, splitFrames(lizardManPath, 4, 3), Animation.PlayMode.REVERSED));
+		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(lizardManPath, 5, 2), Animation.PlayMode.NORMAL));
+
+		LizardManFsmComponent fsm = lizardMan.addComponent(new LizardManFsmComponent());
+		fsm.setFootTrigger(footTrigger);
+		fsm.setBodyCollider(bodyCollider);
+		fsm.setAttackTrigger(atkTrigger);
+		fsm.init();
+		fsm.setEnableInput(true);
 	}
 
 	private void createHero() {
@@ -198,7 +229,7 @@ public class MainGameScreen extends GScreen {
 		//动画器组件
 		AnimatorComponent animator = hero.addComponent(new AnimatorComponent(texture));
 		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(heroPath, 0, 3), Animation.PlayMode.LOOP));
-		animator.addAnim(StateType.Run, new Animation<TextureRegion>(.15f, splitFrames(heroPath, 1, 4), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Move, new Animation<TextureRegion>(.15f, splitFrames(heroPath, 1, 4), Animation.PlayMode.LOOP));
 		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.25f, splitFrames(heroPath, 2, 2), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Crouching, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 3), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Standing, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 3, 3), Animation.PlayMode.REVERSED));
@@ -211,10 +242,11 @@ public class MainGameScreen extends GScreen {
 
 		//状态机组件
 		HeroFsmComponent fsm = hero.addComponent(new HeroFsmComponent());
-		fsm.init();
-		fsm.setFootCollider(footTrigger);
+		fsm.setFootTrigger(footTrigger);
 		fsm.setBodyCollider(heroBodyCollider);
 		fsm.setAttackTrigger(heroAtkTrigger);
+		fsm.init();
+		fsm.setEnableInput(false);
 
 		//跟随相机组件
 		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());
@@ -242,9 +274,9 @@ public class MainGameScreen extends GScreen {
 		createHealthBar(dummy.transform, 0, 140);
 
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
-		dummyAnimator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(monster1Path, 0, 3), Animation.PlayMode.LOOP));
-		dummyAnimator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.2f, splitFrames(monster1Path, 1, 2), Animation.PlayMode.NORMAL));
-		dummyAnimator.addAnim(StateType.Death, new Animation<TextureRegion>(.15f, splitFrames(monster1Path, 2, 5), Animation.PlayMode.NORMAL));
+		dummyAnimator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(dummyPath, 0, 3), Animation.PlayMode.LOOP));
+		dummyAnimator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.2f, splitFrames(dummyPath, 1, 2), Animation.PlayMode.NORMAL));
+		dummyAnimator.addAnim(StateType.Death, new Animation<TextureRegion>(.15f, splitFrames(dummyPath, 2, 5), Animation.PlayMode.NORMAL));
 
 		RectColliderComponent dummyBodyCollider = dummy.addComponent(new RectColliderComponent());
 		dummyBodyCollider.setSize(45, 100);
@@ -357,7 +389,7 @@ public class MainGameScreen extends GScreen {
 //					animator.setCurAnim(keys[++index % keys.length]);
 //				} else if(m==1) {
 //					if (animator2 == null) {
-//						animator2 = monster2.getComponent(AnimatorComponent.class);
+//						animator2 = lizardMan.getComponent(AnimatorComponent.class);
 //						keys2 = animator2.anims.keySet().toArray(new String[]{});
 //					}
 //					animator2.setCurAnim(keys2[++index2 % keys2.length]);
