@@ -20,12 +20,15 @@ public class SpriteRenderer extends Renderer {
 		batch.setProjectionMatrix(gm.getCamera().combined);
 		batch.begin();
 		for(IComponent component : gobjects){
-			SpriteComponent texComp = (SpriteComponent)component;
-			TextureRegion region = texComp.getRegion();
-			if(SpriteComponent.emptyRegion.equals(region)) continue;
-			texComp.updateRegionFlip();
-			Vector2 leftDownPos = texComp.getLeftDownPos();
-			Vector2 renderSize = texComp.getRenderSize();
+			SpriteComponent sprite = (SpriteComponent)component;
+			TextureRegion region = sprite.getRegion();
+			//跳过未启用与未初始化精灵
+			if(!sprite.isEnable() || SpriteComponent.emptyRegion.equals(region)) continue;
+			//应用精灵翻转
+			sprite.updateRegionFlip();
+			//绘制: 中心转左下原点坐标, 计算拉伸
+			Vector2 leftDownPos = sprite.getLeftDownPos();
+			Vector2 renderSize = sprite.getRenderSize();
 			batch.draw(region, leftDownPos.x, leftDownPos.y, renderSize.x, renderSize.y);
 		}
 		batch.end();

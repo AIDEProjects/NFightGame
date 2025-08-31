@@ -29,7 +29,7 @@ public class EntityComponent extends Component {
 		health = MathUtils.clamp(nowHealth, 0, maxHealth);
 	}
 
-	public void hurt(int damage) {
+	public void hurt(float damage) {
 		health = MathUtils.clamp(health - damage, 0, maxHealth);
 	}
 
@@ -39,5 +39,17 @@ public class EntityComponent extends Component {
 
 	public void setSpeed(float speed) {
 		this.speed = speed;
+	}
+
+	public boolean isDead() {
+		return health <= 0;
+	}
+
+	public void heal() {
+		heal(maxHealth);
+	}
+
+	private void heal(float health) {
+		setHealth(health);
 	}
 }

@@ -12,7 +12,8 @@ public class HealthBarComponent extends SpriteComponent {
 
 	private TransformComponent owner;
 	private final Vector2 positionOffset = new Vector2();
-	private SpriteComponent barTex;
+	private SpriteComponent[] barTexes;
+	private boolean visible = true;
 
 	public void bindEntity(TransformComponent trans) {
 		this.owner = trans;
@@ -26,15 +27,23 @@ public class HealthBarComponent extends SpriteComponent {
 		//血量同步
 		EntityComponent ent = owner.getComponent(EntityComponent.class);
 		float healthPercent = ent.getHealth() / ent.getMaxHealth();
-		barTex.getRegion().setRegion(0f, 0f, healthPercent, 1f);
+		barTexes[1].getRegion().setRegion(0f, 0f, healthPercent, 1f);
+
+		//隐藏死亡生物的血条
+		boolean isDead = ent.isDead();
+		if((isDead && visible) || (!isDead && !visible)){
+			for(SpriteComponent s : barTexes){
+				s.setEnable(visible = !isDead);
+			}
+		}
 	}
 
 	public void setPositionOffset(float x, float y) {
 		this.positionOffset.set(x, y);
 	}
 
-	public void setHealthBarTextures(SpriteComponent barTex) {
-		this.barTex = barTex;
+	public void setHealthBarTextures(SpriteComponent[] barTexes) {
+		this.barTexes = barTexes;
 	}
 }
 

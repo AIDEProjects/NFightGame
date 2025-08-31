@@ -161,6 +161,8 @@ public class MainGameScreen extends GScreen {
 		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 36);
 
+		createHealthBar(hero.transform, 0, 140);
+
 		//实体属性
 		EntityComponent ent = hero.addComponent(new EntityComponent());
 		ent.setMaxHealth(20, true);
@@ -219,7 +221,7 @@ public class MainGameScreen extends GScreen {
 		dummyTexture.getScale().set(0.6f);
 		dummyTexture.setOriginOffset(140, 40);
 
-		createDummyHealthBar();
+		createHealthBar(dummy.transform, 0, 140);
 
 		String path = "sprites/roles/monster1/monster1_sheet.png";
 		AnimatorComponent dummyAnimator = dummy.addComponent(new AnimatorComponent(dummyTexture));
@@ -233,7 +235,7 @@ public class MainGameScreen extends GScreen {
 		dummyCollider.setOffsetPosition(0, 45);
 	}
 
-	private void createDummyHealthBar() {
+	private void createHealthBar(TransformComponent bindEnt, float barOffsetX, float barOffsetY) {
 		dummyHealthBar = new GObject();
 		dummyHealthBar.transform.setPosition(300, 300);
 
@@ -252,9 +254,9 @@ public class MainGameScreen extends GScreen {
 		}
 
 		HealthBarComponent dummyHealthBarController = dummyHealthBar.addComponent(new HealthBarComponent());
-		dummyHealthBarController.setHealthBarTextures(textures[1]);
-		dummyHealthBarController.bindEntity(dummy.transform);
-		dummyHealthBarController.setPositionOffset(0, 140);
+		dummyHealthBarController.setHealthBarTextures(textures);
+		dummyHealthBarController.bindEntity(bindEnt);
+		dummyHealthBarController.setPositionOffset(barOffsetX, barOffsetY);
 	}
 
 	int m = 0;
