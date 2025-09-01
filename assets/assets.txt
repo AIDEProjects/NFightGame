@@ -1,5 +1,6 @@
 NotoSansMonoCJKsc-Regular.otf
 Soldier.png
+greetings.png
 libgdx.png
 pixelFont-7-8x14-sproutLands.ttf
 shikeik_avatar.png

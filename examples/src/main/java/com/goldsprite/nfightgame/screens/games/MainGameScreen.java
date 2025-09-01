@@ -1,4 +1,4 @@
-package com.goldsprite.nfightgame.screens;
+package com.goldsprite.nfightgame.screens.games;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,9 +11,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.gdxcore.screens.GScreen;
+import com.goldsprite.gdxcore.utils.ColorTextureUtils;
 import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
-import com.goldsprite.nfightgame.Tools;
 import com.goldsprite.nfightgame.ecs.components.basics.EntityComponent;
 import com.goldsprite.nfightgame.ecs.components.basics.FollowCamComponent;
 import com.goldsprite.nfightgame.ecs.components.basics.HealthBarComponent;
@@ -40,8 +40,17 @@ public class MainGameScreen extends GScreen {
 	private Rocker rocker;
 
 	private SpriteBatch batch;
-	private Texture backTex;
+	private Color backColor = new Color(.5f, .5f, .5f, 1);
+	@Override
+	public Color getBackColor(){return backColor;}
+	private Color screenColor = new Color(.0f, .0f, .0f, 1);
+	@Override
+	public Color getScreenColor(){return screenColor;}
 	private FitViewport worldViewport, uiViewport;
+	@Override
+	public Viewport getViewport() {
+		return uiViewport;
+	}
 	private OrthographicCamera worldCamera, uiCamera;
 	int viewWidth = 1440, viewHeight = 810;
 	private Label fpsLabel;
@@ -63,11 +72,6 @@ public class MainGameScreen extends GScreen {
 		+ "\n" + "特殊: 可以蹭墙跳, 移动打断攻击, 跳跃攻击";
 
 	@Override
-	public Viewport getViewport() {
-		return uiViewport;
-	}
-
-	@Override
 	public void create() {
 		worldViewport = new FitViewport(viewWidth, viewHeight, worldCamera = new OrthographicCamera());
 		worldCamera.zoom = 0.65f;
@@ -81,8 +85,6 @@ public class MainGameScreen extends GScreen {
 		loadTextures();
 
 		createGM();
-
-		backTex = Tools.createBackImage(new Color(0.5f, 0.5f, 0.5f, 1));
 
 		createUI();
 
@@ -400,13 +402,12 @@ public class MainGameScreen extends GScreen {
 
 	@Override
 	public void render(float delta) {
-		ScreenUtils.clear(.7f, .7f, .7f, 1);
+		super.render(delta);
 
 		batch.setProjectionMatrix(uiCamera.combined);
 		batch.begin();
 
-		batch.draw(backTex, 0, 0, getViewSize().x, getViewSize().y);
-		font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond() +"\n"+ (showIntroduction?introduction:""), 20, getViewSize().y - 20);
+		font.draw(batch, "介绍: " + "\n"+ (showIntroduction?introduction:""), 20, getViewSize().y - 20);
 
 		batch.end();
 
