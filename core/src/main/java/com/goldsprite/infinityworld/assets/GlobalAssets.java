@@ -78,8 +78,8 @@ public class GlobalAssets {
 
 			Touchpad.TouchpadStyle touchpadStyle = editorSkin.get(Touchpad.TouchpadStyle.class);
 			Drawable knob = touchpadStyle.knob;
-			knob.setMinWidth(55);
-			knob.setMinHeight(55);
+			knob.setMinWidth(35);
+			knob.setMinHeight(35);
 
 			List.ListStyle listStyle = editorSkin.get(List.ListStyle.class);
 			listStyle.font = editorFont;

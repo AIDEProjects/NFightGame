@@ -24,7 +24,7 @@ public class GdxLauncher extends ApplicationAdapter {
 
 	@Override
 	public void create() {
-		Log.log("", "启动游戏.");
+		Log.log("启动游戏.");
 		//创建统一视口
 		FitViewport viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
 		viewport.apply(true);
