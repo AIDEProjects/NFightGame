@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.goldsprite.gdxcore.screens.GScreen;
 import com.goldsprite.gdxcore.screens.IGScreen;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
-import com.goldsprite.nfightgame.screens.tests.RoleCollisionExamples;
 import com.goldsprite.nfightgame.screens.tests.TestDeltaScreen;
 
 import java.util.LinkedHashMap;
@@ -17,7 +16,6 @@ import java.util.Map;
 public class ExampleSelectScreen extends GScreen {
 	private Map<String, Class<? extends IGScreen>> screenMapping = new LinkedHashMap<String, Class<? extends IGScreen>>() {{
 		put("输入管理器", InputManagerExampleScreen.class);
-		put("角色碰撞", RoleCollisionExamples.class);
 		put("测试delta一致性", TestDeltaScreen.class);
 	}};
 	private Skin skin;
