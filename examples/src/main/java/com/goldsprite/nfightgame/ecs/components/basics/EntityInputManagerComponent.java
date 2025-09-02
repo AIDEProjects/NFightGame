@@ -2,43 +2,66 @@ package com.goldsprite.nfightgame.ecs.components.basics;
 
 import com.goldsprite.gdxcore.ecs.component.Component;
 import com.goldsprite.nfightgame.ecs.components.fsm.interfaces.IEntityFsm;
+import com.goldsprite.nfightgame.inputs.GameInputSystem;
 import com.goldsprite.nfightgame.inputs.InputSystem;
+import com.goldsprite.utils.math.Vector2;
+
+import java.util.function.Consumer;
 
 public class EntityInputManagerComponent extends Component {
 	private IEntityFsm fsm;
+	public boolean active = true;
+	private final Consumer<Vector2> onMove = vector -> {
+		if(!active) return;
+		System.out.println("onMove " + vector);
+		fsm.setKeyDirX(vector.x);
+	};
+	private final Consumer<Boolean> onAttack = down -> {
+		if(!active) return;
+		System.out.println("onAttack_down " + down);
+		fsm.setKeyAttack(down);
+	};
+	private final Consumer<Boolean> onJump = down -> {
+		if(!active) return;
+		System.out.println("onJump_down " + down);
+		fsm.setKeyJump(down);
+	};
+	private final Consumer<Boolean> onCrouch = down -> {
+		if(!active) return;
+		System.out.println("onCrouch_down " + down);
+		fsm.setKeyCrouch(down);
+	};
+	private final Consumer<Boolean> onSpeedBoost = down -> {
+		if(!active) return;
+		System.out.println("onSpeedBoost_down " + down);
+		fsm.setKeySpeedBoost(down);
+	};
+	private final Consumer<Boolean> onHurt = down -> {
+		if(!active) return;
+		System.out.println("onHurt_down " + down);
+		fsm.beHurt(5);
+		fsm.setKeyHurt(down);
+	};
+	private final Consumer<Boolean> onRespawn = down -> {
+		if(!active) return;
+		System.out.println("onRespawn_down " + down);
+		if(down) fsm.respawn();
+	};
+//	public Consumer<Boolean> onChangeRole = down -> {
+//		System.out.println("ChangeRole: " + down);
+//		active = this.equals(role);
+//	};
 
 	public void init() {
-		InputSystem inputSystem = InputSystem.getInstance();
+		GameInputSystem inputSystem = GameInputSystem.getInstance();
 
-//		inputManager.registerKey(GameVirtualKey.UP)
-//			.onDown(() -> System.out.println("上键按下"))
-//			.onUp(() -> System.out.println("上键抬起"));
-//
-//		inputManager.registerKey(GameVirtualKey.DOWN)
-//			.onDown(() -> System.out.println("下键按下"))
-//			.onUp(() -> System.out.println("下键抬起"));
-
-//		inputManager.registerActionListener(GameVirtualKey.Left)
-//			.onDown(() -> fsm.setKeyDirX(-1))
-//			.onUp(() -> fsm.setKeyDirX(0));
-//
-//		inputManager.registerKey(GameVirtualKey.Right)
-//			.onDown(() -> fsm.setKeyDirX(1))
-//			.onUp(() -> fsm.setKeyDirX(0));
-//
-//		inputManager.registerKey(GameVirtualKey.Horizontal)
-//			.onDown(dir -> fsm.setKeyDirX(dir))
-//			.onHold(dir -> fsm.setKeyDirX(dir))
-//			.onUp(dir -> fsm.setKeyDirX(dir));
-//
-//		inputManager.registerKey(GameVirtualKey.Attack)
-//			.onDown(() -> fsm.setKeyAttack(true))
-//			.onUp(() -> fsm.setKeyAttack(false));
-//
-//		inputManager.registerKey(GameVirtualKey.Jump)
-//			.onDown(() -> fsm.setKeyJump(true))
-//			.onUp(() -> fsm.setKeyJump(false));
-
+		inputSystem.registerActionListener(inputSystem.getInputAction("Move"), onMove, Vector2.class);
+		inputSystem.registerActionListener(inputSystem.getInputAction("Attack"), onAttack, Boolean.class);
+		inputSystem.registerActionListener(inputSystem.getInputAction("Jump"), onJump, Boolean.class);
+		inputSystem.registerActionListener(inputSystem.getInputAction("Crouch"), onCrouch, Boolean.class);
+		inputSystem.registerActionListener(inputSystem.getInputAction("SpeedBoost"), onSpeedBoost, Boolean.class);
+		inputSystem.registerActionListener(inputSystem.getInputAction("Hurt"), onHurt, Boolean.class);
+		inputSystem.registerActionListener(inputSystem.getInputAction("Respawn"), onRespawn, Boolean.class);
 	}
 
 	public void bindFsm(IEntityFsm fsm) {

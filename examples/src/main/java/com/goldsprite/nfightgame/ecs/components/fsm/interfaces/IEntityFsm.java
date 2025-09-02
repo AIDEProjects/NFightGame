@@ -60,6 +60,7 @@ public interface IEntityFsm extends IFsm {
 	void consumeHurtKey();
 
 	float getBeHurt_damage();
+	void respawn();
 
 	void addState(IState state);
 

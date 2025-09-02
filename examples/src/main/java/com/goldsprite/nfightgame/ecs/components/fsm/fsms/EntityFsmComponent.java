@@ -128,6 +128,7 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 		float speed = ent.getSpeed() * dirX;
 		rigi.getVelocity().setX(speed);
 	}
+	@Override
 	public void respawn() {
 		changeState(RespawnState.class);
 	}
@@ -136,8 +137,8 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	//Input Area
 	public void inputHandle() {
 		//持续左右
-		boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.A);
-		boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.D);
+//		boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.A);
+//		boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.D);
 		boolean leftJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.A);
 		boolean rightJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.D);
 //		key_jump = Gdx.input.isKeyJustPressed(Input.Keys.K);//跳

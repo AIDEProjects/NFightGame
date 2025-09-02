@@ -13,6 +13,7 @@ import com.goldsprite.gdxcore.ecs.renderer.SpriteRenderer;
 import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.utils.viewport.*;
+import com.goldsprite.nfightgame.inputs.GameInputSystem;
 
 public class GameSystem {
 	private static GameSystem instance;

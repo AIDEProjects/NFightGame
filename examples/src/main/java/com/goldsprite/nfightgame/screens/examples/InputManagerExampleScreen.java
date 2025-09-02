@@ -83,7 +83,7 @@ public class InputManagerExampleScreen extends ExampleGScreen {
 		InputAction jumpAction = new InputAction();
 		jumpAction.setValueType(Boolean.class);
 		KeyBinding keyboardK = new KeyBinding(Input.Keys.K);
-		jumpAction.addInputBinding(keyboardJ);
+		jumpAction.addInputBinding(keyboardK);
 		KeyBinding keyboardSpace = new KeyBinding(Input.Keys.SPACE);
 		jumpAction.addInputBinding(keyboardSpace);
 		VirtualButtonBinding virtualButton2 = new VirtualButtonBinding();

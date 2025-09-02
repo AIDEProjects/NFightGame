@@ -1,12 +1,14 @@
 package com.goldsprite.nfightgame.inputs;
 
+import com.goldsprite.gdxcore.utils.KVPair;
 import com.goldsprite.utils.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class InputAction {
-	private boolean isStarted;
+	private KVPair<InputBinding, Boolean> isStarted = new KVPair<>(null, false);
 	public InputActionContext inputActionContext = new InputActionContext();
 	public Event<InputActionContext> started = new Event<>();
 	public Event<InputActionContext> performed = new Event<>();
@@ -45,12 +47,17 @@ public class InputAction {
 		return valueType;
 	}
 
-	public boolean isStarted() {
-		return isStarted;
+	public boolean isStarted(){
+		return isStarted.getValue();
 	}
-
 	public void setStarted(boolean started) {
-		isStarted = started;
+		isStarted.setValue(started);
+	}
+	public boolean isStarted(InputBinding binding) {
+		return binding.equals(isStarted.getKey()) ? isStarted.getValue() : false;
+	}
+	public void setStarted(InputBinding binding, boolean started) {
+		isStarted.set(binding, started);
 	}
 
 	public void setValue(Object value) {

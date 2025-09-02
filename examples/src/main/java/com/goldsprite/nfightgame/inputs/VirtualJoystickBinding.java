@@ -6,15 +6,18 @@ import com.goldsprite.utils.math.Vector2;
 public class VirtualJoystickBinding extends Vector2KeyBinding {
 	private VirtualJoystick joystick;
 
-	public VirtualJoystick getJoystick(){
+	public VirtualJoystick getJoystick() {
 		return joystick;
 	}
-	public void setJoystick(VirtualJoystick joystick){
+
+	public void setJoystick(VirtualJoystick joystick) {
 		this.joystick = joystick;
 	}
 
 	@Override
 	public boolean updateValue() {
+		if (joystick == null) return false;
+
 		Vector2 vector = action.readValue(Vector2.class);
 		vector.set(joystick.getVector());
 
@@ -28,22 +31,34 @@ public class VirtualJoystickBinding extends Vector2KeyBinding {
 
 	@Override
 	public boolean getActionRight() {
+		if (joystick == null) return false;
 		float angle = getJoystick().getAngle();
 		return angle >= 315 || (angle < 45 && angle > 0);
 	}
+
 	@Override
 	public boolean getActionUp() {
+		if (joystick == null) return false;
 		float angle = getJoystick().getAngle();
 		return angle >= 45 && angle < 135;
 	}
+
 	@Override
 	public boolean getActionLeft() {
+		if (joystick == null) return false;
 		float angle = getJoystick().getAngle();
 		return angle >= 135 && angle < 225;
 	}
+
 	@Override
 	public boolean getActionDown() {
+		if (joystick == null) return false;
 		float angle = getJoystick().getAngle();
 		return angle >= 225 && angle < 315;
+	}
+
+	@Override
+	public boolean matchesKey(int keyboardCode) {
+		return false;
 	}
 }

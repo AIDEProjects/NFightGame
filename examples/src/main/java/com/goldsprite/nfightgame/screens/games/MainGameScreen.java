@@ -19,16 +19,19 @@ import com.goldsprite.nfightgame.ecs.components.basics.HealthBarComponent;
 import com.goldsprite.nfightgame.ecs.components.fsm.fsms.DummyFsmComponent;
 import com.goldsprite.nfightgame.ecs.components.fsm.fsms.HeroFsmComponent;
 import com.goldsprite.nfightgame.ecs.components.fsm.fsms.LizardManFsmComponent;
-import com.goldsprite.nfightgame.ecs.ui.Rocker;
 import com.goldsprite.gdxcore.ecs.GObject;
 import com.goldsprite.gdxcore.ecs.GameSystem;
 import com.goldsprite.nfightgame.ecs.components.fsm.enums.StateType;
-import com.goldsprite.nfightgame.inputs.InputSystem;
+import com.goldsprite.nfightgame.inputs.GameInputSystem;
+import com.goldsprite.nfightgame.inputs.widgets.VirtualButton;
+import com.goldsprite.nfightgame.inputs.widgets.VirtualJoystick;
 import com.goldsprite.utils.math.Vector2Int;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
+
+import java.util.function.Consumer;
 
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
@@ -37,7 +40,7 @@ public class MainGameScreen extends GScreen {
 
 	private Skin uiSkin;
 	private Stage uiStage;
-	private Rocker rocker;
+	private VirtualJoystick joystick;
 
 	private SpriteBatch batch;
 	private Color backColor = new Color(.5f, .5f, .5f, 1);
@@ -86,9 +89,9 @@ public class MainGameScreen extends GScreen {
 
 		createGM();
 
-		createUI();
-
 		createGObjects();
+
+		createUI();
 	}
 
 	private void loadTextures() {
@@ -105,9 +108,8 @@ public class MainGameScreen extends GScreen {
 		gm.setViewport(worldViewport);
 
 		//初始化游戏输入器
-		InputSystem inputSystem = InputSystem.getInstance();
-//		inputManager.setVirtualKey(GameVirtualKey.Up);
-		getImp().addProcessor(inputSystem);
+		GameInputSystem inputs = GameInputSystem.getInstance();
+		getImp().addProcessor(inputs);
 
 		//启用/禁用调式绘制器
 		gm.getGizmosRenderer().setEnabled(true);
@@ -186,14 +188,15 @@ public class MainGameScreen extends GScreen {
 		animator.addAnim(StateType.Respawn, new Animation<TextureRegion>(.2f, splitFrames(lizardManPath, 4, 3), Animation.PlayMode.REVERSED));
 		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(lizardManPath, 5, 2), Animation.PlayMode.NORMAL));
 
-//		EntityInputManagerComponent inputs = lizardMan.addComponent(new EntityInputManagerComponent());
-
 		LizardManFsmComponent fsm = lizardMan.addComponent(new LizardManFsmComponent());
 		fsm.setFootTrigger(footTrigger);
 		fsm.setBodyCollider(bodyCollider);
 		fsm.setAttackTrigger(atkTrigger);
 		fsm.init();
 		fsm.setEnableInput(false);
+
+		EntityInputManagerComponent inputs = lizardMan.addComponent(new EntityInputManagerComponent());
+		inputs.bindFsm(fsm);
 	}
 
 	private void createHero() {
@@ -297,13 +300,14 @@ public class MainGameScreen extends GScreen {
 		dummyBodyCollider.setSize(45, 100);
 		dummyBodyCollider.setOffsetPosition(0, 45);
 
-		//实体输入机
-//		EntityInputManagerComponent inputs = dummy.addComponent(new EntityInputManagerComponent());
-
 		//Dummy状态机
 		DummyFsmComponent dummyFsm = dummy.addComponent(new DummyFsmComponent());
 		dummyFsm.init();
 		dummyFsm.setBodyCollider(dummyBodyCollider);
+
+		//实体输入机
+		EntityInputManagerComponent inputs = dummy.addComponent(new EntityInputManagerComponent());
+		inputs.bindFsm(dummyFsm);
 	}
 
 	private void createHealthBar(TransformComponent bindEnt, float barOffsetX, float barOffsetY) {
@@ -327,6 +331,8 @@ public class MainGameScreen extends GScreen {
 	}
 
 	int m = 0;
+	int changeRoleIndex = 0;
+	EntityInputManagerComponent[] entInputs;
 	private void createUI() {
 		uiSkin = GlobalAssets.getInstance().editorSkin;
 		font = FontUtils.generate(100);
@@ -335,41 +341,71 @@ public class MainGameScreen extends GScreen {
 		uiStage = new Stage(uiViewport);
 		getImp().addProcessor(uiStage);
 
-//		rocker = new Rocker(0, uiSkin);
-//		rocker.setPosition(30, 30);
-//		rocker.setSize(225, 225);
-//		uiStage.addActor(rocker);
-//
-//		TextButton atkBtn = new TextButton("平A", uiSkin);
-//		atkBtn.addListener(new ClickListener() {
-//			public void clicked(InputEvent e, float x, float y) {
-//				hero.getComponent(RoleControllerComponent.class).attack();
-//			}
-//		});
-//		atkBtn.setSize(100, 100);
-//		atkBtn.setPosition(getViewSize().x - 75, 75, Align.bottomRight);
-//		uiStage.addActor(atkBtn);
-//
-//		TextButton jumpBtn = new TextButton("跳", uiSkin);
-//		jumpBtn.addListener(new ClickListener() {
-//			public void clicked(InputEvent e, float x, float y) {
-//				hero.getComponent(RoleControllerComponent.class).jump();
-//			}
-//		});
-//		jumpBtn.setSize(100, 100);
-//		jumpBtn.setPosition(getViewSize().x - 75 - (100 + 50), 75, Align.bottomRight);
-//		uiStage.addActor(jumpBtn);
-//
-//		TextButton crouchBtn = new TextButton("蹲", uiSkin);
-//		crouchBtn.addListener(new ClickListener() {
-//			public void clicked(InputEvent e, float x, float y) {
-//				RoleControllerComponent controller = hero.getComponent(RoleControllerComponent.class);
-//				controller.crouching = !controller.crouching;
-//			}
-//		});
-//		crouchBtn.setSize(100, 100);
-//		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
-//		uiStage.addActor(crouchBtn);
+		joystick = new VirtualJoystick(225, 0.3f, uiSkin);
+		joystick.setPosition(30, 30);
+		uiStage.addActor(joystick);
+		GameInputSystem.getInstance().setVirtualJoystick(joystick);
+
+		VirtualButton atkBtn = new VirtualButton("平A", uiSkin);
+		atkBtn.setSize(100, 100);
+		atkBtn.setPosition(getViewSize().x - 75, 75, Align.bottomRight);
+		uiStage.addActor(atkBtn);
+		GameInputSystem.getInstance().setAttackVirButton(atkBtn);
+
+		VirtualButton jumpBtn = new VirtualButton("跳", uiSkin);
+		jumpBtn.setSize(100, 100);
+		jumpBtn.setPosition(getViewSize().x - 75 - (100 + 50), 75, Align.bottomRight);
+		uiStage.addActor(jumpBtn);
+		GameInputSystem.getInstance().setJumpVirButton(jumpBtn);
+
+		VirtualButton crouchBtn = new VirtualButton("蹲", uiSkin);
+		crouchBtn.setSize(100, 100);
+		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
+		uiStage.addActor(crouchBtn);
+		GameInputSystem.getInstance().setCrouchVirButton(crouchBtn);
+
+		VirtualButton speedBoostBtn = new VirtualButton("疾跑", uiSkin);
+		speedBoostBtn.setSize(100, 100);
+		speedBoostBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 3, 75, Align.bottomRight);
+		uiStage.addActor(speedBoostBtn);
+		GameInputSystem.getInstance().setSpeedBoostVirButton(speedBoostBtn);
+
+		VirtualButton hurtBtn = new VirtualButton("受伤", uiSkin);
+		hurtBtn.setSize(100, 100);
+		hurtBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 4, 75, Align.bottomRight);
+		uiStage.addActor(hurtBtn);
+		GameInputSystem.getInstance().setHurtVirButton(hurtBtn);
+
+		VirtualButton respawnBtn = new VirtualButton("复活", uiSkin);
+		respawnBtn.setSize(100, 100);
+		respawnBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 5, 75, Align.bottomRight);
+		uiStage.addActor(respawnBtn);
+		GameInputSystem.getInstance().setRespawnVirButton(respawnBtn);
+
+		VirtualButton changeRoleBtn = new VirtualButton("切换角色", uiSkin);
+		changeRoleBtn.setSize(100, 100);
+		changeRoleBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 6, 75, Align.bottomRight);
+		uiStage.addActor(changeRoleBtn);
+		GameInputSystem.getInstance().setChangeRoleVirButton(changeRoleBtn);
+
+		//切换角色按钮
+		entInputs = new EntityInputManagerComponent[]{
+			hero.getComponent(EntityInputManagerComponent.class),
+			dummy.getComponent(EntityInputManagerComponent.class),
+			lizardMan.getComponent(EntityInputManagerComponent.class)
+		};
+		for(EntityInputManagerComponent i : entInputs) {
+			i.active = false;
+		}
+		entInputs[0].active = true;
+		//轮换启用单个角色的输入器
+		Consumer<Boolean> onChangeRole = down -> {
+			for(EntityInputManagerComponent i : entInputs) {
+				i.active = false;
+			}
+			entInputs[++changeRoleIndex%entInputs.length].active = true;
+		};
+		GameInputSystem.getInstance().registerActionListener(GameInputSystem.getInstance().getInputAction("ChangeRole"), onChangeRole, Boolean.class);
 //
 //		TextButton slidingBtn = new TextButton("滑铲", uiSkin);
 //		slidingBtn.addListener(new ClickListener() {
@@ -427,6 +463,8 @@ public class MainGameScreen extends GScreen {
 		font.draw(batch, "介绍: " + "\n"+ (showIntroduction?introduction:""), 20, getViewSize().y - 20);
 
 		batch.end();
+
+		GameInputSystem.getInstance().update(delta);
 
 		gm.gameLoop(delta);
 

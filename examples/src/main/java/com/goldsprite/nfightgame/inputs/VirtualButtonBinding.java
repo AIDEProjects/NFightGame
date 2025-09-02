@@ -11,6 +11,11 @@ public class VirtualButtonBinding extends KeyBinding {
 
 	@Override
 	public boolean getKeyPressed() {
-		return virtualButton.isPressed();
+		return virtualButton != null && virtualButton.isPressed();
+	}
+
+	@Override
+	public boolean matchesKey(int code) {
+		return false;
 	}
 }

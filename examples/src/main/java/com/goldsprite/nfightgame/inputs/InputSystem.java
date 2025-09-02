@@ -33,9 +33,9 @@ public class InputSystem extends InputAdapter {
 			listener.accept(val);
 		};
 //		//log提示
-//		action.started.add(c -> System.out.println("started"));
-//		action.performed.add(c -> System.out.println("performed"));
-//		action.canceled.add(c -> System.out.println("canceled"));
+		action.started.add(c -> System.out.println("started"));
+		action.performed.add(c -> System.out.println("performed"));
+		action.canceled.add(c -> System.out.println("canceled"));
 		action.started.add(proxy);
 		action.performed.add(proxy);
 		action.canceled.add(proxy);
@@ -91,30 +91,30 @@ public class InputSystem extends InputAdapter {
 	}
 
 	public void update(float delta) {
+//		if(true) return;
 		//遍历按键行为表的每个action中的每个binding
 		for (InputAction action : inputActions.keyActions.values()) {
 			for (InputBinding binding : action.inputBindings) {
-				boolean isStarted = action.isStarted();
 				boolean isModified = binding.updateValue();
 				boolean isHold = binding.isHold();
 				//虚拟触控输入
 				if((binding instanceof VirtualJoystickBinding) || binding instanceof VirtualButtonBinding){
 					//未开始且有更新 开始
-					if (!isStarted && isModified) {
-						action.setStarted(true);
+					if (!action.isStarted() && isModified) {
+						action.setStarted(binding, true);
 						action.started.invoke(action.inputActionContext);
 						break;
 					}
 					//已开始且无输入 取消
-					if (isStarted && !isHold) {
-						action.setStarted(false);
+					if (action.isStarted(binding) && !isHold) {
+						action.setStarted(binding, false);
 						action.canceled.invoke(action.inputActionContext);
 						break;
 					}
 				}
 
 				//已开始且有值变更(且有值时) 持续回调
-				if (isStarted && isModified) {
+				if (action.isStarted() && isModified) {
 					action.performed.invoke(action.inputActionContext);
 					//找到一组binding后打断， 因为不同组映射无法一起检测：A和→就不行
 					break;
