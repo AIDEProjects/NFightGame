@@ -11,9 +11,15 @@ import java.util.function.Consumer;
 public class EntityInputManagerComponent extends Component {
 	private IEntityFsm fsm;
 	public boolean active = true;
+	private float lastFaceX;
 	private final Consumer<Vector2> onMove = vector -> {
 		if(!active) return;
 		System.out.println("onMove " + vector);
+		int faceX = (int)Math.signum(vector.x);
+		if(faceX != lastFaceX) {
+			fsm.setMoveKeyProtect(false);
+		}
+		lastFaceX = faceX;
 		fsm.setKeyDirX(vector.x);
 	};
 	private final Consumer<Boolean> onAttack = down -> {

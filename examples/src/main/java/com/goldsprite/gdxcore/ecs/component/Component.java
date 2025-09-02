@@ -39,6 +39,13 @@ public class Component implements IComponent {
 		return gObject.getComponent(type, index);
 	}
 
+	public <T extends IComponent> T addComponent(Class<T> clazz) {
+		return getGObject().addComponent(clazz);
+	}
+	public <T extends IComponent> T addComponent(T component) {
+		return getGObject().addComponent(component);
+	}
+
 	public TransformComponent getTransform(){
 		return transform;
 	}

@@ -10,9 +10,10 @@ public interface IComponent extends IRunnable {
 	void setGObject(GObject gObject);
 
 	<T extends IComponent> T getComponent(Class<T> type);
-
-
 	<T extends IComponent> T getComponent(Class<T> type, int index);
+	<T extends IComponent> T addComponent(Class<T> clazz);
+	<T extends IComponent> T addComponent(T component);
+
 
 	void destroy();
 	void destroyImmediate();

@@ -44,6 +44,8 @@ public class MainGameScreen extends GScreen {
 
 	private SpriteBatch batch;
 	private Color backColor = new Color(.5f, .5f, .5f, 1);
+	private FollowCamComponent camfollower;
+
 	@Override
 	public Color getBackColor(){return backColor;}
 	private Color screenColor = new Color(.0f, .0f, .0f, 1);
@@ -70,8 +72,8 @@ public class MainGameScreen extends GScreen {
 	TextureRegion[] healthBarRegions = new TextureRegion[healthBarPath.length];
 	private final boolean showIntroduction = true;
 	private final String introduction = "."
-		+ "按键: WASD移动 JK攻击跳跃 Ctrl蹲下起立 蹲下时移动蹲行"
-		+ "\n" + "测试: Y主角受伤 R主角重生"
+		+ "按键: WASD移动 Shift疾跑 J攻击K/Space跳跃 Ctrl蹲下起立 蹲下时移动蹲行"
+		+ "\n" + "测试: Y主角受伤 R主角重生 Q切换角色"
 		+ "\n" + "特殊: 可以蹭墙跳, 移动打断攻击, 跳跃攻击";
 
 	@Override
@@ -193,7 +195,7 @@ public class MainGameScreen extends GScreen {
 		fsm.setBodyCollider(bodyCollider);
 		fsm.setAttackTrigger(atkTrigger);
 		fsm.init();
-		fsm.setEnableInput(false);
+		fsm.setEnableInput(true);
 
 		EntityInputManagerComponent inputs = lizardMan.addComponent(new EntityInputManagerComponent());
 		inputs.bindFsm(fsm);
@@ -262,12 +264,12 @@ public class MainGameScreen extends GScreen {
 		fsm.init();
 		fsm.setEnableInput(true);
 
-		//实体输入机
+//		//实体输入机
 		EntityInputManagerComponent inputs = hero.addComponent(new EntityInputManagerComponent());
 		inputs.bindFsm(fsm);
 
 		//跟随相机组件
-		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());
+		camfollower = hero.addComponent(new FollowCamComponent());
 		camfollower.setTarget(hero.transform);
 	}
 
@@ -331,7 +333,7 @@ public class MainGameScreen extends GScreen {
 	}
 
 	int m = 0;
-	int changeRoleIndex = 0;
+	int changeRoleIndex = 0, lastChangeRoleIndex=0;
 	EntityInputManagerComponent[] entInputs;
 	private void createUI() {
 		uiSkin = GlobalAssets.getInstance().editorSkin;
@@ -341,7 +343,7 @@ public class MainGameScreen extends GScreen {
 		uiStage = new Stage(uiViewport);
 		getImp().addProcessor(uiStage);
 
-		joystick = new VirtualJoystick(225, 0.3f, uiSkin);
+		joystick = new VirtualJoystick(225, 0.1f, uiSkin);
 		joystick.setPosition(30, 30);
 		uiStage.addActor(joystick);
 		GameInputSystem.getInstance().setVirtualJoystick(joystick);
@@ -366,25 +368,25 @@ public class MainGameScreen extends GScreen {
 
 		VirtualButton speedBoostBtn = new VirtualButton("疾跑", uiSkin);
 		speedBoostBtn.setSize(100, 100);
-		speedBoostBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 3, 75, Align.bottomRight);
+		speedBoostBtn.setPosition(75, 30+225+200, Align.bottomLeft);
 		uiStage.addActor(speedBoostBtn);
 		GameInputSystem.getInstance().setSpeedBoostVirButton(speedBoostBtn);
 
 		VirtualButton hurtBtn = new VirtualButton("受伤", uiSkin);
 		hurtBtn.setSize(100, 100);
-		hurtBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 4, 75, Align.bottomRight);
+		hurtBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 3, 75, Align.bottomRight);
 		uiStage.addActor(hurtBtn);
 		GameInputSystem.getInstance().setHurtVirButton(hurtBtn);
 
 		VirtualButton respawnBtn = new VirtualButton("复活", uiSkin);
 		respawnBtn.setSize(100, 100);
-		respawnBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 5, 75, Align.bottomRight);
+		respawnBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 4, 75, Align.bottomRight);
 		uiStage.addActor(respawnBtn);
 		GameInputSystem.getInstance().setRespawnVirButton(respawnBtn);
 
 		VirtualButton changeRoleBtn = new VirtualButton("切换角色", uiSkin);
 		changeRoleBtn.setSize(100, 100);
-		changeRoleBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 6, 75, Align.bottomRight);
+		changeRoleBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 5, 75, Align.bottomRight);
 		uiStage.addActor(changeRoleBtn);
 		GameInputSystem.getInstance().setChangeRoleVirButton(changeRoleBtn);
 
@@ -403,7 +405,12 @@ public class MainGameScreen extends GScreen {
 			for(EntityInputManagerComponent i : entInputs) {
 				i.active = false;
 			}
-			entInputs[++changeRoleIndex%entInputs.length].active = true;
+			changeRoleIndex = ++changeRoleIndex%entInputs.length;
+			entInputs[changeRoleIndex].active = true;
+			entInputs[lastChangeRoleIndex].getGObject().removeComponent(camfollower);
+			entInputs[changeRoleIndex].addComponent(camfollower);
+			entInputs[changeRoleIndex].getComponent(FollowCamComponent.class).setTarget(entInputs[changeRoleIndex].getTransform());
+			lastChangeRoleIndex = changeRoleIndex;
 		};
 		GameInputSystem.getInstance().registerActionListener(GameInputSystem.getInstance().getInputAction("ChangeRole"), onChangeRole, Boolean.class);
 //

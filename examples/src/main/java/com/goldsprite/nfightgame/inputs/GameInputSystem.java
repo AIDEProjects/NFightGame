@@ -132,7 +132,7 @@ public class GameInputSystem extends InputSystem {
 
 		InputAction changeRoleAction = new InputAction();
 		changeRoleAction.setValueType(Boolean.class);
-		KeyBinding keyChangeRole1 = new KeyBinding(Input.Keys.R);
+		KeyBinding keyChangeRole1 = new KeyBinding(Input.Keys.Q);
 		changeRoleAction.addInputBinding(keyChangeRole1);
 		changeRoleVirButtonBinding = new VirtualButtonBinding();
 		changeRoleAction.addInputBinding(changeRoleVirButtonBinding);
