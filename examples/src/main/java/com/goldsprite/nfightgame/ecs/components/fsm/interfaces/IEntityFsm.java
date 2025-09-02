@@ -5,11 +5,13 @@ import com.goldsprite.gdxcore.ecs.component.ColliderComponent;
 import com.goldsprite.gdxcore.ecs.component.RectColliderComponent;
 import com.goldsprite.gdxcore.ecs.component.RigidbodyComponent;
 import com.goldsprite.nfightgame.ecs.components.basics.EntityComponent;
+import com.goldsprite.nfightgame.ecs.components.basics.EntityInputManagerComponent;
 
 public interface IEntityFsm extends IFsm {
 	EntityComponent getEnt();
 	AnimatorComponent getAnim();
 	RigidbodyComponent getRigi();
+	EntityInputManagerComponent getInputs();
 
 	boolean isFalling();
 	boolean isGround();
@@ -33,23 +35,29 @@ public interface IEntityFsm extends IFsm {
 
 	void setKeyDirX(float key_dirX);
 
-	boolean getKeyJump();
-
-	boolean getKeyCrouch();
-
-	boolean getKeyAttack();
-
-	boolean getKeySpeedBoost();
-
 	boolean getMoveKeyProtect();
 
 	void setMoveKeyProtect(boolean moveKeyProtect);
 
+	boolean getKeyJump();
+
+	void setKeyJump(boolean down);
+
+	boolean getKeyCrouch();
+	void setKeyCrouch(boolean down);
+
+	boolean getKeyAttack();
+	void setKeyAttack(boolean down);
+
+	boolean getKeySpeedBoost();
+	void setKeySpeedBoost(boolean down);
+
+	boolean getKeyHurt();
+	void setKeyHurt(boolean down);
+
 	void beHurt(float damage);
 
 	void consumeHurtKey();
-
-	boolean getKeyHurt();
 
 	float getBeHurt_damage();
 

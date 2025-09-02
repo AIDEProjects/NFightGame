@@ -6,15 +6,14 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.gdxcore.screens.GScreen;
-import com.goldsprite.gdxcore.utils.ColorTextureUtils;
 import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
 import com.goldsprite.nfightgame.ecs.components.basics.EntityComponent;
+import com.goldsprite.nfightgame.ecs.components.basics.EntityInputManagerComponent;
 import com.goldsprite.nfightgame.ecs.components.basics.FollowCamComponent;
 import com.goldsprite.nfightgame.ecs.components.basics.HealthBarComponent;
 import com.goldsprite.nfightgame.ecs.components.fsm.fsms.DummyFsmComponent;
@@ -24,6 +23,7 @@ import com.goldsprite.nfightgame.ecs.ui.Rocker;
 import com.goldsprite.gdxcore.ecs.GObject;
 import com.goldsprite.gdxcore.ecs.GameSystem;
 import com.goldsprite.nfightgame.ecs.components.fsm.enums.StateType;
+import com.goldsprite.nfightgame.inputs.InputSystem;
 import com.goldsprite.utils.math.Vector2Int;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
@@ -100,9 +100,16 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createGM() {
+		//初始化游戏系统
 		gm = new GameSystem();
 		gm.setViewport(worldViewport);
 
+		//初始化游戏输入器
+		InputSystem inputSystem = InputSystem.getInstance();
+//		inputManager.setVirtualKey(GameVirtualKey.Up);
+		getImp().addProcessor(inputSystem);
+
+		//启用/禁用调式绘制器
 		gm.getGizmosRenderer().setEnabled(true);
 	}
 
@@ -179,12 +186,14 @@ public class MainGameScreen extends GScreen {
 		animator.addAnim(StateType.Respawn, new Animation<TextureRegion>(.2f, splitFrames(lizardManPath, 4, 3), Animation.PlayMode.REVERSED));
 		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(lizardManPath, 5, 2), Animation.PlayMode.NORMAL));
 
+//		EntityInputManagerComponent inputs = lizardMan.addComponent(new EntityInputManagerComponent());
+
 		LizardManFsmComponent fsm = lizardMan.addComponent(new LizardManFsmComponent());
 		fsm.setFootTrigger(footTrigger);
 		fsm.setBodyCollider(bodyCollider);
 		fsm.setAttackTrigger(atkTrigger);
 		fsm.init();
-		fsm.setEnableInput(true);
+		fsm.setEnableInput(false);
 	}
 
 	private void createHero() {
@@ -248,7 +257,11 @@ public class MainGameScreen extends GScreen {
 		fsm.setBodyCollider(heroBodyCollider);
 		fsm.setAttackTrigger(heroAtkTrigger);
 		fsm.init();
-		fsm.setEnableInput(false);
+		fsm.setEnableInput(true);
+
+		//实体输入机
+		EntityInputManagerComponent inputs = hero.addComponent(new EntityInputManagerComponent());
+		inputs.bindFsm(fsm);
 
 		//跟随相机组件
 		FollowCamComponent camfollower = hero.addComponent(new FollowCamComponent());
@@ -284,6 +297,10 @@ public class MainGameScreen extends GScreen {
 		dummyBodyCollider.setSize(45, 100);
 		dummyBodyCollider.setOffsetPosition(0, 45);
 
+		//实体输入机
+//		EntityInputManagerComponent inputs = dummy.addComponent(new EntityInputManagerComponent());
+
+		//Dummy状态机
 		DummyFsmComponent dummyFsm = dummy.addComponent(new DummyFsmComponent());
 		dummyFsm.init();
 		dummyFsm.setBodyCollider(dummyBodyCollider);

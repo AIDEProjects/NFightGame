@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.nfightgame.ecs.components.basics.EntityComponent;
+import com.goldsprite.nfightgame.ecs.components.basics.EntityInputManagerComponent;
 import com.goldsprite.nfightgame.ecs.components.fsm.interfaces.IState;
 import com.goldsprite.nfightgame.ecs.components.fsm.interfaces.IEntityFsm;
 import com.goldsprite.nfightgame.ecs.components.fsm.states.RespawnState;
@@ -18,16 +19,17 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	protected EntityComponent ent;
 	protected AnimatorComponent anim;
 	protected RigidbodyComponent rigi;
+	protected EntityInputManagerComponent inputs;
 	private RectColliderComponent bodyCollider;
 	private ColliderComponent footTrigger;
 	private ColliderComponent attackTrigger;
 	private float key_dirX;
-	private boolean key_jump, key_crouch, key_attack, key_speedBoost;
+	private boolean keyJump, key_crouch, key_attack, key_speedBoost;
 	private boolean moveKeyProtect;
 	private float beHurt_damage;
 	private boolean key_hurt;
 	protected boolean resetAnim;
-	protected boolean isEnableInput = true;//启用禁用玩家输入
+	protected boolean isEnableInput = false;//启用禁用玩家输入
 
 	//Component Area
 	public void init() {
@@ -44,6 +46,7 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 		if(anim == null) throw new RuntimeException("anim is null");
 		rigi = getComponent(RigidbodyComponent.class);
 		if(rigi == null) throw new RuntimeException("rigi is null");
+		inputs = getComponent(EntityInputManagerComponent.class);
 	}
 
 	@Override
@@ -64,6 +67,10 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	@Override
 	public RigidbodyComponent getRigi() {
 		return rigi;
+	}
+	@Override
+	public EntityInputManagerComponent getInputs() {
+		return inputs;
 	}
 
 	@Override
@@ -133,16 +140,16 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 		boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.D);
 		boolean leftJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.A);
 		boolean rightJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.D);
-		key_jump = Gdx.input.isKeyJustPressed(Input.Keys.K);//跳
-		key_crouch = Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_LEFT);//蹲
-		key_attack = Gdx.input.isKeyJustPressed(Input.Keys.J);//攻击
-		key_speedBoost = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);//疾跑
-		if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) beHurt(5);//受击(测试
-		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) respawn();//重生(测试
+//		key_jump = Gdx.input.isKeyJustPressed(Input.Keys.K);//跳
+//		key_crouch = Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_LEFT);//蹲
+//		key_attack = Gdx.input.isKeyJustPressed(Input.Keys.J);//攻击
+//		key_speedBoost = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);//疾跑
+//		if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) beHurt(5);//受击(测试
+//		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) respawn();//重生(测试
 
-		if (leftPressed) key_dirX = -1;
-		if (rightPressed) key_dirX = 1;
-		if (!leftPressed && !rightPressed) key_dirX = 0;
+//		if (leftPressed) key_dirX = -1;
+//		if (rightPressed) key_dirX = 1;
+//		if (!leftPressed && !rightPressed) key_dirX = 0;
 		if (moveKeyProtect && (leftJustPressed || rightJustPressed)) moveKeyProtect = false;
 	}
 
@@ -158,23 +165,41 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 
 	@Override
 	public boolean getKeyJump() {
-		return key_jump;
+		return keyJump;
 	}
-
+	@Override
+	public void setKeyJump(boolean down) {
+		if(!isEnableInput()) return;
+		keyJump = down;
+	}
 	@Override
 	public boolean getKeyCrouch() {
 		return key_crouch;
 	}
-
+	@Override
+	public void setKeyCrouch(boolean down) {
+		if(!isEnableInput()) return;
+		key_crouch = down;
+	}
 	@Override
 	public boolean getKeyAttack() {
 		return key_attack;
 	}
-
+	@Override
+	public void setKeyAttack(boolean down) {
+		if(!isEnableInput()) return;
+		key_attack = down;
+	}
 	@Override
 	public boolean getKeySpeedBoost() {
 		return key_speedBoost;
 	}
+	@Override
+	public void setKeySpeedBoost(boolean down) {
+		if(!isEnableInput()) return;
+		key_speedBoost = down;
+	}
+
 	@Override
 	public boolean getMoveKeyProtect() {
 		return moveKeyProtect;
@@ -197,6 +222,12 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public boolean getKeyHurt() {
 		return key_hurt;
 	}
+	@Override
+	public void setKeyHurt(boolean down) {
+		if(!isEnableInput()) return;
+		key_hurt = down;
+	}
+
 	@Override
 	public float getBeHurt_damage() {
 		return beHurt_damage;
