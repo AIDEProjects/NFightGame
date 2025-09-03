@@ -124,11 +124,26 @@ public class MainGameScreen extends GScreen {
 
 		createHero();
 
+		createTerrias();
+	}
+
+	private void createTerrias() {
+		ground = new GObject();
+		ground.transform.setPosition(200, 150);
+
+		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
+		groundCollider.setSize(1500, 40);
+
+
+		float groundTop = ground.transform.getPosition().y + groundCollider.getSize().y/2;//170
+
+
 		wall = new GObject();
 		wall.transform.setPosition(500, 345);
 
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
 		wallCollider.setSize(100, 200);
+
 
 		GObject wall2 = new GObject();
 		wall2.transform.setPosition(800, 350);
@@ -136,11 +151,19 @@ public class MainGameScreen extends GScreen {
 		RectColliderComponent wall2Collider = wall2.addComponent(new RectColliderComponent());
 		wall2Collider.setSize(200, 100);
 
-		ground = new GObject();
-		ground.transform.setPosition(200, 150);
 
-		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
-		groundCollider.setSize(1500, 40);
+		GObject wall3 = new GObject();
+		wall3.transform.setPosition(-50, groundTop + 270 + 45);
+
+		RectColliderComponent wall3Collider = wall3.addComponent(new RectColliderComponent());
+		wall3Collider.setSize(50, 500);
+
+
+		GObject wall4 = new GObject();
+		wall4.transform.setPosition(-175-50, groundTop + 270 + 40 + 20);
+
+		RectColliderComponent wall4Collider = wall4.addComponent(new RectColliderComponent());
+		wall4Collider.setSize(50, 500);
 	}
 
 	private void createLizardMan() {
