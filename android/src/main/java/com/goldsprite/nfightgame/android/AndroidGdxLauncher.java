@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import com.goldsprite.nfightgame.GdxLauncher;
+import com.goldsprite.gdxcore.screens.*;
 
 public class AndroidGdxLauncher extends AndroidApplication {
 
@@ -21,11 +22,12 @@ public class AndroidGdxLauncher extends AndroidApplication {
 			new GdxLauncher()
 		, cfg);
 
-//		//设置退出事件监听器
-//		ScreenManager.exitGame.add(() -> {
+		//设置退出事件监听器
+		ScreenManager.exitGame.add(() -> {
 //			finish();
 //			android.os.Process.killProcess(android.os.Process.myPid());
-//		});
+			moveTaskToBack(true);
+		});
 	}
 
 	private void initLaunchOptions() {

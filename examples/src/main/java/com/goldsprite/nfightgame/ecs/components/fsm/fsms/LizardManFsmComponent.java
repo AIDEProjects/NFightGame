@@ -9,7 +9,7 @@ public class LizardManFsmComponent extends EntityFsmComponent<LizardManFsmCompon
 		addState(new MoveState<>());
 		addState(new JumpState<>());
 		addState(new AttackState<>());
-		getState(AttackState.class).setAtkFrame(8);
+		getState(AttackState.class).setAtkFrame(5);
 		addState(new HurtState<>());
 		addState(new DeathState<>());
 		addState(new RespawnState<>());

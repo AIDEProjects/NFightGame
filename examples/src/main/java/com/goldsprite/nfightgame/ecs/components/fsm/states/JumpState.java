@@ -5,10 +5,12 @@ import com.goldsprite.nfightgame.ecs.components.fsm.interfaces.IEntityFsm;
 
 public class JumpState<F extends IEntityFsm> extends EntityState<F> {
 	boolean isJumped;
+	boolean isOnWall,lastKeyJump;//用于解决蹭墙连跳
 
 	@Override
 	public void enter() {
 		isJumped = false;
+		lastKeyJump = false;
 //			Gdx.app.log("", "enter jump"+(int)(new Random().nextFloat()*100));
 		//动画
 		fsm.getAnim().setCurAnim(StateType.Jump);
@@ -29,8 +31,23 @@ public class JumpState<F extends IEntityFsm> extends EntityState<F> {
 		//持续更新速度与朝向
 		fsm.move(fsm.getKeyDirX());
 		//蹭墙跳
-		if (fsm.getBodyCollider().isCollision() && fsm.getKeyJump()) {
-			jumping();
+		if (!isOnWall && fsm.getBodyCollider().isCollision()) {
+			if(fsm.getKeyJump()){
+				if(!lastKeyJump){
+					fsm.setKeyJump(false);
+					lastKeyJump = true;
+				}else{
+					jumping();
+					isOnWall = true;
+					lastKeyJump = false;
+				}
+			}else{
+				jumping();
+				isOnWall = true;
+			}
+		}
+		if (isOnWall && !fsm.getBodyCollider().isCollision()){
+			isOnWall = false;
 		}
 
 		//回到待机

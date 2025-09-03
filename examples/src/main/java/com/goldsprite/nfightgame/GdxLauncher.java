@@ -17,6 +17,7 @@ public class GdxLauncher extends ApplicationAdapter {
 	public static final float WORLD_WIDTH = 960;
 	public static final float WORLD_HEIGHT = 540;
 	public static boolean showFps = true;
+	public static final String DevVersion = "0.11.3";
 
 	private SpriteBatch batch;
 	private BitmapFont font;
@@ -54,8 +55,12 @@ public class GdxLauncher extends ApplicationAdapter {
 		//Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
-		float margin = 5;
-		font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), margin, margin + font.getLineHeight());
+		float margin = 10;
+		
+		String msg = "FPS: " + Gdx.graphics.getFramesPerSecond()
+		+"\nV"+DevVersion;
+		font.draw(batch, msg, margin, margin+40);
+		
 		batch.end();
 	}
 
