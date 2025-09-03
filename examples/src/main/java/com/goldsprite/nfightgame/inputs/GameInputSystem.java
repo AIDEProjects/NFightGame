@@ -1,7 +1,6 @@
 package com.goldsprite.nfightgame.inputs;
 
 import com.badlogic.gdx.Input;
-import com.goldsprite.nfightgame.ecs.components.basics.EntityInputManagerComponent;
 import com.goldsprite.nfightgame.inputs.widgets.VirtualButton;
 import com.goldsprite.nfightgame.inputs.widgets.VirtualJoystick;
 import com.goldsprite.utils.math.Vector2;
