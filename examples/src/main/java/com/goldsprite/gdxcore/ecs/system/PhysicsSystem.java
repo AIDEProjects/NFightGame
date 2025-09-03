@@ -63,6 +63,9 @@ public class PhysicsSystem extends System {
 				Vector2 velocity = rigi1.getVelocity();
 				lastPosition.set(pos1);
 
+				pos1.x += velocity.x * delta;
+				pos1.y += velocity.y * delta;
+				isColl = checkOtherCollision(c1);
 				//分轴碰撞检测
 				pos1.x += velocity.x * delta;
 				if (checkOtherCollision(c1)) {
@@ -149,8 +152,7 @@ public class PhysicsSystem extends System {
 	}
 
 	private boolean circleToCircleCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof CircleColliderComponent && c2 instanceof CircleColliderComponent))
-			return false;
+		if (!(c1 instanceof CircleColliderComponent && c2 instanceof CircleColliderComponent)) return false;
 		float cx = c1.getCenter().x;
 		float cy = c1.getCenter().y;
 		float r = ((CircleColliderComponent) c1).getRadius();
@@ -166,14 +168,12 @@ public class PhysicsSystem extends System {
 	}
 
 	private boolean rectToCircleCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof RectColliderComponent && c2 instanceof CircleColliderComponent))
-			return false;
+		if (!(c1 instanceof RectColliderComponent && c2 instanceof CircleColliderComponent)) return false;
 		return circleToRectCollision(c2, c1);
 	}
 
 	private boolean circleToRectCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof CircleColliderComponent && c2 instanceof RectColliderComponent))
-			return false;
+		if (!(c1 instanceof CircleColliderComponent && c2 instanceof RectColliderComponent)) return false;
 		float cx = c1.getCenter().x;
 		float cy = c1.getCenter().y;
 		float r = ((CircleColliderComponent) c1).getRadius();
@@ -190,8 +190,7 @@ public class PhysicsSystem extends System {
 	}
 
 	private boolean rectToRectCollision(ColliderComponent c1, ColliderComponent c2) {
-		if (!(c1 instanceof RectColliderComponent && c2 instanceof RectColliderComponent))
-			return false;
+		if (!(c1 instanceof RectColliderComponent && c2 instanceof RectColliderComponent)) return false;
 		float rx = c1.getCenter().x;
 		float ry = c1.getCenter().y;
 		float rw = ((RectColliderComponent) c1).getSize().x;
@@ -204,7 +203,8 @@ public class PhysicsSystem extends System {
 		//AABB
 		float minX = rx - rw / 2, maxX = rx + rw / 2, minY = ry - rh / 2, maxY = ry + rh / 2;
 		float min2X = r2x - r2w / 2, max2X = r2x + r2w / 2, min2Y = r2y - r2h / 2, max2Y = r2y + r2h / 2;
-		return !(minX > max2X || min2X > maxX || minY > max2Y || min2Y > maxY);
+		boolean AABB = !(minX > max2X || min2X > maxX || minY > max2Y || min2Y > maxY);
+		return AABB;
 	}
 }
 

@@ -17,6 +17,7 @@ public class ExampleSelectScreen extends GScreen {
 	private Map<String, Class<? extends IGScreen>> screenMapping = new LinkedHashMap<String, Class<? extends IGScreen>>() {{
 		put("输入管理器", InputManagerExampleScreen.class);
 		put("测试delta一致性", TestDeltaScreen.class);
+		put("物理碰撞演示", CollisionDetectionExampleScreen.class);
 	}};
 	private Skin skin;
 	private Stage stage;

@@ -8,7 +8,10 @@ import com.goldsprite.utils.math.Vector2;
 
 public abstract class ExampleGScreen extends GScreen {
 	public abstract String getIntroduction();
-	public abstract Vector2 getIntroductionPos();
+	private Vector2 introPos = new Vector2();
+	public Vector2 getIntroductionPos() {
+		return introPos.set(20, getViewSize().y - 20);
+	}
 	private SpriteBatch batch;
 	private BitmapFont introFnt;
 

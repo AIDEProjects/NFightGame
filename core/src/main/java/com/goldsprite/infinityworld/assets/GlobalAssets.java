@@ -28,6 +28,7 @@ public class GlobalAssets {
 
 	public Skin defaultSkin;
 	public BitmapFont font;
+	public BitmapFont smallFont;
 
 	public Skin editorSkin;
 	public BitmapFont editorFont, editorFontGray;
@@ -41,6 +42,7 @@ public class GlobalAssets {
 		//默认主题
 		defaultSkin = new Skin(Gdx.files.internal(skinPath));
 		font = FontUtils.generate();
+		smallFont = FontUtils.generate(18);
 
 		//编辑器主题
 		{
@@ -61,6 +63,14 @@ public class GlobalAssets {
 			Label.LabelStyle loggerLabelStyle = editorSkin.get(Label.LabelStyle.class);
 			loggerLabelStyle.font = loggerFont;
 			editorSkin.add("loggerLabelStyle", loggerLabelStyle);
+
+			Label.LabelStyle titleLabelStyle = editorSkin.get("title", Label.LabelStyle.class);
+			titleLabelStyle.font = editorFont;
+			editorSkin.add("title", titleLabelStyle);
+
+			Label.LabelStyle subtitleLabelStyle = editorSkin.get("subtitle", Label.LabelStyle.class);
+			subtitleLabelStyle.font = smallFont;
+			editorSkin.add("subtitle", subtitleLabelStyle);
 
 			TextButton.TextButtonStyle textButtonStyle = editorSkin.get(TextButton.TextButtonStyle.class);
 			textButtonStyle.font = editorFont;
