@@ -3,6 +3,7 @@ package com.goldsprite.gdxcore.ecs;
 import com.badlogic.gdx.graphics.Camera;
 import com.goldsprite.gdxcore.ecs.component.ColliderComponent;
 import com.goldsprite.gdxcore.ecs.component.Component;
+import com.goldsprite.gdxcore.ecs.component.WorldTxtComponent;
 import com.goldsprite.gdxcore.ecs.enums.ManageMode;
 import com.goldsprite.gdxcore.ecs.interfaces.IComponent;
 import com.goldsprite.gdxcore.ecs.component.SpriteComponent;
@@ -13,7 +14,6 @@ import com.goldsprite.gdxcore.ecs.renderer.SpriteRenderer;
 import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.utils.viewport.*;
-import com.goldsprite.nfightgame.inputs.GameInputSystem;
 
 public class GameSystem {
 	private static GameSystem instance;
@@ -48,7 +48,7 @@ public class GameSystem {
 	}
 
 	public static void manageGameComponent(IComponent component, ManageMode mode) {
-		if (component instanceof SpriteComponent) {
+		if ((component instanceof SpriteComponent) || (component instanceof WorldTxtComponent)) {
 			switch (mode) {
 				case ADD:
 					getInstance().spriteRenderer.addGObject(component);
@@ -84,7 +84,6 @@ public class GameSystem {
 	public void gameLoop(float delta) {
 		physicsSystem.update(delta);
 
-
 		for(int i = gobjects.size() - 1; i >= 0; i--) {
 			GObject obj = gobjects.get(i);
 			if(obj.isDestroyed()) continue;
@@ -95,7 +94,7 @@ public class GameSystem {
 		spriteRenderer.update(delta);
 		gizmosRenderer.update(delta);
 
-
+		//执行延迟销毁任务
 		for(int i = destroyGObjects.size() - 1; i >= 0; i--) {
 			GObject obj = destroyGObjects.get(i);
 			if(obj != null){
@@ -111,12 +110,6 @@ public class GameSystem {
 				destroyComponents.remove(comp);
 			}
 		}
-//		destroyComponents.forEach(comp -> {
-//			if(comp != null){
-//				comp.destroyImmediate();
-//				destroyComponents.remove(comp);
-//			}
-//		});
 	}
 
 	public Camera getCamera() {

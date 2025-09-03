@@ -164,6 +164,22 @@ public class MainGameScreen extends GScreen {
 
 		RectColliderComponent wall4Collider = wall4.addComponent(new RectColliderComponent());
 		wall4Collider.setSize(50, 500);
+
+
+		GObject worldTxt1 = new GObject();
+		worldTxt1.transform.setPosition(-160, groundTop + 40);
+
+		WorldTxtComponent worldTxtComp = worldTxt1.addComponent(new WorldTxtComponent());
+		worldTxtComp.initFnt(20);
+		worldTxtComp.setText("你能上去吗?");
+
+
+		GObject worldTxt2 = new GObject();
+		worldTxt2.transform.setPosition(-180, groundTop + 40 + 700);
+
+		WorldTxtComponent worldTxtComp2 = worldTxt2.addComponent(new WorldTxtComponent());
+		worldTxtComp2.initFnt(20);
+		worldTxtComp2.setText("上来也没啥用, 嘿嘿");
 	}
 
 	private void createLizardMan() {
