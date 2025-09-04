@@ -4,6 +4,8 @@ greetings.png
 libgdx.png
 pixelFont-7-8x14-sproutLands.ttf
 shikeik_avatar.png
+sprites/backs/back_moon.png
+sprites/backs/back_moon2.jpg
 sprites/gui/atk_key.png
 sprites/gui/atk_key_down.png
 sprites/gui/healthBar/health_bar_back.png

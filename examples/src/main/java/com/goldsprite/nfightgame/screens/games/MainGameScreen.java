@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.gdxcore.screens.GScreen;
+import com.goldsprite.gdxcore.utils.ColorTextureUtils;
 import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
 import com.goldsprite.nfightgame.components.EntityComponent;
@@ -43,12 +44,12 @@ public class MainGameScreen extends GScreen {
 	private VirtualJoystick joystick;
 
 	private SpriteBatch batch;
-	private Color backColor = new Color(.5f, .5f, .5f, 1);
+	private Color screenColor = new Color(.0f, .0f, .0f, 1);
 	private FollowCamComponent camfollower;
 
 	@Override
 	public Color getBackColor(){return backColor;}
-	private Color screenColor = new Color(.0f, .0f, .0f, 1);
+	private Color backColor = new Color(.0f, .0f, .0f, 1);
 	@Override
 	public Color getScreenColor(){return screenColor;}
 	private FitViewport worldViewport, uiViewport;
@@ -58,7 +59,6 @@ public class MainGameScreen extends GScreen {
 	}
 	private OrthographicCamera worldCamera, uiCamera;
 	int viewWidth = 1440, viewHeight = 810;
-	private Label fpsLabel;
 	private BitmapFont font;
 
 	String heroPath = "sprites/roles/hero/hero_sheet.png";
@@ -70,16 +70,22 @@ public class MainGameScreen extends GScreen {
 		"sprites/gui/healthBar/health_bar_frame.png",
 	};
 	TextureRegion[] healthBarRegions = new TextureRegion[healthBarPath.length];
+	String back1Path = "sprites/backs/back_moon.png";
+	String back2Path = "sprites/backs/back_moon2.jpg";
+
 	private final boolean showIntroduction = true;
 	private final String introduction = "."
 		+ "按键: WASD移动 Shift疾跑 J攻击K/Space跳跃 Ctrl蹲下起立 蹲下时移动蹲行"
 		+ "\n" + "测试: Y主角受伤 R主角重生 Q切换角色"
 		+ "\n" + "特殊: 可以蹭墙跳, 移动打断攻击, 跳跃攻击";
 
+	TextureRegion blackRegion;
 	@Override
 	public void create() {
+		blackRegion = ColorTextureUtils.createColorTextureRegion(Color.BLACK);
+
 		worldViewport = new FitViewport(viewWidth, viewHeight, worldCamera = new OrthographicCamera());
-		worldCamera.zoom = 0.65f;
+		worldCamera.zoom = 0.65f;//0.65f
 		worldCamera.update();
 		worldViewport.apply(true);
 		uiViewport = new FitViewport(viewWidth, viewHeight, uiCamera = new OrthographicCamera());
@@ -118,6 +124,8 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createGObjects() {
+		createBack();
+
 		createDummy();
 
 		createLizardMan();
@@ -127,12 +135,36 @@ public class MainGameScreen extends GScreen {
 		createTerrias();
 	}
 
+	private void createBack() {
+		GObject back = new GObject();
+		back.transform.setPosition(500, 150);
+
+		SpriteComponent sprite = back.addComponent(new SpriteComponent());
+		sprite.setRegion(new TextureRegion(new Texture(Gdx.files.internal(back2Path))));
+		sprite.setOriginOffset(512, 50);
+		sprite.getScale().set(1.4f);
+
+		SpriteComponent spriteLeft = back.addComponent(new SpriteComponent());
+		spriteLeft.setRegion(new TextureRegion(new Texture(Gdx.files.internal(back2Path))));
+		spriteLeft.setOriginOffset(512+1024, 50);
+		spriteLeft.getScale().set(1.4f);
+
+		SpriteComponent spriteRight = back.addComponent(new SpriteComponent());
+		spriteRight.setRegion(new TextureRegion(new Texture(Gdx.files.internal(back2Path))));
+		spriteRight.setOriginOffset(512-1024, 50);
+		spriteRight.getScale().set(1.4f);
+
+
+		int k;
+
+	}
+
 	private void createTerrias() {
 		ground = new GObject("Ground");
 		ground.transform.setPosition(200, 150);
 
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
-		groundCollider.setSize(1500, 40);
+		groundCollider.setSize(4000, 40);
 
 
 		float groundTop = ground.transform.getPosition().y + groundCollider.getSize().y/2;//170
@@ -141,32 +173,58 @@ public class MainGameScreen extends GScreen {
 		wall = new GObject("Wall");
 		wall.transform.setPosition(500, 345);
 
+		float sizeX = 100, sizeY = 200;
+
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
-		wallCollider.setSize(100, 200);
+		wallCollider.setSize(sizeX, sizeY);
 
+		SpriteComponent wallSprite = wall.addComponent(new SpriteComponent());
+		wallSprite.setRegion(ColorTextureUtils.createColorTextureRegion(Color.WHITE));
+		wallSprite.setScale(sizeX, sizeY);
+		wallSprite.setOriginOffset(sizeX/2, sizeY/2);
+/*
 
-		GObject wall2 = new GObject("Wall2");
+		GObject wall2 = new GObject();
 		wall2.transform.setPosition(800, 350);
 
+		sizeX = 200;sizeY = 100;
 		RectColliderComponent wall2Collider = wall2.addComponent(new RectColliderComponent());
-		wall2Collider.setSize(200, 100);
+		wall2Collider.setSize(sizeX, sizeY);
 
+		SpriteComponent wall2Sprite = wall2.addComponent(new SpriteComponent());
+		wall2Sprite.setRegion(ColorTextureUtils.createColorTextureRegion(Color.BLACK));
+		wall2Sprite.setScale(sizeX, sizeY);
+		wall2Sprite.setOriginOffset(sizeX/2, sizeY/2);
+*/
 
-		GObject wall3 = new GObject("Wall3");
+		/*GObject wall3 = new GObject();
 		wall3.transform.setPosition(-50, groundTop + 270 + 45);
 
+		sizeX = 50;sizeY = 500;
 		RectColliderComponent wall3Collider = wall3.addComponent(new RectColliderComponent());
-		wall3Collider.setSize(50, 500);
+		wall3Collider.setSize(sizeX, sizeY);
+
+		SpriteComponent wall3Sprite = wall3.addComponent(new SpriteComponent());
+		wall3Sprite.setRegion(new TextureRegion(blackRegion));
+		wall3Sprite.setScale(sizeX, sizeY);
+		wall3Sprite.setOriginOffset(sizeX/2, sizeY/2);
 
 
-		GObject wall4 = new GObject("Wall4");
+		GObject wall4 = new GObject();
 		wall4.transform.setPosition(-175-50, groundTop + 270 + 40 + 20);
 
+		sizeX = 50;sizeY = 500;
 		RectColliderComponent wall4Collider = wall4.addComponent(new RectColliderComponent());
-		wall4Collider.setSize(50, 500);
+		wall4Collider.setSize(sizeX, sizeY);int k;
 
+		SpriteComponent wall4Sprite = wall4.addComponent(new SpriteComponent());
+		wall4Sprite.setRegion(new TextureRegion(blackRegion));
+		wall4Sprite.setScale(sizeX, sizeY);
+		wall4Sprite.setOriginOffset(sizeX/2, sizeY/2);
 
-		GObject worldTxt1 = new GObject("WorldTxt1");
+*/
+
+		GObject worldTxt1 = new GObject();
 		worldTxt1.transform.setPosition(-160, groundTop + 40);
 
 		WorldTxtComponent worldTxtComp = worldTxt1.addComponent(new WorldTxtComponent());
@@ -174,7 +232,7 @@ public class MainGameScreen extends GScreen {
 		worldTxtComp.setText("你能上去吗?");
 
 
-		GObject worldTxt2 = new GObject("WorldTxt2");
+		GObject worldTxt2 = new GObject();
 		worldTxt2.transform.setPosition(-180, groundTop + 40 + 700);
 
 		WorldTxtComponent worldTxtComp2 = worldTxt2.addComponent(new WorldTxtComponent());

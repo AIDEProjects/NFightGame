@@ -9,7 +9,6 @@ import com.goldsprite.utils.math.*;
 import com.badlogic.gdx.graphics.*;
 
 public class RectColliderComponent extends ColliderComponent {
-	public Rectangle rect = new Rectangle();
 	private final Vector2 size = new Vector2();
 	private final Vector2 sclSize = new Vector2();
 
