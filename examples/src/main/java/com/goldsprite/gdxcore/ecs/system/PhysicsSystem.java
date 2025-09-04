@@ -41,13 +41,15 @@ public class PhysicsSystem extends System {
 
 	private float delta;
 	public void update(float delta) {
+		//限制最大delta
+		delta = MathUtils.clamp(delta, 0, 1/30f);
 		this.delta = delta;
 		if (!isEnabled())
 			return;
 
 		//使用固定步长的物理重力
 		accumulator += delta;
-		if(accumulator >= fixedTimeStep){
+		while(accumulator >= fixedTimeStep){
 			updateGravity(fixedTimeStep);
 			accumulator -= fixedTimeStep;
 		}
@@ -193,14 +195,14 @@ public class PhysicsSystem extends System {
 		return distance < r;
 	}
 
-	
+
 	RectCollider tmpRColl = new RectCollider(), tmpRColl2 = new RectCollider();
-	
+
 	private boolean rectToRectCollision(ColliderComponent c1, ColliderComponent c2) {
 		if (!(c1 instanceof RectColliderComponent && c2 instanceof RectColliderComponent)) return false;
-		
+
 		boolean isColl = false;
-		
+
 		RectColliderComponent coll1 = (RectColliderComponent)c1;
 		RectColliderComponent coll2 = (RectColliderComponent)c2;
 		RectCollider collA = tmpRColl;
@@ -218,7 +220,7 @@ public class PhysicsSystem extends System {
 		}
 		return isColl;
 	}
-	
+
 	Vector2 tmpVec = new Vector2();
 	static Vector2 velBack = new Vector2();
 	static Rectangle projectedRect = new Rectangle();
@@ -282,7 +284,7 @@ public class PhysicsSystem extends System {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 }

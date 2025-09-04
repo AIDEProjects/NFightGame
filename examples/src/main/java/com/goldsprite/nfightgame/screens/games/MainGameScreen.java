@@ -18,7 +18,7 @@ import com.goldsprite.nfightgame.components.FollowCamComponent;
 import com.goldsprite.nfightgame.components.HealthBarComponent;
 import com.goldsprite.nfightgame.fsm.fsms.DummyFsmComponent;
 import com.goldsprite.nfightgame.fsm.fsms.HeroFsmComponent;
-import com.goldsprite.nfightgame.fsm.fsms.LizardManFsmComponent;
+import com.goldsprite.nfightgame.fsm.fsms.LizardmanFsmComponent;
 import com.goldsprite.gdxcore.ecs.GObject;
 import com.goldsprite.gdxcore.ecs.GameSystem;
 import com.goldsprite.nfightgame.fsm.enums.StateType;
@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 public class MainGameScreen extends GScreen {
 	private GameSystem gm;
 
-	private GObject hero, dummy, dummyHealthBar, lizardMan, wall, ground;
+	private GObject hero, dummy, dummyHealthBar, lizardman, wall, ground;
 
 	private Skin uiSkin;
 	private Stage uiStage;
@@ -128,7 +128,7 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createTerrias() {
-		ground = new GObject();
+		ground = new GObject("Ground");
 		ground.transform.setPosition(200, 150);
 
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
@@ -138,35 +138,35 @@ public class MainGameScreen extends GScreen {
 		float groundTop = ground.transform.getPosition().y + groundCollider.getSize().y/2;//170
 
 
-		wall = new GObject();
+		wall = new GObject("Wall");
 		wall.transform.setPosition(500, 345);
 
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
 		wallCollider.setSize(100, 200);
 
 
-		GObject wall2 = new GObject();
+		GObject wall2 = new GObject("Wall2");
 		wall2.transform.setPosition(800, 350);
 
 		RectColliderComponent wall2Collider = wall2.addComponent(new RectColliderComponent());
 		wall2Collider.setSize(200, 100);
 
 
-		GObject wall3 = new GObject();
+		GObject wall3 = new GObject("Wall3");
 		wall3.transform.setPosition(-50, groundTop + 270 + 45);
 
 		RectColliderComponent wall3Collider = wall3.addComponent(new RectColliderComponent());
 		wall3Collider.setSize(50, 500);
 
 
-		GObject wall4 = new GObject();
+		GObject wall4 = new GObject("Wall4");
 		wall4.transform.setPosition(-175-50, groundTop + 270 + 40 + 20);
 
 		RectColliderComponent wall4Collider = wall4.addComponent(new RectColliderComponent());
 		wall4Collider.setSize(50, 500);
 
 
-		GObject worldTxt1 = new GObject();
+		GObject worldTxt1 = new GObject("WorldTxt1");
 		worldTxt1.transform.setPosition(-160, groundTop + 40);
 
 		WorldTxtComponent worldTxtComp = worldTxt1.addComponent(new WorldTxtComponent());
@@ -174,7 +174,7 @@ public class MainGameScreen extends GScreen {
 		worldTxtComp.setText("你能上去吗?");
 
 
-		GObject worldTxt2 = new GObject();
+		GObject worldTxt2 = new GObject("WorldTxt2");
 		worldTxt2.transform.setPosition(-180, groundTop + 40 + 700);
 
 		WorldTxtComponent worldTxtComp2 = worldTxt2.addComponent(new WorldTxtComponent());
@@ -183,44 +183,44 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createLizardMan() {
-		lizardMan = new GObject();
-		lizardMan.transform.setScale(1.1f);
-		lizardMan.transform.setPosition(400, 200);
-		lizardMan.transform.setFace(-1, 1);
+		lizardman = new GObject("LizardMan");
+		lizardman.transform.setScale(1.1f);
+		lizardman.transform.setPosition(400, 200);
+		lizardman.transform.setFace(-1, 1);
 
-		RigidbodyComponent rigi = lizardMan.addComponent(new RigidbodyComponent());
+		RigidbodyComponent rigi = lizardman.addComponent(new RigidbodyComponent());
 
 		//身体碰撞器
-		RectColliderComponent bodyCollider = lizardMan.addComponent(new RectColliderComponent());
+		RectColliderComponent bodyCollider = lizardman.addComponent(new RectColliderComponent());
 		bodyCollider.setOffsetPosition(0, 50);
 		bodyCollider.setSize(35, 110);
 
 		//脚底触发器
-		CircleColliderComponent footTrigger = lizardMan.addComponent(new CircleColliderComponent());
+		CircleColliderComponent footTrigger = lizardman.addComponent(new CircleColliderComponent());
 		footTrigger.setTrigger(true);
 		footTrigger.setOffsetPosition(0, 0);
 		footTrigger.setRadius(17);
 
 		//攻击触发器
-		CircleColliderComponent atkTrigger = lizardMan.addComponent(new CircleColliderComponent());
+		CircleColliderComponent atkTrigger = lizardman.addComponent(new CircleColliderComponent());
 		atkTrigger.setTrigger(true);
 		atkTrigger.setEnable(false);
 		atkTrigger.setOffsetPosition(65f, 65);
 		atkTrigger.setRadius(28);
 
-		createHealthBar(lizardMan.transform, 0, 120);
+		createHealthBar(lizardman.transform, 0, 120);
 
-		SpriteComponent texture = lizardMan.addComponent(new SpriteComponent());
+		SpriteComponent texture = lizardman.addComponent(new SpriteComponent());
 		texture.getScale().set(1.5f);
 		texture.setOriginOffset(119, 40);
 
 		//实体属性
-		EntityComponent ent = lizardMan.addComponent(new EntityComponent());
+		EntityComponent ent = lizardman.addComponent(new EntityComponent());
 		ent.setMaxHealth(20, true);
 		ent.setSpeed(140);
 		ent.setBoostSpeedMultiplier(1.5f);
 
-		AnimatorComponent animator = lizardMan.addComponent(new AnimatorComponent(texture));
+		AnimatorComponent animator = lizardman.addComponent(new AnimatorComponent(texture));
 		animator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(lizardManPath, 0, 3), Animation.PlayMode.LOOP));
 		animator.addAnim(StateType.Move, new Animation<TextureRegion>(.25f, splitFrames(lizardManPath, 1, 4), Animation.PlayMode.LOOP));
 		animator.addAnim(StateType.Attack, new Animation<TextureRegion>(.15f, splitFrames(lizardManPath, 2, 9), Animation.PlayMode.NORMAL));
@@ -229,19 +229,19 @@ public class MainGameScreen extends GScreen {
 		animator.addAnim(StateType.Respawn, new Animation<TextureRegion>(.2f, splitFrames(lizardManPath, 4, 3), Animation.PlayMode.REVERSED));
 		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(lizardManPath, 5, 2), Animation.PlayMode.NORMAL));
 
-		LizardManFsmComponent fsm = lizardMan.addComponent(new LizardManFsmComponent());
+		LizardmanFsmComponent fsm = lizardman.addComponent(new LizardmanFsmComponent());
 		fsm.setFootTrigger(footTrigger);
 		fsm.setBodyCollider(bodyCollider);
 		fsm.setAttackTrigger(atkTrigger);
 		fsm.init();
 		fsm.setEnableInput(true);
 
-		EntityInputManagerComponent inputs = lizardMan.addComponent(new EntityInputManagerComponent());
+		EntityInputManagerComponent inputs = lizardman.addComponent(new EntityInputManagerComponent());
 		inputs.bindFsm(fsm);
 	}
 
 	private void createHero() {
-		hero = new GObject();
+		hero = new GObject("Hero");
 		//变换属性
 		hero.transform.setFace(1, 1);
 		hero.transform.setPosition(100, 250);
@@ -313,7 +313,7 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createDummy() {
-		dummy = new GObject();
+		dummy = new GObject("Dummy");
 		dummy.transform.setFace(-1, 1);
 		dummy.transform.setPosition(220, 300);
 		dummy.transform.setScale(1.2f);
@@ -352,7 +352,7 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createHealthBar(TransformComponent bindEnt, float barOffsetX, float barOffsetY) {
-		dummyHealthBar = new GObject();
+		dummyHealthBar = new GObject(bindEnt.getGObject().getName()+"_HealthBar");
 		dummyHealthBar.transform.setPosition(300, 300);
 
 		SpriteComponent[] textures = new SpriteComponent[healthBarRegions.length];
@@ -433,7 +433,7 @@ public class MainGameScreen extends GScreen {
 		entInputs = new EntityInputManagerComponent[]{
 			hero.getComponent(EntityInputManagerComponent.class),
 			dummy.getComponent(EntityInputManagerComponent.class),
-			lizardMan.getComponent(EntityInputManagerComponent.class)
+			lizardman.getComponent(EntityInputManagerComponent.class)
 		};
 		for(EntityInputManagerComponent i : entInputs) {
 			i.active = false;

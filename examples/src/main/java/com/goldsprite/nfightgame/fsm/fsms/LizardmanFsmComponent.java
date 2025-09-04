@@ -2,7 +2,7 @@ package com.goldsprite.nfightgame.fsm.fsms;
 
 import com.goldsprite.nfightgame.fsm.states.*;
 
-public class LizardManFsmComponent extends EntityFsmComponent<LizardManFsmComponent, EntityState<LizardManFsmComponent>>{
+public class LizardmanFsmComponent extends EntityFsmComponent<LizardmanFsmComponent, EntityState<LizardmanFsmComponent>>{
 	@Override
 	public void initStates() {
 		addState(new IdleState<>());

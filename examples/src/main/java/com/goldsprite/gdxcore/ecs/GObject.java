@@ -7,11 +7,17 @@ import com.goldsprite.gdxcore.ecs.component.TransformComponent;
 import java.util.*;
 
 public class GObject {
+	private String name;
 	private boolean isDestroyed;
 	public final TransformComponent transform;
 	private final Map<Class<? extends IComponent>, List<IComponent>> components = new LinkedHashMap<>();
 
-	public GObject() {
+	public GObject(){
+		this("GameObject");
+	}
+	public GObject(String name) {
+		this.name = name;
+
 		addComponent(transform = new TransformComponent());
 
 		GameSystem.manageGObject(this, ManageMode.ADD);
@@ -96,5 +102,14 @@ public class GObject {
 
 	public boolean isDestroyed() {
 		return isDestroyed;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 }
