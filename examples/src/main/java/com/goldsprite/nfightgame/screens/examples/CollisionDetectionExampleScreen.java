@@ -48,9 +48,11 @@ public class CollisionDetectionExampleScreen extends ExampleGScreen {
 		return "物理碰撞演示: 矩形AABB碰撞检测与响应";
 	}
 
+	private Color backColor = new Color(0.2f, 0.2f, 0.2f, 1);
 	@Override
-	public Viewport getViewport() {
-		return new ScreenViewport();
+	public Color getBackColor()
+	{
+		return backColor;
 	}
 
 	@Override
@@ -314,25 +316,27 @@ public class CollisionDetectionExampleScreen extends ExampleGScreen {
 		stage.draw();
 	}
 
+	Vector2 tmpVec = new Vector2();
 	private void handleInput() {
 		// 在设置模式下处理拖拽
 		if (/*isSettingMode && */Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-			float mouseX = Gdx.input.getX();
-			float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // 转换Y坐标
-
+			Vector2 mousePos = tmpVec.set(Gdx.input.getX(), Gdx.input.getY());
+			screenToWorldCoord(mousePos);
+			float worldX = mousePos.x;
+			float worldY = mousePos.y;
 			// 检查是否点击了矩形A
-			if (Math.abs(mouseX - (collA.bound.getLeftDownX() + collA.bound.getWidth()/2)) < collA.bound.getWidth()/2 &&
-				Math.abs(mouseY - (collA.bound.getLeftDownY() + collA.bound.getHeight()/2)) < collA.bound.getHeight()/2) {
-				collA.bound.center.x = mouseX;
-				collA.bound.center.y = mouseY;
+			if (Math.abs(worldX - (collA.bound.getLeftDownX() + collA.bound.getWidth()/2)) < collA.bound.getWidth()/2 &&
+				Math.abs(worldY - (collA.bound.getLeftDownY() + collA.bound.getHeight()/2)) < collA.bound.getHeight()/2) {
+				collA.bound.center.x = worldX;
+				collA.bound.center.y = worldY;
 				updateUIValues();
 			}
 
 			// 检查是否点击了矩形B
-			if (Math.abs(mouseX - (collB.bound.getLeftDownX() + collB.bound.getWidth()/2)) < collB.bound.getWidth()/2 &&
-				Math.abs(mouseY - (collB.bound.getLeftDownY() + collB.bound.getHeight()/2)) < collB.bound.getHeight()/2) {
-				collB.bound.center.x = mouseX;
-				collB.bound.center.y = mouseY;
+			if (Math.abs(worldX - (collB.bound.getLeftDownX() + collB.bound.getWidth()/2)) < collB.bound.getWidth()/2 &&
+				Math.abs(worldY - (collB.bound.getLeftDownY() + collB.bound.getHeight()/2)) < collB.bound.getHeight()/2) {
+				collB.bound.center.x = worldX;
+				collB.bound.center.y = worldY;
 				updateUIValues();
 			}
 		}
@@ -362,7 +366,8 @@ public class CollisionDetectionExampleScreen extends ExampleGScreen {
 	}
 
 	private void drawRectangles() {
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+		shapeRenderer.setProjectionMatrix(getCamera().combined);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
 		// 绘制矩形A（黄色，碰撞时变红）
 		if (collA.bound.checkAABBCollision(collB.bound)) {

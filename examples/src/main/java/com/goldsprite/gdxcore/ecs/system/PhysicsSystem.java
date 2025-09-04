@@ -10,6 +10,8 @@ import com.goldsprite.utils.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.goldsprite.utils.math.*;
+import com.goldsprite.gdxcore.physics.*;
 
 public class PhysicsSystem extends System {
 	public static float GRAVITY = 9.81f;
@@ -37,7 +39,9 @@ public class PhysicsSystem extends System {
 		if(remove) gObjects.remove(collider.getGObject());
 	}
 
+	private float delta;
 	public void update(float delta) {
+		this.delta = delta;
 		if (!isEnabled())
 			return;
 
@@ -62,24 +66,24 @@ public class PhysicsSystem extends System {
 				Vector2 pos1 = c1.getTransform().getPosition();
 				Vector2 velocity = rigi1.getVelocity();
 				lastPosition.set(pos1);
-
+//
 				pos1.x += velocity.x * delta;
 				pos1.y += velocity.y * delta;
 				isColl = checkOtherCollision(c1);
-				//分轴碰撞检测
-				pos1.x += velocity.x * delta;
-				if (checkOtherCollision(c1)) {
-					isColl = true;
-					pos1.setX(lastPosition.x);
-					velocity.x = 0;
-				}
-				pos1.y += velocity.y * delta;
-				if (checkOtherCollision(c1)) {
-					isColl = true;
-					pos1.setY(lastPosition.y);
-					velocity.y = 0;
-				}
-				pos1.set(lastPosition);
+//				//分轴碰撞检测
+//				pos1.x += velocity.x * delta;
+//				if (checkOtherCollision(c1)) {
+//					isColl = true;
+//					pos1.setX(lastPosition.x);
+//					velocity.x = 0;
+//				}
+//				pos1.y += velocity.y * delta;
+//				if (checkOtherCollision(c1)) {
+//					isColl = true;
+//					pos1.setY(lastPosition.y);
+//					velocity.y = 0;
+//				}
+//				pos1.set(lastPosition);
 			}
 			c1.setIsCollision(isColl);
 		}
@@ -189,22 +193,97 @@ public class PhysicsSystem extends System {
 		return distance < r;
 	}
 
+	
+	RectCollider tmpRColl = new RectCollider(), tmpRColl2 = new RectCollider();
+	
 	private boolean rectToRectCollision(ColliderComponent c1, ColliderComponent c2) {
 		if (!(c1 instanceof RectColliderComponent && c2 instanceof RectColliderComponent)) return false;
-		float rx = c1.getCenter().x;
-		float ry = c1.getCenter().y;
-		float rw = ((RectColliderComponent) c1).getSize().x;
-		float rh = ((RectColliderComponent) c1).getSize().y;
-		float r2x = c2.getCenter().x;
-		float r2y = c2.getCenter().y;
-		float r2w = ((RectColliderComponent) c2).getSize().x;
-		float r2h = ((RectColliderComponent) c2).getSize().y;
-
+		
+		boolean isColl = false;
+		
+		RectColliderComponent coll1 = (RectColliderComponent)c1;
+		RectColliderComponent coll2 = (RectColliderComponent)c2;
+		RectCollider collA = tmpRColl;
+		RectCollider collB = tmpRColl2;
+		collA.velocity = coll1.getComponent(RigidbodyComponent.class).getVelocity();
+		collA.bound.set(coll1.getCenter().x, coll1.getCenter().y, coll1.getSize().x/2, coll1.getSize().y/2);
+		collB.bound.set(coll2.getCenter().x, coll2.getCenter().y, coll2.getSize().x/2, coll2.getSize().y/2);
 		//AABB
-		float minX = rx - rw / 2, maxX = rx + rw / 2, minY = ry - rh / 2, maxY = ry + rh / 2;
-		float min2X = r2x - r2w / 2, max2X = r2x + r2w / 2, min2Y = r2y - r2h / 2, max2Y = r2y + r2h / 2;
-		boolean AABB = !(minX > max2X || min2X > maxX || minY > max2Y || min2Y > maxY);
-		return AABB;
+		if(isColl = collA.bound.checkAABBCollision(collB.bound)){
+			Vector2 velBack = resolveCollision(collA, collB, delta);
+			if(velBack != null){
+				Vector2 pos1 = c1.getTransform().getPosition();
+				pos1.add(velBack);
+			}
+		}
+		return isColl;
+	}
+	
+	Vector2 tmpVec = new Vector2();
+	static Vector2 velBack = new Vector2();
+	static Rectangle projectedRect = new Rectangle();
+	public Vector2 resolveCollision(RectCollider collA, RectCollider collB, float delta) {
+		Rectangle rectA = collA.bound;
+		Rectangle rectB = collB.bound;
+		Vector2 velocity = tmpVec.set(collA.velocity).scl(delta);//单帧速度
+		float k = velocity.y / velocity.x;//斜率
+
+		CollInfo collInfo = collA.collInfo.reset();
+		collInfo.newVelocity.set(collA.velocity);
+		projectedRect.setHalfSize(rectA.halfSize.x, rectA.halfSize.y);
+
+//		if(k == 0 || Float.isInfinite(k)) return;
+
+		//y轴碰撞
+		if (velocity.y != 0) {
+			float depY = velocity.y > 0
+				? rectB.bottomY() - rectA.topY()
+				: rectB.topY() - rectA.bottomY();
+			if(Math.signum(velocity.y) != Math.signum(depY)){
+				float mappingX = depY / k;
+				//获取回退量
+				velBack.set(mappingX, depY);
+				//创建y轴假想碰撞点矩形
+				projectedRect.center.set(rectA.center.x + velBack.x, rectA.center.y + velBack.y);
+				if (projectedRect.checkAABBCollision(rectB)) {
+					//collA.velocity.y = 0;
+					collInfo.isCollision = true;
+					collInfo.normalDirection.set(velocity.y > 0 ? Vector2.down : Vector2.up);
+					collInfo.newVelocity.set(velocity).
+						add(velBack.y).
+						div(delta);
+					//rectA.center.y += velBack.y;
+					velBack.x = 0;
+					return velBack;
+				}
+			}
+		}
+		//x轴碰撞
+		if (velocity.x != 0) {
+			float depX = velocity.x > 0
+				? rectB.leftX() - rectA.rightX()
+				: rectB.rightX() - rectA.leftX();
+			if(Math.signum(velocity.x) != Math.signum(depX)) {
+				float mappingY = depX * k;
+				//获取回退量
+				velBack.set(depX, mappingY);
+				//创建y轴假想碰撞点矩形
+				projectedRect.center.set(rectA.center.x + velBack.x, rectA.center.y + velBack.y);
+				if (projectedRect.checkAABBCollision(rectB)) {
+					//collA.velocity.x = 0;
+					collInfo.isCollision = true;
+					collInfo.normalDirection.set(velocity.x > 0 ? Vector2.left : Vector2.right);
+					collInfo.newVelocity.set(velocity).
+						add(velBack.y).
+						div(delta);
+					//rectA.center.x += velBack.x;
+					velBack.y = 0;
+					return velBack;
+				}
+			}
+		}
+		
+		return null;
 	}
 }
 
