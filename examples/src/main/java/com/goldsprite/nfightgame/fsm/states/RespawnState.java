@@ -10,6 +10,12 @@ public class RespawnState<F extends IEntityFsm> extends EntityState<F> {
 	}
 
 	@Override
+	public void exit() {
+		fsm.getBodyCollider().setEnable(true);
+		fsm.getFootTrigger().setEnable(true);
+	}
+
+	@Override
 	public void running(float delta) {
 		//起身后治愈角色并回到待机
 		if (fsm.getAnim().isFinished()) {

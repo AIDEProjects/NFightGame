@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.nfightgame.components.EntityComponent;
 import com.goldsprite.nfightgame.components.EntityInputManagerComponent;
+import com.goldsprite.nfightgame.fsm.enums.StateType;
 import com.goldsprite.nfightgame.fsm.interfaces.IEntityFsm;
 import com.goldsprite.nfightgame.fsm.interfaces.IState;
 import com.goldsprite.nfightgame.fsm.states.RespawnState;
@@ -308,5 +309,14 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	@Override
 	public boolean isResetAnim() {
 		return resetAnim;
+	}
+
+	public boolean isDead() {
+		if(!hasState(StateType.Death)) return false;
+		return getCurrentState().equals(StateType.Death);
+	}
+
+	private boolean hasState(StateType stateType) {
+		return states.containsKey(stateType);
 	}
 }

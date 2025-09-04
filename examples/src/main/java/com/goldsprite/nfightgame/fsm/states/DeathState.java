@@ -7,6 +7,8 @@ public class DeathState<F extends IEntityFsm> extends EntityState<F> {
 	@Override
 	public void enter() {
 		fsm.getAnim().setCurAnim(StateType.Death);
+		fsm.getBodyCollider().setEnable(false);
+		fsm.getFootTrigger().setEnable(false);
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import com.goldsprite.nfightgame.components.EntityInputManagerComponent;
 import com.goldsprite.nfightgame.components.FollowCamComponent;
 import com.goldsprite.nfightgame.components.HealthBarComponent;
 import com.goldsprite.nfightgame.fsm.fsms.DummyFsmComponent;
+import com.goldsprite.nfightgame.fsm.fsms.EntityFsmComponent;
 import com.goldsprite.nfightgame.fsm.fsms.HeroFsmComponent;
 import com.goldsprite.nfightgame.fsm.fsms.LizardmanFsmComponent;
 import com.goldsprite.gdxcore.ecs.GObject;
@@ -409,6 +410,7 @@ public class MainGameScreen extends GScreen {
 		dummyAnimator.addAnim(StateType.Idle, new Animation<TextureRegion>(.25f, splitFrames(dummyPath, 0, 3), Animation.PlayMode.LOOP));
 		dummyAnimator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.2f, splitFrames(dummyPath, 1, 2), Animation.PlayMode.NORMAL));
 		dummyAnimator.addAnim(StateType.Death, new Animation<TextureRegion>(.15f, splitFrames(dummyPath, 2, 5), Animation.PlayMode.NORMAL));
+		dummyAnimator.addAnim(StateType.Respawn, new Animation<TextureRegion>(.15f, splitFrames(dummyPath, 2, 5), Animation.PlayMode.REVERSED));
 
 		RectColliderComponent dummyBodyCollider = dummy.addComponent(new RectColliderComponent());
 		dummyBodyCollider.setSize(45, 100);
@@ -534,15 +536,7 @@ public class MainGameScreen extends GScreen {
 			entInputs[0].active = true;
 			//轮换启用单个角色的输入器
 			Consumer<Boolean> onChangeRole = down -> {
-				for (EntityInputManagerComponent i : entInputs) {
-					i.active = false;
-				}
-				changeRoleIndex = ++changeRoleIndex % entInputs.length;
-				entInputs[changeRoleIndex].active = true;
-				entInputs[lastChangeRoleIndex].getGObject().removeComponent(camfollower);
-				entInputs[changeRoleIndex].addComponent(camfollower);
-				entInputs[changeRoleIndex].getComponent(FollowCamComponent.class).setTarget(entInputs[changeRoleIndex].getTransform());
-				lastChangeRoleIndex = changeRoleIndex;
+				nextRole();
 			};
 			GameInputSystem.getInstance().registerActionListener(GameInputSystem.getInstance().getInputAction("ChangeRole"), onChangeRole, Boolean.class);
 		} catch (Exception e) {
@@ -560,6 +554,18 @@ public class MainGameScreen extends GScreen {
 //		uiStage.addActor(slidingBtn);
 
 		createInspector();
+	}
+
+	private void nextRole() {
+		for (EntityInputManagerComponent i : entInputs) {
+			i.active = false;
+		}
+		changeRoleIndex = ++changeRoleIndex % entInputs.length;
+		entInputs[changeRoleIndex].active = true;
+		entInputs[lastChangeRoleIndex].getGObject().removeComponent(camfollower);
+		entInputs[changeRoleIndex].addComponent(camfollower);
+		entInputs[changeRoleIndex].getComponent(FollowCamComponent.class).setTarget(entInputs[changeRoleIndex].getTransform());
+		lastChangeRoleIndex = changeRoleIndex;
 	}
 
 	Table inspectorTable;
