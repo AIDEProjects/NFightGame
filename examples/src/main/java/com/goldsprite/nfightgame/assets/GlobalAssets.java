@@ -1,4 +1,4 @@
-package com.goldsprite.infinityworld.assets;
+package com.goldsprite.nfightgame.assets;
 
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -19,7 +19,7 @@ public class GlobalAssets {
 	public static final int editorFontSize = 40;
 	public static final float editorFontScl = 0.5f;
 	public static final float loggerFontScl = 0.4f;
-	public static final float editorSplitHandleSize = 12;
+	public static final float editorSplitHandleSize = 25;//分割条宽度12
 	public static final int editorWindowResizeBorderSize = 20;
 
 	//实例资源
@@ -93,6 +93,9 @@ public class GlobalAssets {
 
 			List.ListStyle listStyle = editorSkin.get(List.ListStyle.class);
 			listStyle.font = editorFont;
+
+			CheckBox.CheckBoxStyle checkBoxStyle = editorSkin.get("switch", CheckBox.CheckBoxStyle.class);
+			checkBoxStyle.font = editorFont;
 		}
 	}
 

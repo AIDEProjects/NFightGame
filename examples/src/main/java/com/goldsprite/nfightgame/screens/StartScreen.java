@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.goldsprite.gdxcore.screens.GScreen;
-import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.assets.GlobalAssets;
 import com.goldsprite.nfightgame.screens.examples.ExampleSelectScreen;
 import com.goldsprite.nfightgame.screens.games.EngineEditorScreen;
 import com.goldsprite.nfightgame.screens.games.MainGameScreen;

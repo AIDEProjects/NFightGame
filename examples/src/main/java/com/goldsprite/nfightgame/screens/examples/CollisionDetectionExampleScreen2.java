@@ -1,7 +1,7 @@
 package com.goldsprite.nfightgame.screens.examples;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.assets.GlobalAssets;
 import com.goldsprite.utils.math.Vector2;
 
 public class CollisionDetectionExampleScreen2 extends ExampleGScreen{

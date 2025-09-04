@@ -3,7 +3,7 @@ package com.goldsprite.nfightgame.screens.examples;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.goldsprite.gdxcore.ui.GStage;
-import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.assets.GlobalAssets;
 import com.goldsprite.nfightgame.inputs.*;
 import com.goldsprite.nfightgame.inputs.widgets.VirtualButton;
 import com.goldsprite.nfightgame.inputs.widgets.VirtualJoystick;

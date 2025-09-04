@@ -11,10 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.physics.RectCollider;
-import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.assets.GlobalAssets;
 import com.goldsprite.utils.math.Rectangle;
 import com.goldsprite.utils.math.Vector2;
 

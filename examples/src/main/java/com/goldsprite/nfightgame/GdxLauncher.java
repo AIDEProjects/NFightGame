@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.goldsprite.gdxcore.logs.Log;
 import com.goldsprite.gdxcore.screens.ScreenManager;
 import com.goldsprite.gdxcore.utils.FontUtils;
-import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.assets.GlobalAssets;
 import com.goldsprite.nfightgame.screens.StartScreen;
 import com.goldsprite.nfightgame.screens.examples.ExampleSelectScreen;
 
@@ -56,11 +56,11 @@ public class GdxLauncher extends ApplicationAdapter {
 		batch.setProjectionMatrix(cam.combined);
 		batch.begin();
 		float margin = 10;
-		
+
 		String msg = "FPS: " + Gdx.graphics.getFramesPerSecond()
 		+"\nV"+DevVersion;
 		font.draw(batch, msg, margin, margin+40);
-		
+
 		batch.end();
 	}
 

@@ -4,17 +4,22 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.gdxcore.screens.GScreen;
 import com.goldsprite.gdxcore.ui.GSplitPane;
+import com.goldsprite.gdxcore.ui.GStage;
 import com.goldsprite.gdxcore.utils.ColorTextureUtils;
 import com.goldsprite.gdxcore.utils.FontUtils;
 import com.goldsprite.gdxcore.utils.Pivot;
-import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.assets.GlobalAssets;
 import com.goldsprite.nfightgame.components.EntityComponent;
 import com.goldsprite.nfightgame.components.EntityInputManagerComponent;
 import com.goldsprite.nfightgame.components.FollowCamComponent;
@@ -41,8 +46,8 @@ public class MainGameScreen extends GScreen {
 
 	private GObject hero, dummy, dummyHealthBar, lizardman, wall, ground;
 
-	private Skin uiSkin;
-	private Stage uiStage;
+	private Skin skin;
+	private GStage uiStage;
 	private VirtualJoystick joystick;
 
 	private SpriteBatch batch;
@@ -60,7 +65,8 @@ public class MainGameScreen extends GScreen {
 		return uiViewport;
 	}
 	private OrthographicCamera worldCamera, uiCamera;
-	int viewWidth = 1440, viewHeight = 810;
+	int worldViewWidth = 1728, worldViewHeight = 810;
+	int uiViewWidth = 1152, uiViewHeight = 540;
 	private BitmapFont font;
 
 	String heroPath = "sprites/roles/hero/hero_sheet.png";
@@ -74,8 +80,6 @@ public class MainGameScreen extends GScreen {
 	TextureRegion[] healthBarRegions = new TextureRegion[healthBarPath.length];
 	String back1Path = "sprites/backs/back_moon.png";
 	String back2Path = "sprites/backs/back_moon2.jpg";
-
-	private final boolean showIntroduction = true;
 	private final String introduction = "."
 		+ "按键: WASD移动 Shift疾跑 J攻击K/Space跳跃 Ctrl蹲下起立 蹲下时移动蹲行"
 		+ "\n" + "测试: Y主角受伤 R主角重生 Q切换角色"
@@ -86,11 +90,11 @@ public class MainGameScreen extends GScreen {
 	public void create() {
 		blackRegion = ColorTextureUtils.createColorTextureRegion(Color.BLACK);
 
-		worldViewport = new FitViewport(viewWidth, viewHeight, worldCamera = new OrthographicCamera());
+		worldViewport = new FitViewport(worldViewWidth, worldViewHeight, worldCamera = new OrthographicCamera());
 		worldCamera.zoom = 0.65f;//0.65f
 		worldCamera.update();
 		worldViewport.apply(true);
-		uiViewport = new FitViewport(viewWidth, viewHeight, uiCamera = new OrthographicCamera());
+		uiViewport = new FitViewport(uiViewWidth, uiViewHeight, uiCamera = new OrthographicCamera());
 		uiViewport.apply(true);
 
 		batch = new SpriteBatch();
@@ -122,7 +126,7 @@ public class MainGameScreen extends GScreen {
 		getImp().addProcessor(inputs);
 
 		//启用/禁用调式绘制器
-		gm.getGizmosRenderer().setEnabled(true);
+		gm.getGizmosRenderer().setEnabled(enableGizmos);
 	}
 
 	private void createGObjects() {
@@ -444,59 +448,76 @@ public class MainGameScreen extends GScreen {
 	int m = 0;
 	int changeRoleIndex = 0, lastChangeRoleIndex=0;
 	EntityInputManagerComponent[] entInputs;
+	MTable guiTable;
+	// 比例系数（当前分辨率 ÷ 设计分辨率）
+	float scale = 960f / 1440f;  // = 0.666...
+
+	// 工具方法：缩放并创建虚拟按钮
+	private VirtualButton createButton(String text, float size, float x, float y, int align, Skin skin, Table guiTable) {
+		VirtualButton btn = new VirtualButton(text, skin);
+		btn.setSize(size, size);
+		btn.setPosition(x, y, align);
+		guiTable.addActor(btn);
+		return btn;
+	}
+
 	private void createUI() {
-		uiSkin = GlobalAssets.getInstance().editorSkin;
+		skin = GlobalAssets.getInstance().editorSkin;
 		font = FontUtils.generate(100);
 		font.getData().setScale(0.2f);
 
-		uiStage = new Stage(uiViewport);
+		uiStage = new GStage(uiViewport);
 		getImp().addProcessor(uiStage);
 
-		joystick = new VirtualJoystick(225, 0.1f, uiSkin);
-		joystick.setPosition(30, 30);
-		uiStage.addActor(joystick);
+		guiTable = new MTable();
+		guiTable.setFillParent(true);
+
+		float scale = 960f / 1440f;
+
+		// === 摇杆 ===
+		VirtualJoystick joystick = new VirtualJoystick(225 * scale, 0.1f, skin);
+		joystick.setPosition(30 * scale, 30 * scale);
+		guiTable.addActor(joystick);
 		GameInputSystem.getInstance().setVirtualJoystick(joystick);
 
-		VirtualButton atkBtn = new VirtualButton("平A", uiSkin);
-		atkBtn.setSize(100, 100);
-		atkBtn.setPosition(getViewSize().x - 75, 75, Align.bottomRight);
-		uiStage.addActor(atkBtn);
+		// === 通用按钮参数 ===
+		float btnSize = 100 * scale;
+		float margin = 50 * scale;
+		float baseY = 75 * scale;
+
+		// 攻击按钮
+		VirtualButton atkBtn = createButton("平A", btnSize,
+			getViewSize().x - 75 * scale, baseY, Align.bottomRight, skin, guiTable);
 		GameInputSystem.getInstance().setAttackVirButton(atkBtn);
 
-		VirtualButton jumpBtn = new VirtualButton("跳", uiSkin);
-		jumpBtn.setSize(100, 100);
-		jumpBtn.setPosition(getViewSize().x - 75 - (100 + 50), 75, Align.bottomRight);
-		uiStage.addActor(jumpBtn);
+		// 跳
+		VirtualButton jumpBtn = createButton("跳", btnSize,
+			getViewSize().x - 75 * scale - (btnSize + margin), baseY, Align.bottomRight, skin, guiTable);
 		GameInputSystem.getInstance().setJumpVirButton(jumpBtn);
 
-		VirtualButton crouchBtn = new VirtualButton("蹲", uiSkin);
-		crouchBtn.setSize(100, 100);
-		crouchBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
-		uiStage.addActor(crouchBtn);
+		// 蹲
+		VirtualButton crouchBtn = createButton("蹲", btnSize,
+			getViewSize().x - 75 * scale - (btnSize + margin) * 2, baseY, Align.bottomRight, skin, guiTable);
 		GameInputSystem.getInstance().setCrouchVirButton(crouchBtn);
 
-		VirtualButton speedBoostBtn = new VirtualButton("疾跑", uiSkin);
-		speedBoostBtn.setSize(100, 100);
-		speedBoostBtn.setPosition(75, 30 + 225 + 200, Align.bottomLeft);
-		uiStage.addActor(speedBoostBtn);
+		// 疾跑（左上）
+		VirtualButton speedBoostBtn = createButton("疾跑", btnSize,
+			75 * scale, 30 * scale + 225 * scale + 200 * scale, Align.bottomLeft, skin, guiTable);
 		GameInputSystem.getInstance().setSpeedBoostVirButton(speedBoostBtn);
 
-		VirtualButton hurtBtn = new VirtualButton("受伤", uiSkin);
-		hurtBtn.setSize(100, 100);
-		hurtBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 3, 75, Align.bottomRight);
-		uiStage.addActor(hurtBtn);
+		// 受伤
+		VirtualButton hurtBtn = createButton("受伤", btnSize,
+			getViewSize().x - 75 * scale - (btnSize + margin) * 3, baseY, Align.bottomRight, skin, guiTable);
 		GameInputSystem.getInstance().setHurtVirButton(hurtBtn);
 
-		VirtualButton respawnBtn = new VirtualButton("复活", uiSkin);
-		respawnBtn.setSize(100, 100);
-		respawnBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 4, 75, Align.bottomRight);
-		uiStage.addActor(respawnBtn);
+		// 复活
+		VirtualButton respawnBtn = createButton("复活", btnSize,
+			getViewSize().x - 75 * scale - (btnSize + margin) * 4, baseY, Align.bottomRight, skin, guiTable);
 		GameInputSystem.getInstance().setRespawnVirButton(respawnBtn);
 
-		VirtualButton changeRoleBtn = new VirtualButton("切换角色", uiSkin);
-		changeRoleBtn.setSize(100, 100);
-		changeRoleBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 5, 75, Align.bottomRight);
-		uiStage.addActor(changeRoleBtn);
+		// 切换角色
+		VirtualButton changeRoleBtn = createButton("切换角色", btnSize,
+			getViewSize().x - 75 * scale - (btnSize + margin) * 5, baseY, Align.bottomRight, skin, guiTable);
 		GameInputSystem.getInstance().setChangeRoleVirButton(changeRoleBtn);
 
 		//切换角色按钮
@@ -543,24 +564,130 @@ public class MainGameScreen extends GScreen {
 
 	Table inspectorTable;
 	GSplitPane inspectorPanelGSplit;
+	boolean enableGizmos = false;
 	private void createInspector() {
-		Table emptyTable = new Table();
-		inspectorTable = new Table(uiSkin);
-		inspectorTable.top().left();
+		String[] tabs = {"检查器", "编辑配置"};
+		Table page1 = new Table(skin);
 		{
-			Label label = new Label("哈哈", uiSkin);
-			inspectorTable.add(label);
-			inspectorTable.row();
-			Label label2 = new Label("哈哈", uiSkin);
-			inspectorTable.add(label2);
+			page1.add(new Label("第一页", skin)).pad(20);
 		}
-		inspectorTable.setBackground("list");
-		ScrollPane inspectorScrollPane = new ScrollPane(inspectorTable, uiSkin);
-		inspectorPanelGSplit = new GSplitPane(emptyTable, inspectorScrollPane, false, uiSkin);
-		inspectorPanelGSplit.setToggleData(1, 0.3f);
-		inspectorPanelGSplit.setAbsoluteSplitAmount(1);
+		Table page2 = new Table(skin);
+		{
+			page2.add(new Label("第二页", skin)).pad(20).row();
+			CheckBox toggleGizmosEnable = new CheckBox("调试线("+(options.enableGizmos?"开":"关")+")", skin, "switch");
+			toggleGizmosEnable.addListener(new ChangeListener() {
+				@Override
+				public void changed(ChangeEvent changeEvent, Actor actor) {
+					options.enableGizmos = !options.enableGizmos;
+					gm.getGizmosRenderer().setEnabled(options.enableGizmos);
+					toggleGizmosEnable.setText("调试线("+(options.enableGizmos?"开":"关")+")");
+				}
+			});
+			page2.add(toggleGizmosEnable).row();
+			CheckBox toggleIntros = new CheckBox("介绍("+(options.showIntros?"开":"关")+")", skin, "switch");
+			toggleIntros.addListener(new ChangeListener() {
+				@Override
+				public void changed(ChangeEvent changeEvent, Actor actor) {
+					options.showIntros = !options.showIntros;
+					toggleIntros.setText("介绍("+(options.showIntros?"开":"关")+")");
+				}
+			});
+			page2.add(toggleIntros).row();
+		}
+		Table[] pages = {page1, page2};
+		inspectorTable = createPagesTab(skin, tabs, pages);
+
+		ScrollPane inspectorScrollPane = new ScrollPane(inspectorTable, skin);
+		inspectorScrollPane.setScrollingDisabled(false, false); // 允许横向和纵向滚动
+		inspectorScrollPane.setCancelTouchFocus(false);
+		inspectorScrollPane.setSmoothScrolling(false); // 禁用平滑滚动动画
+		inspectorPanelGSplit = new GSplitPane(inspectorScrollPane, guiTable, false, skin);
+		inspectorPanelGSplit.setToggleData(0, 0.25f);
+		inspectorPanelGSplit.setAbsoluteSplitAmount(0);
 		inspectorPanelGSplit.setFillParent(true);
+		inspectorPanelGSplit.addListener(new ClickListener() {
+			private float startX, startY;
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				startX = x;
+				startY = y;
+				return true; // 拦截事件
+			}
+			@Override
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				float dx = x - startX;
+				float dy = y - startY;
+				float distanceSquared = dx * dx + dy * dy;
+				float tolerance = 1f;
+				if (distanceSquared < tolerance * tolerance) { // 阈值 10 像素以内算点击
+					Actor hit = inspectorPanelGSplit.hit(x, y, true);
+					if (hit == inspectorPanelGSplit) {
+						inspectorPanelGSplit.toggle();
+					}
+				}
+			}
+		});
 		uiStage.addActor(inspectorPanelGSplit);
+	}
+
+	private Table createPagesTab(Skin skin, String[] tabNames, Table[] pageContents) {
+		if (tabNames.length != pageContents.length) {
+			throw new IllegalArgumentException("tabNames 和 pageContents 数量必须一致");
+		}
+
+		// 顶层总表，背景 panel1
+		Table root = new Table(skin);
+		root.setBackground("panel1");
+
+		// 菜单栏，背景 list
+		Table menuBar = new Table(skin);
+		menuBar.setBackground("list");
+
+		// 内容，背景 list
+		Table content = new Table(skin);
+		content.setBackground("list");
+
+		// 页面堆叠
+		Stack pages = new Stack();
+		for (Table page : pageContents) {
+			page.setVisible(false);
+			pages.add(page);
+		}
+		pageContents[0].setVisible(true);
+
+		content.add(pages).expand().fill();
+
+		// 创建按钮
+		for (int i = 0; i < tabNames.length; i++) {
+			final int index = i;
+			TextButton tabButton = new TextButton(tabNames[i], skin);
+
+			tabButton.addListener(new ChangeListener() {
+				@Override
+				public void changed(ChangeEvent event, Actor actor) {
+					for (int j = 0; j < pageContents.length; j++) {
+						pageContents[j].setVisible(j == index);
+					}
+				}
+			});
+
+			// 按钮均分宽度，最小高度 150
+			menuBar.add(tabButton).expandX().fillX().minHeight(50).pad(5);
+		}
+
+		// 布局
+		root.top().pad(10);
+		root.add(menuBar).growX().row();
+		root.add(content).expand().fill().pad(10);
+
+		return root;
+	}
+
+
+	private <T extends Table> void marginLRB(T layout, float margin) {
+		layout.padLeft(margin);
+		layout.padRight(margin);
+		layout.padBottom(margin);
 	}
 
 	private void updateInspector() {
@@ -571,19 +698,20 @@ public class MainGameScreen extends GScreen {
 	public void render(float delta) {
 		super.render(delta);
 
-		batch.setProjectionMatrix(uiCamera.combined);
-		batch.begin();
-
-		font.draw(batch, "介绍: " + "\n"+ (showIntroduction?introduction:""), 20, getViewSize().y - 20);
-
-		batch.end();
-
 		GameInputSystem.getInstance().update(delta);
 
 		gm.gameLoop(delta);
 
+		if(options.showIntros) {
+			batch.setProjectionMatrix(uiCamera.combined);
+			batch.begin();
+			font.draw(batch, "介绍: " + "\n" + introduction, 40, getViewSize().y - 20);
+			batch.end();
+		}
+
 		updateInspector();
 
+		uiStage.getBatch().setProjectionMatrix(uiCamera.combined);
 		uiStage.act(delta);
 		uiStage.draw();
 	}
@@ -604,6 +732,40 @@ public class MainGameScreen extends GScreen {
 			frames.add(new TextureRegion(hero_sheet, count * cell.x, col * cell.y, cell.x, cell.y));
 		}
 		return frames;
+	}
+
+
+	Options options = new Options();
+	public class Options{
+		public boolean showIntros = true;
+
+		public boolean enableGizmos = false;
+	}
+
+
+	/**
+	 * 作用是拦截点击事件： 让其可以精准点到分割条
+	 */
+	public class MTable extends Table {
+		public MTable() {
+			setTouchable(Touchable.enabled);
+		}
+
+		@Override
+		public Actor hit(float x, float y, boolean touchable) {
+			// 先让父类处理子控件
+			Actor hit = super.hit(x, y, touchable);
+			if (hit != null && hit != this) {
+				return hit; // 点击到子控件，返回子控件
+			}
+
+			// 点击在 MTable 自己的空白区域
+			if (isVisible() && x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
+				return this;
+			}
+
+			return null; // 其他地方
+		}
 	}
 
 }

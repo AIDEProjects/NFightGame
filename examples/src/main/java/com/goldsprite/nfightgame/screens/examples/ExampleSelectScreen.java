@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.goldsprite.gdxcore.screens.GScreen;
 import com.goldsprite.gdxcore.screens.IGScreen;
-import com.goldsprite.infinityworld.assets.GlobalAssets;
+import com.goldsprite.nfightgame.assets.GlobalAssets;
 import com.goldsprite.nfightgame.screens.tests.TestDeltaScreen;
 
 import java.util.LinkedHashMap;
