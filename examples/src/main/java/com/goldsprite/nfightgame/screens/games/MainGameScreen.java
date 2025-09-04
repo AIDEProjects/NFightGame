@@ -10,8 +10,10 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.gdxcore.screens.GScreen;
+import com.goldsprite.gdxcore.ui.GSplitPane;
 import com.goldsprite.gdxcore.utils.ColorTextureUtils;
 import com.goldsprite.gdxcore.utils.FontUtils;
+import com.goldsprite.gdxcore.utils.Pivot;
 import com.goldsprite.infinityworld.assets.GlobalAssets;
 import com.goldsprite.nfightgame.components.EntityComponent;
 import com.goldsprite.nfightgame.components.EntityInputManagerComponent;
@@ -136,35 +138,46 @@ public class MainGameScreen extends GScreen {
 	}
 
 	private void createBack() {
+		TextureRegion backRegion = new TextureRegion(new Texture(Gdx.files.internal(back2Path)));
+
 		GObject back = new GObject();
 		back.transform.setPosition(500, 150);
 
 		SpriteComponent sprite = back.addComponent(new SpriteComponent());
-		sprite.setRegion(new TextureRegion(new Texture(Gdx.files.internal(back2Path))));
-		sprite.setOriginOffset(512, 50);
+		sprite.setRegion(backRegion);
+		sprite.setOriginOffset(0, -310);
 		sprite.getScale().set(1.4f);
 
 		SpriteComponent spriteLeft = back.addComponent(new SpriteComponent());
-		spriteLeft.setRegion(new TextureRegion(new Texture(Gdx.files.internal(back2Path))));
-		spriteLeft.setOriginOffset(512+1024, 50);
+		spriteLeft.setRegion(backRegion);
+		spriteLeft.setOriginOffset(0+1024, -310);
 		spriteLeft.getScale().set(1.4f);
 
 		SpriteComponent spriteRight = back.addComponent(new SpriteComponent());
-		spriteRight.setRegion(new TextureRegion(new Texture(Gdx.files.internal(back2Path))));
-		spriteRight.setOriginOffset(512-1024, 50);
+		spriteRight.setRegion(backRegion);
+		spriteRight.setOriginOffset(0-1024, -310);
 		spriteRight.getScale().set(1.4f);
 
-
-		int k;
-
+//		SpriteComponent spriteTop = back.addComponent(new SpriteComponent());
+//		spriteTop.setRegion(backRegion);
+//		spriteTop.setOriginOffset(0, 576+310);
+//		spriteTop.setSpriteFace(1, -1);
+//		spriteTop.getScale().set(1.4f);
 	}
 
 	private void createTerrias() {
+		float sizeX = 0, sizeY = 0;
+
 		ground = new GObject("Ground");
 		ground.transform.setPosition(200, 150);
 
+		sizeX = 4000;sizeY = 40;
+		SpriteComponent groundSprite = ground.addComponent(new SpriteComponent());
+		groundSprite.setRegion(blackRegion);
+		groundSprite.setScale(sizeX, sizeY);
+
 		RectColliderComponent groundCollider = ground.addComponent(new RectColliderComponent());
-		groundCollider.setSize(4000, 40);
+		groundCollider.setSize(sizeX, sizeY);
 
 
 		float groundTop = ground.transform.getPosition().y + groundCollider.getSize().y/2;//170
@@ -173,56 +186,53 @@ public class MainGameScreen extends GScreen {
 		wall = new GObject("Wall");
 		wall.transform.setPosition(500, 345);
 
-		float sizeX = 100, sizeY = 200;
+		sizeX = 100;sizeY = 200;
+		SpriteComponent wallSprite = wall.addComponent(new SpriteComponent());
+		wallSprite.setRegion(blackRegion);
+		wallSprite.setScale(sizeX, sizeY);
 
 		RectColliderComponent wallCollider = wall.addComponent(new RectColliderComponent());
 		wallCollider.setSize(sizeX, sizeY);
 
-		SpriteComponent wallSprite = wall.addComponent(new SpriteComponent());
-		wallSprite.setRegion(ColorTextureUtils.createColorTextureRegion(Color.WHITE));
-		wallSprite.setScale(sizeX, sizeY);
-		wallSprite.setOriginOffset(sizeX/2, sizeY/2);
-/*
 
 		GObject wall2 = new GObject();
 		wall2.transform.setPosition(800, 350);
 
 		sizeX = 200;sizeY = 100;
+
+		SpriteComponent wall2Sprite = wall2.addComponent(new SpriteComponent());
+		wall2Sprite.setRegion(blackRegion);
+		wall2Sprite.setScale(sizeX, sizeY);
+
 		RectColliderComponent wall2Collider = wall2.addComponent(new RectColliderComponent());
 		wall2Collider.setSize(sizeX, sizeY);
 
-		SpriteComponent wall2Sprite = wall2.addComponent(new SpriteComponent());
-		wall2Sprite.setRegion(ColorTextureUtils.createColorTextureRegion(Color.BLACK));
-		wall2Sprite.setScale(sizeX, sizeY);
-		wall2Sprite.setOriginOffset(sizeX/2, sizeY/2);
-*/
 
-		/*GObject wall3 = new GObject();
+		GObject wall3 = new GObject();
 		wall3.transform.setPosition(-50, groundTop + 270 + 45);
 
 		sizeX = 50;sizeY = 500;
-		RectColliderComponent wall3Collider = wall3.addComponent(new RectColliderComponent());
-		wall3Collider.setSize(sizeX, sizeY);
 
 		SpriteComponent wall3Sprite = wall3.addComponent(new SpriteComponent());
 		wall3Sprite.setRegion(new TextureRegion(blackRegion));
 		wall3Sprite.setScale(sizeX, sizeY);
-		wall3Sprite.setOriginOffset(sizeX/2, sizeY/2);
+
+		RectColliderComponent wall3Collider = wall3.addComponent(new RectColliderComponent());
+		wall3Collider.setSize(sizeX, sizeY);
 
 
 		GObject wall4 = new GObject();
 		wall4.transform.setPosition(-175-50, groundTop + 270 + 40 + 20);
 
 		sizeX = 50;sizeY = 500;
-		RectColliderComponent wall4Collider = wall4.addComponent(new RectColliderComponent());
-		wall4Collider.setSize(sizeX, sizeY);int k;
 
 		SpriteComponent wall4Sprite = wall4.addComponent(new SpriteComponent());
 		wall4Sprite.setRegion(new TextureRegion(blackRegion));
 		wall4Sprite.setScale(sizeX, sizeY);
-		wall4Sprite.setOriginOffset(sizeX/2, sizeY/2);
 
-*/
+		RectColliderComponent wall4Collider = wall4.addComponent(new RectColliderComponent());
+		wall4Collider.setSize(sizeX, sizeY);
+
 
 		GObject worldTxt1 = new GObject();
 		worldTxt1.transform.setPosition(-160, groundTop + 40);
@@ -270,7 +280,7 @@ public class MainGameScreen extends GScreen {
 
 		SpriteComponent texture = lizardman.addComponent(new SpriteComponent());
 		texture.getScale().set(1.5f);
-		texture.setOriginOffset(119, 40);
+		texture.setOriginOffset(-9, -88);
 
 		//实体属性
 		EntityComponent ent = lizardman.addComponent(new EntityComponent());
@@ -329,7 +339,7 @@ public class MainGameScreen extends GScreen {
 		//材质组件
 		SpriteComponent texture = hero.addComponent(new SpriteComponent());
 		texture.getScale().set(1.5f);
-		texture.setOriginOffset(119, 36);
+		texture.setOriginOffset(-9, -92);
 
 		createHealthBar(hero.transform, 0, 140);
 
@@ -351,7 +361,8 @@ public class MainGameScreen extends GScreen {
 		animator.addAnim(StateType.Hurt, new Animation<TextureRegion>(.15f, splitFrames(heroPath, 6, 2), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Death, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 7, 3), Animation.PlayMode.NORMAL));
 		animator.addAnim(StateType.Respawn, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 7, 3), Animation.PlayMode.REVERSED));
-		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.1f, splitFrames(heroPath, 8, 2), Animation.PlayMode.NORMAL));
+		animator.addAnim(StateType.Jump, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 8, 2), Animation.PlayMode.LOOP));
+		animator.addAnim(StateType.Fall, new Animation<TextureRegion>(.2f, splitFrames(heroPath, 9, 2), Animation.PlayMode.LOOP));
 
 		//状态机组件
 		HeroFsmComponent fsm = hero.addComponent(new HeroFsmComponent());
@@ -386,7 +397,7 @@ public class MainGameScreen extends GScreen {
 		SpriteComponent dummyTexture = dummy.addComponent(new SpriteComponent());
 		dummyTexture.setSpriteFace(-1, 1);
 		dummyTexture.getScale().set(0.6f);
-		dummyTexture.setOriginOffset(140, 40);
+		dummyTexture.setOriginOffset(12, -88);
 
 		createHealthBar(dummy.transform, 0, 140);
 
@@ -420,6 +431,7 @@ public class MainGameScreen extends GScreen {
 			textures[i] = s;
 			s.setRegion(region);
 			s.getScale().set(2.6f);
+			s.setPivot(Pivot.LeftDown);
 			s.setOriginOffset(15, 3);
 		}
 
@@ -465,7 +477,7 @@ public class MainGameScreen extends GScreen {
 
 		VirtualButton speedBoostBtn = new VirtualButton("疾跑", uiSkin);
 		speedBoostBtn.setSize(100, 100);
-		speedBoostBtn.setPosition(75, 30+225+200, Align.bottomLeft);
+		speedBoostBtn.setPosition(75, 30 + 225 + 200, Align.bottomLeft);
 		uiStage.addActor(speedBoostBtn);
 		GameInputSystem.getInstance().setSpeedBoostVirButton(speedBoostBtn);
 
@@ -488,28 +500,32 @@ public class MainGameScreen extends GScreen {
 		GameInputSystem.getInstance().setChangeRoleVirButton(changeRoleBtn);
 
 		//切换角色按钮
-		entInputs = new EntityInputManagerComponent[]{
-			hero.getComponent(EntityInputManagerComponent.class),
-			dummy.getComponent(EntityInputManagerComponent.class),
-			lizardman.getComponent(EntityInputManagerComponent.class)
-		};
-		for(EntityInputManagerComponent i : entInputs) {
-			i.active = false;
-		}
-		entInputs[0].active = true;
-		//轮换启用单个角色的输入器
-		Consumer<Boolean> onChangeRole = down -> {
-			for(EntityInputManagerComponent i : entInputs) {
+		//try catch是防止角色没有被添加
+		try {
+			entInputs = new EntityInputManagerComponent[]{
+				hero.getComponent(EntityInputManagerComponent.class),
+				dummy.getComponent(EntityInputManagerComponent.class),
+				lizardman.getComponent(EntityInputManagerComponent.class)
+			};
+			for (EntityInputManagerComponent i : entInputs) {
 				i.active = false;
 			}
-			changeRoleIndex = ++changeRoleIndex%entInputs.length;
-			entInputs[changeRoleIndex].active = true;
-			entInputs[lastChangeRoleIndex].getGObject().removeComponent(camfollower);
-			entInputs[changeRoleIndex].addComponent(camfollower);
-			entInputs[changeRoleIndex].getComponent(FollowCamComponent.class).setTarget(entInputs[changeRoleIndex].getTransform());
-			lastChangeRoleIndex = changeRoleIndex;
-		};
-		GameInputSystem.getInstance().registerActionListener(GameInputSystem.getInstance().getInputAction("ChangeRole"), onChangeRole, Boolean.class);
+			entInputs[0].active = true;
+			//轮换启用单个角色的输入器
+			Consumer<Boolean> onChangeRole = down -> {
+				for (EntityInputManagerComponent i : entInputs) {
+					i.active = false;
+				}
+				changeRoleIndex = ++changeRoleIndex % entInputs.length;
+				entInputs[changeRoleIndex].active = true;
+				entInputs[lastChangeRoleIndex].getGObject().removeComponent(camfollower);
+				entInputs[changeRoleIndex].addComponent(camfollower);
+				entInputs[changeRoleIndex].getComponent(FollowCamComponent.class).setTarget(entInputs[changeRoleIndex].getTransform());
+				lastChangeRoleIndex = changeRoleIndex;
+			};
+			GameInputSystem.getInstance().registerActionListener(GameInputSystem.getInstance().getInputAction("ChangeRole"), onChangeRole, Boolean.class);
+		} catch (Exception e) {
+		}
 //
 //		TextButton slidingBtn = new TextButton("滑铲", uiSkin);
 //		slidingBtn.addListener(new ClickListener() {
@@ -521,40 +537,34 @@ public class MainGameScreen extends GScreen {
 //		slidingBtn.setSize(100, 100);
 //		slidingBtn.setPosition(getViewSize().x - 75 - (100 + 50) * 2, 75, Align.bottomRight);
 //		uiStage.addActor(slidingBtn);
-//
-//		TextButton cgAnimTargetBtn = new TextButton("切换动画目标", uiSkin);
-//		cgAnimTargetBtn.setSize(180, 100);
-//		cgAnimTargetBtn.setPosition(getViewSize().x - 75 - (180 + 50), getViewSize().y - 75, Align.topRight);
-//		uiStage.addActor(cgAnimTargetBtn);
-//		cgAnimTargetBtn.addListener(new ClickListener() {
-//			public void clicked(InputEvent e, float x, float y) {
-//				m = m==0?1:0;
-//			}
-//		});
-//		TextButton cgAnimBtn = new TextButton("切换动画", uiSkin);
-//		cgAnimBtn.setSize(180, 100);
-//		cgAnimBtn.setPosition(getViewSize().x - 75, getViewSize().y - 75, Align.topRight);
-//		uiStage.addActor(cgAnimBtn);
-//		cgAnimBtn.addListener(new ClickListener() {
-//			int index, index2;
-//			AnimatorComponent animator, animator2;
-//			String[] keys, keys2;
-//			public void clicked(InputEvent e, float x, float y) {
-//				if (m == 0) {
-//					if (animator == null) {
-//						animator = hero.getComponent(AnimatorComponent.class);
-//						keys = animator.anims.keySet().toArray(new String[]{});
-//					}
-//					animator.setCurAnim(keys[++index % keys.length]);
-//				} else if(m==1) {
-//					if (animator2 == null) {
-//						animator2 = lizardMan.getComponent(AnimatorComponent.class);
-//						keys2 = animator2.anims.keySet().toArray(new String[]{});
-//					}
-//					animator2.setCurAnim(keys2[++index2 % keys2.length]);
-//				}
-//			}
-//		});
+
+		createInspector();
+	}
+
+	Table inspectorTable;
+	GSplitPane inspectorPanelGSplit;
+	private void createInspector() {
+		Table emptyTable = new Table();
+		inspectorTable = new Table(uiSkin);
+		inspectorTable.top().left();
+		{
+			Label label = new Label("哈哈", uiSkin);
+			inspectorTable.add(label);
+			inspectorTable.row();
+			Label label2 = new Label("哈哈", uiSkin);
+			inspectorTable.add(label2);
+		}
+		inspectorTable.setBackground("list");
+		ScrollPane inspectorScrollPane = new ScrollPane(inspectorTable, uiSkin);
+		inspectorPanelGSplit = new GSplitPane(emptyTable, inspectorScrollPane, false, uiSkin);
+		inspectorPanelGSplit.setToggleData(1, 0.3f);
+		inspectorPanelGSplit.setAbsoluteSplitAmount(1);
+		inspectorPanelGSplit.setFillParent(true);
+		uiStage.addActor(inspectorPanelGSplit);
+	}
+
+	private void updateInspector() {
+
 	}
 
 	@Override
@@ -571,6 +581,8 @@ public class MainGameScreen extends GScreen {
 		GameInputSystem.getInstance().update(delta);
 
 		gm.gameLoop(delta);
+
+		updateInspector();
 
 		uiStage.act(delta);
 		uiStage.draw();

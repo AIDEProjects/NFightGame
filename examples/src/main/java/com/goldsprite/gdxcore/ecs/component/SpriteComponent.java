@@ -2,6 +2,7 @@ package com.goldsprite.gdxcore.ecs.component;
 
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.goldsprite.gdxcore.utils.Pivot;
 import com.goldsprite.utils.math.Vector2;
 import com.goldsprite.utils.math.Vector2Int;
 
@@ -13,6 +14,7 @@ public class SpriteComponent extends Component {
 	private final Vector2Int originOffset = new Vector2Int();//原点距左下偏移
 	private final Vector2Int spriteFace = new Vector2Int(1, 1);
 	private final Vector2Int realFace = new Vector2Int(1, 1);
+	private Pivot pivot = Pivot.Center;
 
 	public TextureRegion getRegion() {
 		return region;
@@ -63,14 +65,28 @@ public class SpriteComponent extends Component {
 
 	private final Vector2 flipOriginOffset = new Vector2();
 	private final Vector2 leftDownPos = new Vector2();
+	private final Vector2 regionSelfUVFix = new Vector2();
 	public Vector2 getLeftDownPos() {
 		//计算翻转实际偏移
 		flipOriginOffset.set(originOffset.x, originOffset.y);
+		//翻转则镜像偏移值
 		if(region.isFlipX()) flipOriginOffset.x = getTextureSize().x-originOffset.x;
 		if(region.isFlipY()) flipOriginOffset.y = getTextureSize().y-originOffset.y;
+		//计算精灵拉伸以及trans拉伸
 		flipOriginOffset.scl(scale).scl(transform.getScale());
+
+		//计算图片自身半宽高
+		if(pivot.equals(Pivot.Center)){
+			regionSelfUVFix.set(getTextureSize()).div(2);
+			//计算精灵拉伸以及trans拉伸
+			regionSelfUVFix.scl(scale).scl(transform.getScale());
+			if(region.isFlipX()) regionSelfUVFix.x *= -1;
+			if(region.isFlipY()) regionSelfUVFix.y *= -1;
+		}else if(pivot.equals(Pivot.LeftDown)){
+			regionSelfUVFix.set(0);
+		}
 		//返回左下位置
-		return leftDownPos.set(transform.getPosition().x - getFlipOriginOffset().x, transform.getPosition().y - getFlipOriginOffset().y);
+		return leftDownPos.set(transform.getPosition().x - getFlipOriginOffset().x - regionSelfUVFix.x, transform.getPosition().y - getFlipOriginOffset().y - regionSelfUVFix.y);
 	}
 
 	private final Vector2 renderSize = new Vector2();
@@ -92,5 +108,12 @@ public class SpriteComponent extends Component {
 
 	public void setSize(float sizeX, float sizeY) {
 		this.textureSize.set(sizeX, sizeY);
+	}
+
+	public Pivot getPivot() {
+		return pivot;
+	}
+	public void setPivot(Pivot pivot) {
+		this.pivot = pivot;
 	}
 }

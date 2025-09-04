@@ -69,4 +69,9 @@ public class Component implements IComponent {
 	public void destroyImmediate() {
 		gObject.removeComponent(this);
 	}
+
+	@Override
+	public String toString() {
+		return gObject.getName();
+	}
 }

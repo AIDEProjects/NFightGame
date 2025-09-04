@@ -31,7 +31,7 @@ public class GSplitPane extends SplitPane{
 			});
 	}
 
-	//mode: 0-藏于左边或上边, 0-藏于右边或下边
+	//mode: 0-藏于左边或上边, 1-藏于右边或下边
 	public void setToggleData(int mode, float expandSplitAmount){
 		setToggleData(mode, 0, expandSplitAmount);
 	}

@@ -34,8 +34,12 @@ public class AnimatorComponent extends Component {
 	}
 
 	public void step(float delta){
-		texComp.setRegion(getAnim(current).getKeyFrame(stateTime));
-		stateTime += delta;
+		try {
+			texComp.setRegion(getAnim(current).getKeyFrame(stateTime));
+			stateTime += delta;
+		} catch (Exception e) {
+			//没有动画就什么也不做
+		}
 	}
 
 	public Animation<TextureRegion> getAnim(Enum key) {

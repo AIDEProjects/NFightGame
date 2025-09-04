@@ -23,6 +23,9 @@ public class JumpState<F extends IEntityFsm> extends EntityState<F> {
 
 	@Override
 	public void running(float delta) {
+		//切换跳跃与下落动画
+		boolean isFalling = fsm.isFalling();
+		fsm.getAnim().setCurAnim(isFalling ? StateType.Fall : StateType.Jump);
 		//是否松手
 		if(!fsm.getKeyJump())
 			isKeyJumpUp = true;

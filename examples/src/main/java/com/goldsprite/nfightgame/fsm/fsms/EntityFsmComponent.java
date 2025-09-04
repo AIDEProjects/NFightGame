@@ -5,8 +5,8 @@ import com.badlogic.gdx.Input;
 import com.goldsprite.gdxcore.ecs.component.*;
 import com.goldsprite.nfightgame.components.EntityComponent;
 import com.goldsprite.nfightgame.components.EntityInputManagerComponent;
-import com.goldsprite.nfightgame.fsm.interfaces.IState;
 import com.goldsprite.nfightgame.fsm.interfaces.IEntityFsm;
+import com.goldsprite.nfightgame.fsm.interfaces.IState;
 import com.goldsprite.nfightgame.fsm.states.RespawnState;
 
 import java.util.LinkedHashMap;
@@ -20,6 +20,8 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	protected AnimatorComponent anim;
 	protected RigidbodyComponent rigi;
 	protected EntityInputManagerComponent inputs;
+	protected boolean resetAnim;
+	protected boolean isEnableInput = false;//启用禁用玩家输入
 	private RectColliderComponent bodyCollider;
 	private ColliderComponent footTrigger;
 	private ColliderComponent attackTrigger;
@@ -28,8 +30,6 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	private boolean moveKeyProtect;
 	private float beHurt_damage;
 	private boolean key_hurt;
-	protected boolean resetAnim;
-	protected boolean isEnableInput = false;//启用禁用玩家输入
 
 	//Component Area
 	public void init() {
@@ -41,17 +41,17 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 
 	protected void initMachine() {
 		ent = getComponent(EntityComponent.class);
-		if(ent == null) throw new RuntimeException("ent is null");
+		if (ent == null) throw new RuntimeException("ent is null");
 		anim = getComponent(AnimatorComponent.class);
-		if(anim == null) throw new RuntimeException("anim is null");
+		if (anim == null) throw new RuntimeException("anim is null");
 		rigi = getComponent(RigidbodyComponent.class);
-		if(rigi == null) throw new RuntimeException("rigi is null");
+		if (rigi == null) throw new RuntimeException("rigi is null");
 		inputs = getComponent(EntityInputManagerComponent.class);
 	}
 
 	@Override
 	public void update(float delta) {
-		if(isEnableInput) inputHandle();
+		if (isEnableInput) inputHandle();
 
 		running(delta);
 	}
@@ -60,14 +60,17 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public EntityComponent getEnt() {
 		return ent;
 	}
+
 	@Override
 	public AnimatorComponent getAnim() {
 		return anim;
 	}
+
 	@Override
 	public RigidbodyComponent getRigi() {
 		return rigi;
 	}
+
 	@Override
 	public EntityInputManagerComponent getInputs() {
 		return inputs;
@@ -77,6 +80,7 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public boolean isFalling() {
 		return rigi.getVelocity().y < -100f;
 	}
+
 	@Override
 	public boolean isGround() {
 		return footTrigger.isCollision();
@@ -86,23 +90,27 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public ColliderComponent getFootTrigger() {
 		return footTrigger;
 	}
+
+	@Override
+	public void setFootTrigger(ColliderComponent footTrigger) {
+		this.footTrigger = footTrigger;
+	}
+
 	@Override
 	public RectColliderComponent getBodyCollider() {
 		return bodyCollider;
 	}
 
 	@Override
-	public void setFootTrigger(ColliderComponent footTrigger) {
-		this.footTrigger = footTrigger;
-	}
-	@Override
 	public void setBodyCollider(RectColliderComponent bodyCollider) {
 		this.bodyCollider = bodyCollider;
 	}
+
 	@Override
 	public ColliderComponent getAttackTrigger() {
 		return attackTrigger;
 	}
+
 	@Override
 	public void setAttackTrigger(ColliderComponent c) {
 		attackTrigger = c;
@@ -110,10 +118,11 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 		//设定攻击效果
 		attackTrigger.onTriggerEnterListeners.add(victim -> {
 			EntityFsmComponent victimEnt = victim.getComponent(EntityFsmComponent.class);
-			if(victimEnt == null) return;
+			if (victimEnt == null) return;
 
-			victimEnt.beHurt(5);
-			Gdx.app.log("", "伤害");
+			float damage = 5;
+			victimEnt.beHurt(damage);
+			Gdx.app.log("", "伤害" + damage);
 		});
 	}
 
@@ -128,6 +137,7 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 		float speed = ent.getSpeed() * dirX;
 		rigi.getVelocity().setX(speed);
 	}
+
 	@Override
 	public void respawn() {
 		changeState(RespawnState.class);
@@ -168,36 +178,43 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public boolean getKeyJump() {
 		return keyJump;
 	}
+
 	@Override
 	public void setKeyJump(boolean down) {
-		if(!isEnableInput()) return;
+		if (!isEnableInput()) return;
 		keyJump = down;
 	}
+
 	@Override
 	public boolean getKeyCrouch() {
 		return key_crouch;
 	}
+
 	@Override
 	public void setKeyCrouch(boolean down) {
-		if(!isEnableInput()) return;
+		if (!isEnableInput()) return;
 		key_crouch = down;
 	}
+
 	@Override
 	public boolean getKeyAttack() {
 		return key_attack;
 	}
+
 	@Override
 	public void setKeyAttack(boolean down) {
-		if(!isEnableInput()) return;
+		if (!isEnableInput()) return;
 		key_attack = down;
 	}
+
 	@Override
 	public boolean getKeySpeedBoost() {
 		return key_speedBoost;
 	}
+
 	@Override
 	public void setKeySpeedBoost(boolean down) {
-		if(!isEnableInput()) return;
+		if (!isEnableInput()) return;
 		key_speedBoost = down;
 	}
 
@@ -205,15 +222,18 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public boolean getMoveKeyProtect() {
 		return moveKeyProtect;
 	}
+
 	@Override
 	public void setMoveKeyProtect(boolean moveKeyProtect) {
 		this.moveKeyProtect = moveKeyProtect;
 	}
+
 	@Override
 	public void beHurt(float damage) {
 		key_hurt = true;
 		beHurt_damage = damage;
 	}
+
 	@Override
 	public void consumeHurtKey() {
 		key_hurt = false;
@@ -223,9 +243,10 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public boolean getKeyHurt() {
 		return key_hurt;
 	}
+
 	@Override
 	public void setKeyHurt(boolean down) {
-		if(!isEnableInput()) return;
+		if (!isEnableInput()) return;
 		key_hurt = down;
 	}
 
@@ -233,49 +254,54 @@ public class EntityFsmComponent<F extends IEntityFsm, S extends IState> extends 
 	public float getBeHurt_damage() {
 		return beHurt_damage;
 	}
+
 	public boolean isEnableInput() {
 		return isEnableInput;
 	}
+
 	public void setEnableInput(boolean enableInput) {
 		isEnableInput = enableInput;
 	}
 
 
 	//State Area
-	public void initStates() {}
-	public void running(float delta){
+	public void initStates() {
+	}
+
+	public void running(float delta) {
 		getCurrentState().running(delta);
 	}
+
 	@Override
-	public S getCurrentState(){
+	public S getCurrentState() {
 		return states.get(current);
 	}
 
 	@Override
-	public void changeState(Class<? extends IState> key){
+	public void changeState(Class<? extends IState> key) {
 		changeState(key, true);
 	}
 
 	@Override
 	public <T extends IState> T getState(Class<T> key) {
-		return (T)states.get(key);
+		return (T) states.get(key);
 	}
 
 	@Override
-	public void changeState(Class<? extends IState> key, boolean resetAnim){
-		if(!states.containsKey(key)) return;
-		Gdx.app.log(getClass().getSimpleName(), "changeState "+current.getSimpleName()+" -> "+key.getSimpleName() +" "+ new Random().nextInt(1000));
+	public void changeState(Class<? extends IState> key, boolean resetAnim) {
+		if (!states.containsKey(key)) return;
+		Gdx.app.log(getClass().getSimpleName(), "changeState " + current.getSimpleName() + " -> " + key.getSimpleName() + " " + new Random().nextInt(1000));
 
 		this.resetAnim = resetAnim;
-		if(current != null)getCurrentState().exit();
+		if (current != null) getCurrentState().exit();
 		current = key;
 		getCurrentState().enter();
 	}
 
 	@Override
 	public void addState(IState state) {
-		if(current == null) current = state.getClass();
-		states.put(state.getClass(), (S)state);
+		if (current == null) current = state.getClass();
+		states.put(state.getClass(), (S) state);
 		state.setFsm(this);
 	}
 
